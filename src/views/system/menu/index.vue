@@ -67,11 +67,7 @@
             </template>
           </el-table-column>
 
-          <el-table-column label="权限标识" show-overflow-tooltip>
-            <template #default="scope">
-              <span>{{ scope.row.permission }}</span>
-            </template>
-          </el-table-column>
+
           <el-table-column label="排序" show-overflow-tooltip width="80">
             <template #default="scope">
               {{ scope.row.sort }}
