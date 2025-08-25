@@ -55,7 +55,7 @@ const viteConfig: UserConfigFnObject = defineConfig((mode: ConfigEnv) => {
         server: {
             host: '0.0.0.0',
             port: env.VITE_PORT as unknown as number, // 端口号g
-            hostname: "localhost", // 主机名
+            hostname: env.VITE_APP_API_URL, // 主机名
             open: JSON.parse(env.VITE_OPEN),// 运行自动打开浏览器
             hmr: true,
             proxy: {
