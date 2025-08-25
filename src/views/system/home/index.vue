@@ -200,7 +200,7 @@
   </div>
 </template>
 
-<script setup lang="ts" name="home">
+<script setup lang="ts" name="homeinfo">
 import { reactive, onMounted, ref, watch, nextTick, onActivated, markRaw } from 'vue';
 import { formatAxis } from '/@/utils/formatTime';
 import { useUserInfo } from '/@/stores/userInfo';
