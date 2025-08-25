@@ -1,6 +1,10 @@
 import request from '/@/utils/request';
 import { getEnv } from '/@/utils/mms';
 import { AxiosPromise } from 'axios';
+import { SysEnum } from "/@/enums/SysEnum";
+import { EncryptTypeEnum } from "/@/enums/EncryptTypeEnum";
+import { DocUserBo, DocUserVo, DocUserTable } from '/@/views/docAdmin/docUser/type';
+
 
 /**
  * 控制台
@@ -8,41 +12,52 @@ import { AxiosPromise } from 'axios';
  * @returns
  */
 export function homeApi() {
-	return {
-		info: <T = any>(params?: object): AxiosPromise<T> => {
-			return request({
-				url: getEnv() + '/system/home/info',
-				method: 'get',
-				params,
-			});
-		},
-		menu: <T = any>(params?: object): AxiosPromise<T> => {
-			return request({
-				url: getEnv() + '/system/home/menu',
-				method: 'get',
-				params,
-			});
-		},
-		orderNum: <T = any>(params?: object): AxiosPromise<T> => {
-			return request({
-				url: getEnv() + '/system/home/orderNum',
-				method: 'get',
-				params,
-			});
-		},
-		orderPrice: <T = any>(params?: object): AxiosPromise<T> => {
-			return request({
-				url: getEnv() + '/system/home/orderPrice',
-				method: 'get',
-				params,
-			});
-		},
-		memberSex: <T = any>(params?: object): AxiosPromise<T> => {
-			return request({
-				url: getEnv() + '/system/home/memberSex',
-				method: 'get',
-				params,
-			});
-		},
-	};
+    return {
+        list: (params?: object): AxiosPromise<DocUserVo[]> => {
+            return request({
+                url: getEnv() + '/docAdmin/docUser/list',
+                method: 'post',
+                data: params,
+                headers: {
+                    'Encrypt-State': SysEnum.SYS_COMMON_STATE_CLOSE,
+                    'Encrypt-Type': EncryptTypeEnum.AES
+                },
+            });
+        },
+        info: <T = any>(params?: object): AxiosPromise<T> => {
+            return request({
+                url: getEnv() + '/system/home/info',
+                method: 'get',
+                params,
+            });
+        },
+        menu: <T = any>(params?: object): AxiosPromise<T> => {
+            return request({
+                url: getEnv() + '/system/home/menu',
+                method: 'get',
+                params,
+            });
+        },
+        orderNum: <T = any>(params?: object): AxiosPromise<T> => {
+            return request({
+                url: getEnv() + '/system/home/orderNum',
+                method: 'get',
+                params,
+            });
+        },
+        orderPrice: <T = any>(params?: object): AxiosPromise<T> => {
+            return request({
+                url: getEnv() + '/system/home/orderPrice',
+                method: 'get',
+                params,
+            });
+        },
+        memberSex: <T = any>(params?: object): AxiosPromise<T> => {
+            return request({
+                url: getEnv() + '/system/home/memberSex',
+                method: 'get',
+                params,
+            });
+        },
+    };
 }
