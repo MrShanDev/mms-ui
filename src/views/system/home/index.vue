@@ -1,154 +1,65 @@
 <template>
   <div class="home-container layout-pd mt15">
+
     <el-row :gutter="15" class="home-card-one mb15">
-       <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
-          <div class="home-card-item flex col-between">
-            <div class="flex flex-auto">
-              <div class="avatar">
-                <el-image style="width: 80px; height: 80px" src="https://sxpcwlkj-test.oss-accelerate.aliyuncs.com/mmsMall/upload/68ac155ee354d6c9a177bf7d.png" fit="fill"></el-image>
-              </div>
-              <div>
-                <span class="font30">早安，mms，开始您一天的工作吧！</span>
-                <div class="mt10">今日晴，20°C-32°C！</div>
-              </div>
+      <el-col
+          :xs="24"
+          :sm="12"
+          :md="12"
+          :lg="6"
+          :xl="6"
+          v-for="(v, k) in state.homeOne"
+          :key="k"
+          :class="{ 'home-media home-media-lg': k > 1, 'home-media-sm': k === 1 }"
+      >
+        <div class="home-card-item flex">
+          <div class="flex-margin flex w100" :class="` home-one-animation${k}`">
+            <div class="flex-auto">
+              <span class="font30">{{ v.num1 }}{{ v.num5 }}</span>
+              <span class="ml10 font12" :style="{ color: v.color1 }">今日+{{ v.num2 }}{{ v.num5 }}</span>
+              <div class="mt10">{{ v.num3 }}</div>
             </div>
-            <div class="flex">
-              <div class="home-card-item-term">
-                  <div class="font20" style="margin-bottom: 15px;">任务</div>
-                  <div class="f-w-600 f-18">2/10</div>
-              </div>
-              <div class="home-card-item-term">
-                  <div class="font20" style="margin-bottom: 15px;">用户</div>
-                  <div class="f-w-600 f-18">99</div>
-              </div>
-              <div class="home-card-item-term">
-                  <div class="font20" style="margin-bottom: 15px;">公告</div>
-                  <div class="f-w-600 f-18">10</div>
-              </div>
+            <div class="home-card-item-icon flex" :style="{ background: `var(${v.color2})` }">
+              <Icon class="flex-margin font32" :icon="v.num4"   :style="{ color: `var(${v.color3})` }" />
             </div>
           </div>
+        </div>
       </el-col>
     </el-row>
     <el-row :gutter="15" class="home-card-two mb15">
       <el-col :xs="24" :sm="10" :md="10" :lg="8" :xl="8">
         <div class="home-card-item">
-          <div class="home-card-item-title">快捷菜单</div>
-          <div class="home-card-item-content flex flex-wrap">
-            <div v-for="value in 6" class="item-content-term flex-col row-center col-center">
-              <div class="icon">
-                <el-image style="width: 38px; height: 38px" src="https://sxpcwlkj-test.oss-accelerate.aliyuncs.com/mmsMall/upload/68ac11cee354d6c9a177bf7c.png" fit="fill"></el-image>
+          <div class="home-card-item-title">快捷导航工具</div>
+          <div class="home-monitor">
+            <div class="flex-warp">
+              <div class="flex-warp-item" v-for="(v, k) in state.homeThree" :key="k">
+                <div class="flex-warp-item-box" :class="`home-animation${k}`">
+                  <div class="flex-margin" @click="toRouter(v)">
+                    <i :class="v.icon" :style="{ color: v.iconColor }"></i>
+                    <span class="pl5">{{ v.label }}</span>
+                    <div class="mt10">{{ v.value }}</div>
+                  </div>
+                </div>
               </div>
-              <div class="desc">控制台</div>
             </div>
           </div>
         </div>
       </el-col>
       <el-col :xs="24" :sm="14" :md="14" :lg="16" :xl="16">
         <div class="home-card-item">
-          <div class="home-card-item-title">MMS项目</div>
-          <div class="home-card-item-content flex flex-wrap">
-            <div v-for="value in 7" class="item-content-terms flex-col row-center col-center">
-              <div class="icon">
-                <el-image style="width: 70px; height: 70px" src="https://sxpcwlkj-test.oss-accelerate.aliyuncs.com/mmsMall/upload/68ac11cee354d6c9a177bf7c.png" fit="fill"></el-image>
-              </div>
-              <div class="desc">控制台</div>
-            </div>
-          </div>
+          <div style="height: 100%" ref="homeLineRef"></div>
         </div>
       </el-col>
     </el-row>
     <el-row :gutter="15" class="home-card-three">
-      <el-col :xs="8" :sm="8" :md="8" :lg="8" :xl="8">
+      <el-col :xs="24" :sm="10" :md="10" :lg="8" :xl="8" class="home-media">
         <div class="home-card-item">
-          <div class="home-card-item-title">用户分析</div>
-          <div class="home-card-item-content flex-col row-between">
-            <div v-for="value in 4" class="item-content-term flex row-between">
-              <div class="flex">
-                <div class="avatar">
-                    <el-image style="width: 60px; height: 60px" src="https://sxpcwlkj-test.oss-accelerate.aliyuncs.com/mmsMall/upload/68ac155ee354d6c9a177bf7d.png" fit="fill"></el-image>
-                </div>
-                <div class="user flex-col row-between">
-                  <div class="f-18">西决</div>
-                  <div class="f-14">最后登陆日期：<span style="color: #858585;">2025/09/01</span></div>
-                </div>
-              </div>
-              <div class="f-14" style="color: #858585;">
-                  普通会员
-              </div>
-            </div>
-          </div>
+          <div style="height: 100%" ref="homePieRef"></div>
         </div>
       </el-col>
-      <el-col :xs="8" :sm="8" :md="8" :lg="8" :xl="8">
+      <el-col :xs="24" :sm="14" :md="14" :lg="16" :xl="16" class="home-media">
         <div class="home-card-item">
-          <div class="home-card-item-title">系统公告</div>
-          <div class="home-card-item-content flex-col row-between col-between">
-             <div v-for="value in 10" class="flex row-between" style="height: 40px;">
-                <div class="f-16">
-                  1. 系统1.0.0更新日志
-                </div>
-                <div class="f-18">
-                    >
-                </div>
-            </div>
-          </div>
-        </div>
-      </el-col>
-      <el-col :xs="8" :sm="8" :md="8" :lg="8" :xl="8">
-        <div class="home-card-item">
-          <div class="home-card-item-title">系统信息</div>
-          <div class="home-card-item-content flex-col row-between col-between">
-            <div class="flex" style="height: 40px; line-height: 40px;">
-                <div class="f-20">
-                  CPU
-                </div>
-                <div class="f-16" style="color: #858585;">
-                    
-                </div>
-            </div>
-            <div class="flex" style="height: 40px; line-height: 40px;">
-                <div class="f-20">
-                  负载
-                </div>
-                <div class="f-16" style="color: #858585;">
-                   
-                </div>
-            </div>
-             <div class="flex" style="height: 40px; line-height: 40px;">
-                <div class="f-20">
-                  系统名称：  
-                </div>
-                <div class="f-16" style="color: #858585;">
-                    模块化管理系统
-                </div>
-            </div>
-            <div class="flex" style="height: 40px; line-height: 40px;">
-                <div class="f-20">
-                  系统版本：    
-                </div>
-                <div class="f-16" style="color: #858585;">
-                    v1.5.0
-                </div>
-            </div>
-            <div class="flex" style="height: 40px; line-height: 40px;">
-                <div class="f-20">
-                  系统文档：    
-                </div>
-                <div class="f-16" style="color: #858585;">
-                    模块化管理系统文档
-                </div>
-            </div>
-            <div class="flex" style="height: 40px; line-height: 40px;">
-                <div class="f-20">
-                  系统简述：    
-                </div>
-                <div class="f-16" style="color: #858585; line-height: 30px;">
-                    <p>模块化扩展、代码生成引擎</p>
-                    <p>高效、安全、模块解耦</p>
-                    <p>商城、企业、网站管理系统，灵活组装</p>
-                </div>
-            </div>
-          </div>
+          <div style="height: 100%" ref="homeBarRef"></div>
         </div>
       </el-col>
     </el-row>
@@ -592,10 +503,10 @@ $homeNavLengh: 8;
   .home-card-three {
     .home-card-item {
       width: 100%;
-      height: 140px;
+      height: 130px;
       border-radius: 4px;
       transition: all ease 0.3s;
-      // padding: 25px;
+      padding: 20px;
       overflow: hidden;
       background: var(--el-color-white);
       color: var(--el-text-color-primary);
@@ -631,66 +542,40 @@ $homeNavLengh: 8;
       }
     }
   }
-  .home-card-one .home-card-item {
-    padding: 25px;
-    .avatar{
-      overflow: hidden;
-      margin-right: 15px;
-      width: 80px;
-      height: 80px;
-      border-radius: 80px;
-      border: 3px solid #00A8E8;
-    }
-    .home-card-item-term{
-      width: 100px;
-    }
-  }
-  
-  .home-card-two {
+  .home-card-two,
+  .home-card-three {
     .home-card-item {
       height: 350px;
       width: 100%;
       overflow: hidden;
-      .home-card-item-title {
-        padding-left: 15px;
-        height: 80px;
-        line-height: 80px;
-        border-bottom: 1px solid #E9E9E9;
-      }
-      .home-card-item-content{
-        .item-content-term{
-          width: 33.33%;
-          height: 125px;
-        }
-        .item-content-terms{
-          width: 16.66%;
-          height: 125px;
-        }
-      }
-    }
-  }
-  .home-card-three {
-    .home-card-item {
-      height: 540px;
-      width: 100%;
-      overflow: hidden;
-      .home-card-item-title {
-        padding-left: 15px;
-        height: 80px;
-        line-height: 80px;
-        border-bottom: 1px solid #E9E9E9;
-      }
-      .home-card-item-content{
-        padding: 5%;
-        .item-content-term{
-          margin-bottom: 15px;
-          padding: 15px;
-          width: 100%;
-          height: 90px;
-          border: 1px solid #E9E9E9;
-          border-radius: 10px;
-          .avatar{
-            margin-right: 15px;
+      .home-monitor {
+        height: 100%;
+        .flex-warp-item {
+          width: 25%;
+          height: 111px;
+          display: flex;
+          .flex-warp-item-box {
+            margin: auto;
+            text-align: center;
+            color: var(--el-text-color-primary);
+            display: flex;
+            border-radius: 5px;
+            background: var(--next-bg-color);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            &:hover {
+              background: var(--el-color-primary-light-9);
+              transition: all 0.3s ease;
+            }
+          }
+          @for $i from 0 through $homeNavLengh {
+            .home-animation#{$i} {
+              opacity: 0;
+              animation-name: error-num;
+              animation-duration: 0.5s;
+              animation-fill-mode: forwards;
+              animation-delay: calc($i/10) + s;
+            }
           }
         }
       }
