@@ -13,15 +13,15 @@
               </div>
             </div>
             <div class="flex">
-              <div class="home-card-item-term">
+              <div class="home-card-item-term text-center">
                   <div class="font20" style="margin-bottom: 15px;">任务</div>
                   <div class="f-w-600 f-18">{{state.systemData.task}}</div>
               </div>
-              <div class="home-card-item-term">
+              <div class="home-card-item-term text-center">
                   <div class="font20" style="margin-bottom: 15px;">用户</div>
                   <div class="f-w-600 f-18">{{state.systemData.userTool}}</div>
               </div>
-              <div class="home-card-item-term">
+              <div class="home-card-item-term text-center">
                   <div class="font20" style="margin-bottom: 15px;">公告</div>
                   <div class="f-w-600 f-18">{{state.systemData.newsTool}}</div>
               </div>
@@ -107,9 +107,8 @@
       <el-col :xs="8" :sm="8" :md="8" :lg="8" :xl="8">
         <div class="home-card-item">
           <div class="home-card-item-title">系统信息</div>
-          <div class="home-card-item-content flex-col row-between col-between p-40">
-            <div class="flex" style="line-height: 40px;">
-
+          <div class="home-card-item-content flex-col row-between col-between p-20">
+            <div class="flex">
                 <div class="f-16 flex-1" style="color: #858585;">
                   <VueDataUi
                       component="VueUiSparkline"
@@ -118,7 +117,7 @@
                   />
                 </div>
             </div>
-            <div class="flex" style="line-height: 40px;">
+            <div class="flex">
                 <div class="f-16 flex-1" style="color: #858585;">
                   <VueDataUi
                       component="VueUiSparkline"
@@ -127,35 +126,35 @@
                   />
                 </div>
             </div>
-             <div class="flex " style="height: 40px; line-height: 40px;margin-top: 10px;">
-                <div class="f-18">
+             <div class="flex " style="margin-top: 10px;">
+                <div class="f-16 flex-1" style="line-height: 30px;">
                   系统名称：
                 </div>
-                <div class="f-14" style="color: #858585;">
+                <div class="f-14 flex-4" style="color: #858585;line-height: 30px;">
                     {{state.systemData.systemInfo.name}}
                 </div>
             </div>
-            <div class="flex" style="height: 40px; line-height: 40px;">
-                <div class="f-18">
+            <div class="flex" >
+                <div class="f-16 flex-1" style="line-height: 30px;">
                   系统版本：
                 </div>
-                <div class="f-14" style="color: #858585;">
+                <div class="f-14 flex-4" style="color: #858585;line-height: 30px;">
                   {{state.systemData.systemInfo.version}}
                 </div>
             </div>
-            <div class="flex" style="height: 40px; line-height: 40px;">
-                <div class="f-18">
+            <div class="flex" >
+                <div class="f-16 flex-1" style="line-height: 30px;">
                   系统文档：
                 </div>
-                <div class="f-14" style="color: #858585;">
+                <div class="f-14 flex-4 shou" style="color: #858585;line-height: 30px;" @click="openWindow(state.systemData.systemInfo.docUrl)">
                   {{state.systemData.systemInfo.docUrl}}
                 </div>
             </div>
-            <div class="flex" style="height: 80px; line-height: 40px;">
-                <div class="f-18">
+            <div class="flex" >
+                <div class="f-16 flex-1" style="line-height: 30px;">
                   系统简述：
                 </div>
-                <div class="f-14" style="color: #858585;">
+                <div class="f-12 flex-4" style="color: #858585;line-height: 20px;">
                   {{state.systemData.systemInfo.describe}}
                 </div>
             </div>
