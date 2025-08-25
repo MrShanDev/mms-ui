@@ -266,6 +266,25 @@
               />
             </el-form-item>
           </el-col>
+          <el-col
+              v-show="state.ruleForm.parentId > 0"
+              :xs="24"
+              :sm="12"
+              :md="12"
+              :lg="12"
+              :xl="12"
+              class="mb20"
+          >
+            <el-form-item label="快捷菜单">
+              <el-radio-group
+                  v-model="state.ruleForm.isFast"
+              >
+                <el-radio :value="1">是</el-radio>
+                <el-radio :value="0">否</el-radio>
+              </el-radio-group>
+            </el-form-item>
+          </el-col>
+
         </el-row>
       </el-form>
       <template #footer>
@@ -326,6 +345,7 @@ const state = reactive({
     roles: "", // 权限标识，取角色管理
     permission: "", // 菜单类型为按钮时，权限标识
     status: 0,
+    isFast:0 // 快捷菜单
   },
   menuData: [] as RouteItems, // 上级菜单数据
   dialog: {
@@ -363,6 +383,7 @@ const resetForm = () => {
     roles: "", // 权限标识，取角色管理
     permission: "", // 菜单类型为按钮时，权限标识
     status: 0,
+    isFast:0 // 快捷菜单
   };
 };
 

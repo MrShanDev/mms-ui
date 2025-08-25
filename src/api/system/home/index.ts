@@ -24,6 +24,13 @@ export function homeApi() {
                 },
             });
         },
+        homeInit: <T = any>(params?: object): AxiosPromise<T> => {
+            return request({
+                url: getEnv() + '/system/home/homeInit',
+                method: 'get',
+                params,
+            });
+        },
         info: <T = any>(params?: object): AxiosPromise<T> => {
             return request({
                 url: getEnv() + '/system/home/info',

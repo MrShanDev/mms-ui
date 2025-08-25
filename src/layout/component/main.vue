@@ -12,7 +12,7 @@
 		</el-scrollbar>
 		<el-backtop :target="setBacktopClass" />
     <!--聊天室-->
-    <chat/>
+<!--    <chat/>-->
 	</el-main>
 </template>
 

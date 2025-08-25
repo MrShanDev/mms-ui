@@ -18,11 +18,12 @@ import { GridLayout, GridItem } from 'vue-grid-layout'
 import SvgIcon from '/@/components/svg-icon';
 import '/@/icons/iconfont/iconfont'
 import '/@/styles/myStyle.scss'
-
+// 图表
+import { VueUiRadar } from "vue-data-ui"
 // 样式
 import '/@/theme/index.scss';
 import 'virtual:windi.css';
-
+import "vue-data-ui/style.css"
 // VXE Table
 // ... 纯表格
 import VxeTable from 'vxe-table'
@@ -40,6 +41,7 @@ import other from "/@/utils/other";
 const app = createApp(App);
 app.component('GridLayout', GridLayout)
 app.component('GridItem', GridItem)
+app.component("VueUiRadar", VueUiRadar)
 // 自定义指令
 directive(app);
 //自定义标签

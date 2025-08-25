@@ -2,24 +2,33 @@
   <div class="login-container flex">
     <div class="login-left">
       <div class="login-left-logo">
+        <Animate>
         <img :src="getThemeConfig.logo" alt="logo" />
+        </Animate>
         <div class="login-left-logo-text">
-          <span>{{ getThemeConfig.globalTitle }}</span>
-          <span class="login-left-logo-text-msg">{{
-              getThemeConfig.globalDescription
-            }}</span>
+          <Animate>
+            <span>{{ getThemeConfig.globalTitle }}</span>
+          </Animate>
+          <Animate>
+          <span class="login-left-logo-text-msg">{{getThemeConfig.globalDescription }}</span>
+          </Animate>
         </div>
       </div>
       <div class="login-left-img">
+        <Animate class="flex flex-center">
         <img :src="getThemeConfig.loginBg" alt="loginMain" />
+        </Animate>
       </div>
-      <img :src="loginBg" class="login-left-waves" alt="bg" />
+      <img :src="loginBg" class="login-left-waves " alt="bg" />
     </div>
     <div class="login-right flex">
       <div class="login-right-warp flex-margin">
         <div class="login-right-warp-mian">
           <div class="login-right-warp-main-title">
-            {{ getThemeConfig.globalTitle }} 欢迎您！
+            <Animate inCss="at-item">
+              {{ getThemeConfig.globalTitle }} 欢迎您！
+            </Animate>
+
           </div>
           <div class="login-right-warp-main-form" v-if="getThemeConfig.loginType.length>0" >
             <el-tabs v-model="state.tabsActiveName" @tab-change="changeTab" >
@@ -69,6 +78,9 @@ import loginBg from "/@/assets/login-bg.svg";
 import { startBase } from "/@/api/system/init";
 
 // 引入组件
+const Animate = defineAsyncComponent(
+    () => import("/@/components/animate/index.vue")
+);
 // 账号登录
 const Account = defineAsyncComponent(
     () => import("/@/views/system/login/component/account.vue")
@@ -179,9 +191,10 @@ onMounted(() => {
       width: 100%;
       height: 52%;
       img {
-        width: 100%;
+        width: 50%;
         height: 100%;
         animation: error-num 0.6s ease;
+        text-align: center;
       }
     }
     .login-left-waves {

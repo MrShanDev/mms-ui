@@ -22,6 +22,7 @@ declare type FunctionType = {
 	roles: string;
 	permission: string;
 	status: number;
+	isFast: number;
 };
 
 
