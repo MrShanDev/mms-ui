@@ -68,7 +68,7 @@
           </el-table-column>
           <el-table-column label="状态" show-overflow-tooltip width="80">
             <template #default="scope">
-              <el-tag :type="scope.row.visible==1?'success':'danger'" size="small" >{{ scope.row.visible==1?"显示":"隐藏" }}</el-tag>
+              <el-tag :type="scope.row.visible==-1?'success':'danger'" size="small" >{{ scope.row.visible==-1?"显示":"隐藏" }}</el-tag>
             </template>
           </el-table-column>
           <el-table-column label="快捷菜单" show-overflow-tooltip width="100">

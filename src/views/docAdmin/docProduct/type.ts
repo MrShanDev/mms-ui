@@ -1,17 +1,17 @@
-import {BaseEntity} from "/@/types/global";
+import { BaseEntity } from "/@/types/global";
 
 /**
 * 对象实体Vo
 * @extends {BaseEntity}
 */
 export declare interface DocProductVo extends BaseEntity {
-      prodId: string|number; 
-      prodName: string|number; 
-      unitPrice: string|number; 
-      markPrice: string|number; 
-      type: string|number; 
-      ctime: string|number; 
-      mtime: string|number; 
+      prodId: string | number;
+      prodName: string | number;
+      unitPrice: string | number;
+      markPrice: string | number;
+      type: string | number;
+      ctime: string | number;
+      mtime: string | number;
 }
 
 /**
@@ -19,11 +19,11 @@ export declare interface DocProductVo extends BaseEntity {
 * @extends {BaseEntity}
 */
 export declare interface DocProductBo extends BaseEntity {
-        prodId: string|number; 
-        prodName: string|number; 
-        unitPrice: string|number; 
-        markPrice: string|number; 
-        type: string|number; 
-        ctime: string|number; 
-        mtime: string|number; 
+      prodId: string | number;
+      prodName: string | number;
+      unitPrice: string | number;
+      markPrice: string | number;
+      type: string | number;
+      ctime: string | number;
+      mtime: string | number;
 }

@@ -78,12 +78,12 @@
     import { isEmpty, generateUUID } from "/@/utils/mms";
     import {NextLoading} from "/@/utils/loading";
     import FastSelect from "/@/components/fast-select/src/fast-select.vue";
-    import {docUserApi} from '/@/views/docAdmin/docUser';
-    import {DocUserBo,DocUserVo } from '/@/views/docAdmin/docUser/type';
+    import {docUserApi} from '.';
+    import {DocUserBo,DocUserVo } from './type';
     const baseApi = docUserApi();
     import FastTableColumn from "/@/components/fast-table-column";
     const docUserDialogRef = ref();
-    const DocUserDialog = defineAsyncComponent(() => import('/@/views/docAdmin/docUser/dialog.vue'));
+    const DocUserDialog = defineAsyncComponent(() => import('/@/views/docAdmin/docUsers/dialog.vue'));
     const TableTool = defineAsyncComponent(() => import("/@/components/table-tool/index.vue"));
 
     const curdEnum = CURDEnum;

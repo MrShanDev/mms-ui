@@ -3,7 +3,7 @@ import { getEnv } from '/@/utils/mms';
 import { AxiosPromise } from 'axios';
 import { SysEnum } from "/@/enums/SysEnum";
 import { EncryptTypeEnum } from "/@/enums/EncryptTypeEnum";
-import { DocUserBo, DocUserVo, DocUserTable } from '/@/views/docAdmin/docUser/type';
+import { DocUserBo, DocUserVo, DocUserTable } from '../../../views/docAdmin/docUsers/type';
 
 
 /**

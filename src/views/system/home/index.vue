@@ -5,10 +5,10 @@
           <div class="home-card-item flex col-between">
             <div class="flex flex-auto">
               <div class="avatar">
-                <el-image style="width: 80px; height: 80px" :src="userInfos.photo || 'https://sxpcwlkj.oss-cn-beijing.aliyuncs.com/defimg.png'" fit="fill"></el-image>
+                <el-image :src="userInfos.photo || 'https://sxpcwlkj.oss-cn-beijing.aliyuncs.com/defimg.png'" fit="fill"></el-image>
               </div>
               <div>
-                <span class="font30">{{ currentTime }}，{{state.systemData.userName}}，开始您一天的工作吧！</span>
+                <span class="home-card-item-desc">{{ currentTime }}，{{state.systemData.userName}}，开始您一天的工作吧！</span>
                 <div class="mt10">{{state.systemData.week}}</div>
               </div>
             </div>
@@ -29,9 +29,9 @@
           </div>
       </el-col>
     </el-row>
-    <el-row :gutter="15" class="home-card-two mb15">
-      <el-col :xs="24" :sm="10" :md="10" :lg="8" :xl="8">
-        <div class="home-card-item">
+    <el-row :gutter="15" class="home-card-two">
+      <el-col :xs="24" :sm="24" :md="10" :lg="8" :xl="8">
+        <div class="home-card-item mb15">
           <div class="home-card-item-title">快捷菜单</div>
           <div class="home-card-item-content flex flex-wrap">
             <div v-for="(item,index) in state.systemData.fastList" :key="index" @click="router.push(item.path)"  class="item-content-term flex-col row-center col-center">
@@ -45,8 +45,8 @@
           </div>
         </div>
       </el-col>
-      <el-col :xs="24" :sm="14" :md="14" :lg="16" :xl="16">
-        <div class="home-card-item">
+      <el-col :xs="24" :sm="24" :md="14" :lg="16" :xl="16">
+        <div class="home-card-item mb15">
           <div class="home-card-item-title">MMS项目</div>
           <div class="home-card-item-content flex flex-wrap">
             <div  v-for="(item,index) in state.systemData.eventList" :key="index" @click="openWindow(item.remark)" class="item-content-event flex-col row-center col-center cursor-pointer">
@@ -68,8 +68,8 @@
       </el-col>
     </el-row>
     <el-row :gutter="15" class="home-card-three">
-      <el-col :xs="8" :sm="8" :md="8" :lg="8" :xl="8">
-        <div class="home-card-item">
+      <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
+        <div class="home-card-item mb15">
           <div class="home-card-item-title">用户分析</div>
           <div
               v-infinite-scroll="load"
@@ -89,8 +89,8 @@
           </div>
         </div>
       </el-col>
-      <el-col :xs="8" :sm="8" :md="8" :lg="8" :xl="8">
-        <div class="home-card-item">
+      <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
+        <div class="home-card-item mb15">
           <div class="home-card-item-title">系统公告</div>
           <div class="home-card-item-content flex-col row-between col-between">
              <div v-for="(item,index) in state.sysNoticeData" :key="index" class="flex row-between p-10 cursor-pointer" style="height: 40px;">
@@ -104,8 +104,8 @@
           </div>
         </div>
       </el-col>
-      <el-col :xs="8" :sm="8" :md="8" :lg="8" :xl="8">
-        <div class="home-card-item">
+      <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
+        <div class="home-card-item mb15 setting">
           <div class="home-card-item-title">系统信息</div>
           <div class="home-card-item-content flex-col row-between col-between p-20">
             <div class="flex">
@@ -126,7 +126,7 @@
                   />
                 </div>
             </div>
-             <div class="flex " style="margin-top: 10px;">
+             <div class="flex " style="margin-top: 8px;">
                 <div class="f-16 flex-1" style="line-height: 30px;">
                   系统名称：
                 </div>
@@ -180,7 +180,7 @@
           <el-input v-model="state.eventDialog.ruleForm.id" placeholder="主键ID"></el-input>
         </el-form-item>
         <el-form-item label="项目名称" prop="configName">
-          <el-input v-model="state.eventDialog.ruleForm.configName" placeholder="配置名称"></el-input>
+          <el-input v-model="state.eventDialog.ruleForm.configName" placeholder="项目名称"></el-input>
         </el-form-item>
         <el-form-item label="项目图标" prop="configValue">
           <fast-img v-model="state.eventDialog.ruleForm.configValue" :fileUrl="state.eventDialog.ruleForm.configValue" />
@@ -212,7 +212,7 @@ const storesTagsViewRoutes = useTagsViewRoutes();
 const storesThemeConfig = useThemeConfig();
 const { themeConfig } = storeToRefs(storesThemeConfig);
 const { isTagsViewCurrenFull } = storeToRefs(storesTagsViewRoutes);
-import {DocUserBo,DocUserVo } from '/@/views/docAdmin/docUser/type';
+import {DocUserBo,DocUserVo } from '../../docAdmin/docUsers/type';
 import {NoticeEntity, NoticeState} from "/@/api/system/notice/type";
 import {noticeApi} from '/@/api/system/notice';
 import { homeApi } from '/@/api/system/home';
@@ -590,11 +590,8 @@ $homeNavLengh: 8;
   .home-card-two,
   .home-card-three {
     .home-card-item {
-      width: 100%;
-      height: 140px;
       border-radius: 4px;
       transition: all ease 0.3s;
-      // padding: 25px;
       overflow: hidden;
       background: var(--el-color-white);
       color: var(--el-text-color-primary);
@@ -630,26 +627,36 @@ $homeNavLengh: 8;
       }
     }
   }
-  .home-card-one .home-card-item {
-    padding: 25px;
-    height: 13vh;
-    .avatar{
-      overflow: hidden;
-      margin-right: 15px;
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      border: 3px solid #00A8E8;
-    }
-    .home-card-item-term{
-      width: 100px;
+  .home-card-one{
+    .home-card-item {
+      height: 140px;
+      padding: 25px;
+      .avatar{
+        overflow: hidden;
+        margin-right: 15px;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        border: 3px solid #00A8E8;
+        el-image{
+          width: 100%;
+          height: 100%;
+        }
+      }
+      .home-card-item-desc{
+        font-size: 1.5rem;
+      }
+      .home-card-item-term{
+        width: 100px;
+      }
     }
   }
+   
 
   .home-card-two {
     .home-card-item {
-      height: 25vh;
       width: 100%;
+      height: 250px;
       overflow: hidden;
       .home-card-item-title {
         padding-left: 15px;
@@ -671,7 +678,7 @@ $homeNavLengh: 8;
   }
   .home-card-three {
     .home-card-item {
-      height: 48vh;
+      height: 500px;
       width: 100%;
       overflow: hidden;
       .home-card-item-title {

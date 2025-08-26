@@ -12,13 +12,8 @@
                         </el-form-item>
                     </el-col>
                     <el-col class="mt-5" :span="24">
-                        <el-form-item label="产品名称" prop="prodName">
+                        <el-form-item label="卡项名称" prop="prodName">
                             <el-input v-model="state.ruleForm.prodName" placeholder="产品名称"></el-input>
-                        </el-form-item>
-                    </el-col>
-                    <el-col class="mt-5" :span="24">
-                        <el-form-item label="销售单价" prop="unitPrice">
-                            <el-input v-model="state.ruleForm.unitPrice" placeholder="销售单价"></el-input>
                         </el-form-item>
                     </el-col>
                     <el-col class="mt-5" :span="24">
@@ -27,29 +22,18 @@
                         </el-form-item>
                     </el-col>
                     <el-col class="mt-5" :span="24">
-                        <el-form-item label="产品类型" prop="type">
-                            <el-input v-model="state.ruleForm.type" placeholder="产品类型"></el-input>
+                        <el-form-item label="销售单价" prop="unitPrice">
+                            <el-input v-model="state.ruleForm.unitPrice" placeholder="销售单价"></el-input>
                         </el-form-item>
                     </el-col>
                     <el-col class="mt-5" :span="24">
-                        <el-form-item label="创建时间" prop="ctime">
-                            <el-input v-model="state.ruleForm.ctime" placeholder="创建时间"></el-input>
+                        <el-form-item label="会员天数" prop="unitPrice">
+                            <el-input v-model="state.ruleForm.unitPrice" placeholder="会员天数"></el-input>
                         </el-form-item>
                     </el-col>
                     <el-col class="mt-5" :span="24">
-                        <el-form-item label="更新时间" prop="mtime">
-                            <el-input v-model="state.ruleForm.mtime" placeholder="更新时间"></el-input>
-                        </el-form-item>
-                    </el-col>
-                    <el-col class="mt-5" :span="24">
-                    <el-form-item label="商品状态" prop="status">
-                        <!--up：上架 un：下降 rm：删除-->
-                        <fast-switch v-model="state.ruleForm.status" dict-type="SYS_STATE" placeholder="状态"></fast-switch>
-                    </el-form-item>
-                    </el-col>
-                    <el-col class="mt-5" :span="24">
-                        <el-form-item label="排序" prop="sort">
-                            <el-input-number v-model="state.ruleForm.sort" :min="1" label="排序"></el-input-number>
+                        <el-form-item label="会员简述" prop="unitPrice">
+                            <el-input v-model="state.ruleForm.unitPrice" placeholder="会员简述"></el-input>
                         </el-form-item>
                     </el-col>
                 </el-row>
@@ -68,7 +52,7 @@
     import { reactive, ref, nextTick } from "vue";
     import { CURDEnum } from '/@/enums/CURDEnum';
     import {DocProductBo,DocProductVo } from '/@/views/docAdmin/docProduct/type';
-    const dialogWidth = ref('50vw');
+    const dialogWidth = ref('18vw');
     import FastSwitch from "/@/components/fast-switch/src/fast-switch.vue";
     // 定义子组件向父组件传值/事件
     const emit = defineEmits(['refresh']);

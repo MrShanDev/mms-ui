@@ -58,11 +58,11 @@ const setCollapseStyle = computed(() => {
 		if (layout === 'columns' || layout === 'classic') {
 			// 分栏布局、经典布局，菜单收起时宽度给 1px，防止切换动画消失
 			if (isCollapse) return [asideBrColor, 'layout-aside-pc-1'];
-			else return [asideBrColor, 'layout-aside-pc-220'];
+			else return [asideBrColor, 'layout-aside-pc-185'];
 		} else {
 			// 其它布局给 64px
 			if (isCollapse) return [asideBrColor, 'layout-aside-pc-64'];
-			else return [asideBrColor, 'layout-aside-pc-220'];
+			else return [asideBrColor, 'layout-aside-pc-185'];
 		}
 	}
 });

@@ -37,7 +37,7 @@
                   :label="$t('message.label.one1')"
                   name="account"
               >
-                <Account :captchaState="getThemeConfig.captchaState" />
+                <Account :captchaState="getThemeConfig.captchaState" :demoMode="getThemeConfig.demoMode" :demoAccount="getThemeConfig.demoAccount" :demoPassword="getThemeConfig.demoPassword" />
               </el-tab-pane>
               <el-tab-pane
                   v-if="getThemeConfig.loginType.includes('2')"
@@ -110,7 +110,10 @@ const getThemeConfig = reactive({
   loginType: [] as Array<string>,
   loginBg: loginMain,
   captchaState: false,
-  codeUrl:''
+  codeUrl: '',
+  demoMode: false,
+  demoAccount: '',
+  demoPassword: ''
 });
 
 const baseStart = () => {
@@ -121,6 +124,9 @@ const baseStart = () => {
       getThemeConfig.logo = res.data.logo;
       getThemeConfig.loginType = res.data.loginType;
       getThemeConfig.captchaState = res.data.captchaState;
+      getThemeConfig.demoMode = res.data.demoMode;
+      getThemeConfig.demoAccount = res.data.demoAccount;
+      getThemeConfig.demoPassword = res.data.demoPassword;
       if (res.data.loginBg != null && res.data.loginBg.length > 0) {
         getThemeConfig.loginBg = res.data.loginBg;
       }

@@ -96,6 +96,18 @@ const props = defineProps({
     type: Boolean,
     default: () => false,
   },
+  demoMode: {
+    type: Boolean,
+    default: () => false,
+  },
+  demoAccount: {
+    type: String,
+    default: () => '',
+  },
+  demoPassword: {
+    type: String,
+    default: () => '',
+  }
 });
 // 定义变量内容
 const { t } = useI18n();
@@ -239,6 +251,10 @@ onMounted(() => {
   window.addEventListener("keydown", keyDown);
   if (props.captchaState) {
     captchaIn(0);
+  }
+  if (props.demoMode) {
+    state.ruleForm.username = props.demoAccount
+    state.ruleForm.password = props.demoPassword
   }
 });
 </script>

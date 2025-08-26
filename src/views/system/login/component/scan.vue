@@ -14,7 +14,9 @@
         <div class="fond16 ">{{unCodeMsg}} <span class="fond16 f-c-1 shou"  @click="initQrcode">刷新</span> </div>
       </div>
       <div v-else >
-        <img class="grayscale" :src="codeUrl" @click="initQrcode" style="width: 70%"  alt=""/>
+        <div v-loading="!codeUrl" element-loading-text="加载中..." style="height: 250px;">
+          <img class="grayscale" :src="codeUrl" @click="initQrcode" style="width: 70%"  alt=""/>
+        </div>
         <div   class="font12 mt10 login-msg flex flex-col">
           <div class="fond16 f-c-2">剩余 {{exitTime+'s'}}</div>
           <div class="mt10">{{ $t("message.scan.text") }}</div>

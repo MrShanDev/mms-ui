@@ -61,7 +61,7 @@
 <script setup lang="ts" name="docAdminDocUserDialog">
     import { reactive, ref, nextTick } from "vue";
     import { CURDEnum } from '/@/enums/CURDEnum';
-    import {DocUserBo,DocUserVo } from '/@/views/docAdmin/docUser/type';
+    import {DocUserBo,DocUserVo } from './type';
     const dialogWidth = ref('50vw');
     import FastSwitch from "/@/components/fast-switch/src/fast-switch.vue";
     // 定义子组件向父组件传值/事件
