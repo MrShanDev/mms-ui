@@ -83,7 +83,8 @@
 		"node_modules/preact/src/internal.d.ts",
 		"node_modules/preact/src/internal.d.ts",
 		"node_modules/preact/src/internal.d.ts",
-		"auto-imports.d.ts"
+		"auto-imports.d.ts",
+		".eslintrc.js"
 	], // **Represents any directory, and * represents any file. Indicates that all files in the src directory will be compiled
 	"exclude": ["node_modules", "dist"] // Indicates the file directory that does not need to be compiled
 }

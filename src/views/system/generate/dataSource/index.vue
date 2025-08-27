@@ -91,15 +91,15 @@
             width="170"
           >
             <template #default="scope">
-              <el-button type="primary" link @click="datasourceHandle(scope.row.id)"
-                >测试</el-button
-              >
-              <el-button type="primary" link @click="addOrUpdateHandle(scope.row.id)"
-                >编辑</el-button
-              >
-              <el-button type="primary" link @click="deleteBatchHandle(scope.row.id)"
-                >删除</el-button
-              >
+              <el-button type="primary" link @click="datasourceHandle(scope.row.id)">
+                测试
+              </el-button>
+              <el-button type="primary" link @click="addOrUpdateHandle(scope.row.id)">
+                编辑
+              </el-button>
+              <el-button type="primary" link @click="deleteBatchHandle(scope.row.id)">
+                删除
+              </el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -112,67 +112,63 @@
           layout="total, sizes, prev, pager, next, jumper"
           @size-change="sizeChangeHandle"
           @current-change="currentChangeHandle"
-        >
-        </el-pagination>
+        ></el-pagination>
 
         <!-- 弹窗, 新增 / 修改 -->
-        <add-or-update
-          ref="addOrUpdateRef"
-          @refresh-data-list="getDataList"
-        ></add-or-update>
+        <add-or-update ref="addOrUpdateRef" @refresh-data-list="getDataList"></add-or-update>
       </el-card>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from "vue";
-import { IHooksOptions } from "/@/hooks/interface";
-import { useDataSourceTestApi } from "/@/api/gen";
-import { useCrud } from "/@/hooks";
-import { ElMessage } from "element-plus";
-import AddOrUpdate from "./addOrUpdate.vue";
-import { decrypt } from "/@/utils/mms";
-import {getEnv} from '/@/utils/mms';
-const state: IHooksOptions = reactive({
-  dataListUrl: getEnv() + "/gen/dataSource/page",
-  deleteUrl: getEnv() + "/gen/dataSource",
-  queryForm: {
-    connName: "",
-    dbType: "",
-  },
-});
+  import { reactive, ref } from 'vue';
+  import { IHooksOptions } from '/@/hooks/interface';
+  import { useDataSourceTestApi } from '/@/api/gen';
+  import { useCrud } from '/@/hooks';
+  import { ElMessage } from 'element-plus';
+  import AddOrUpdate from './addOrUpdate.vue';
+  import { decrypt } from '/@/utils/mms';
+  import { getEnv } from '/@/utils/mms';
+  const state: IHooksOptions = reactive({
+    dataListUrl: getEnv() + '/gen/dataSource/page',
+    deleteUrl: getEnv() + '/gen/dataSource',
+    queryForm: {
+      connName: '',
+      dbType: '',
+    },
+  });
 
-const datasourceHandle = (id: number) => {
-  useDataSourceTestApi(id)
-    .then((res: any) => {
-      ElMessage.success(res.msg);
-    })
-    .catch((e) => {
-      ElMessage.error(e);
-    });
-};
+  const datasourceHandle = (id: number) => {
+    useDataSourceTestApi(id)
+      .then((res: any) => {
+        ElMessage.success(res.msg);
+      })
+      .catch((e) => {
+        ElMessage.error(e);
+      });
+  };
 
-const addOrUpdateRef = ref();
-const addOrUpdateHandle = (id?: number) => {
-  addOrUpdateRef.value.init(id);
-};
+  const addOrUpdateRef = ref();
+  const addOrUpdateHandle = (id?: number) => {
+    addOrUpdateRef.value.init(id);
+  };
 
-const {
-  getDataList,
-  selectionChangeHandle,
-  sizeChangeHandle,
-  currentChangeHandle,
-  deleteBatchHandle,
-} = useCrud(state);
+  const {
+    getDataList,
+    selectionChangeHandle,
+    sizeChangeHandle,
+    currentChangeHandle,
+    deleteBatchHandle,
+  } = useCrud(state);
 
-const formatPassword = (str: string): string => {
-  return Array(decrypt(str).length).fill("•").join("");
-};
-const init = (id: number) => {
-  getDataList();
-};
-defineExpose({
-  init,
-});
+  const formatPassword = (str: string): string => {
+    return Array(decrypt(str).length).fill('•').join('');
+  };
+  const init = (id: number) => {
+    getDataList();
+  };
+  defineExpose({
+    init,
+  });
 </script>

@@ -6,10 +6,10 @@ import { getEnv } from '/@/utils/mms';
  * @returns
  */
 export function sysInfo() {
-	return request({
-		url: getEnv() + '/system/visitor/sysInfo',
-		method: 'post',
-	});
+  return request({
+    url: getEnv() + '/system/visitor/sysInfo',
+    method: 'post',
+  });
 }
 
 /**
@@ -18,10 +18,10 @@ export function sysInfo() {
  * @returns
  */
 export function captcha(code: string) {
-	return request({
-		url: getEnv() + '/system/visitor/' + code,
-		method: 'get',
-	});
+  return request({
+    url: getEnv() + '/system/visitor/' + code,
+    method: 'get',
+  });
 }
 
 /**
@@ -30,27 +30,27 @@ export function captcha(code: string) {
  * @returns
  */
 export function login(params: object) {
-	return request({
-		url: getEnv() + '/system/auth/login',
-		method: 'post',
-		headers: {
-			encrypt: false,
-			repeatSubmit: true,
-		},
-		data: params,
-	});
+  return request({
+    url: getEnv() + '/system/auth/login',
+    method: 'post',
+    headers: {
+      encrypt: false,
+      repeatSubmit: true,
+    },
+    data: params,
+  });
 }
 
 export function loginByPhone(params: object) {
-    return request({
-        url: getEnv() + '/system/auth/loginByPhone',
-        method: 'post',
-        headers: {
-            encrypt: false,
-            repeatSubmit: true,
-        },
-        data: params,
-    });
+  return request({
+    url: getEnv() + '/system/auth/loginByPhone',
+    method: 'post',
+    headers: {
+      encrypt: false,
+      repeatSubmit: true,
+    },
+    data: params,
+  });
 }
 
 /**
@@ -58,8 +58,8 @@ export function loginByPhone(params: object) {
  * @returns
  */
 export function logout() {
-	return request({
-		url: getEnv() + '/system/auth/logout',
-		method: 'post',
-	});
+  return request({
+    url: getEnv() + '/system/auth/logout',
+    method: 'post',
+  });
 }

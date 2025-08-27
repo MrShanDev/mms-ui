@@ -17,40 +17,40 @@
 </template>
 
 <script setup lang="ts" name="FastSelect">
-import { getDictDataList } from "/@/utils/mms";
-import { useAppStore } from "/@/stores/app";
+  import { getDictDataList } from '/@/utils/mms';
+  import { useAppStore } from '/@/stores/app';
 
-const appStore = useAppStore();
-const props = defineProps({
-  modelValue: {
-    type: [Number, String],
-    required: true,
-  },
-  dictType: {
-    type: String,
-    required: true,
-  },
-  clearable: {
-    type: Boolean,
-    required: false,
-    default: () => false,
-  },
-  placeholder: {
-    type: String,
-    required: false,
-    default: () => "",
-  },
-  disabled: {
-    type: Boolean,
-    required: false,
-    default: () => false,
-  }
-});
+  const appStore = useAppStore();
+  const props = defineProps({
+    modelValue: {
+      type: [Number, String],
+      required: true,
+    },
+    dictType: {
+      type: String,
+      required: true,
+    },
+    clearable: {
+      type: Boolean,
+      required: false,
+      default: () => false,
+    },
+    placeholder: {
+      type: String,
+      required: false,
+      default: () => '',
+    },
+    disabled: {
+      type: Boolean,
+      required: false,
+      default: () => false,
+    },
+  });
 
-const dataList = getDictDataList(appStore.dictList, props.dictType);
+  const dataList = getDictDataList(appStore.dictList, props.dictType);
 </script>
 <style lang="scss" scoped>
-.w-full {
-  min-width: 150px !important;
-}
+  .w-full {
+    min-width: 150px !important;
+  }
 </style>
