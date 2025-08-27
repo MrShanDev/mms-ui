@@ -26,9 +26,10 @@
                             <el-table-column v-if="false" prop="uid" label="用户编号" header-align="center" align="center"></el-table-column>
                             <el-table-column prop="nickname" label="昵称" header-align="center" align="center"></el-table-column>
                             <el-table-column prop="avatar" label="头像" header-align="center" align="center"></el-table-column>
-                            <el-table-column prop="type" label="用户类型" header-align="center" align="center"></el-table-column>
-                            <el-table-column prop="ctime" label="创建时间" header-align="center" align="center"></el-table-column>
-                            <el-table-column prop="mtime" label="更新时间" header-align="center" align="center"></el-table-column>
+                            <fast-table-column prop="type" label="用户类型" dict-type="DOCTYPE"></fast-table-column>
+                            <el-table-column prop="ctime" label="注册时间" header-align="center" align="center"></el-table-column>
+                            <el-table-column prop="mtime" label="最后登陆时间" header-align="center" align="center"></el-table-column>
+                          <el-table-column prop="vipDate" label="会员到期时间" header-align="center" align="center"></el-table-column>
                             <fast-table-column prop="status" label="状态" dict-type="SYS_STATE"></fast-table-column>
                             <el-table-column prop="sort" label="排序" header-align="center" align="center"></el-table-column>
                             <el-table-column fixed="right" label="操作" width=" 100 ">
@@ -83,7 +84,7 @@
     const baseApi = docUserApi();
     import FastTableColumn from "/@/components/fast-table-column";
     const docUserDialogRef = ref();
-    const DocUserDialog = defineAsyncComponent(() => import('/@/views/docAdmin/docUsers/dialog.vue'));
+    const DocUserDialog = defineAsyncComponent(() => import('/@/views/docAdmin/docUser/dialog.vue'));
     const TableTool = defineAsyncComponent(() => import("/@/components/table-tool/index.vue"));
 
     const curdEnum = CURDEnum;

@@ -6,9 +6,9 @@ import { BaseEntity } from "/@/types/global";
 */
 export declare interface DocProductVo extends BaseEntity {
       prodId: string | number;
-      prodName: string | number;
-      unitPrice: string | number;
-      markPrice: string | number;
+      prodName: string;
+      unitPrice: number;
+      markPrice: number;
       type: string | number;
       ctime: string | number;
       mtime: string | number;

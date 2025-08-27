@@ -212,7 +212,7 @@ const storesTagsViewRoutes = useTagsViewRoutes();
 const storesThemeConfig = useThemeConfig();
 const { themeConfig } = storeToRefs(storesThemeConfig);
 const { isTagsViewCurrenFull } = storeToRefs(storesTagsViewRoutes);
-import {DocUserBo,DocUserVo } from '../../docAdmin/docUsers/type';
+import {DocUserBo,DocUserVo } from '/@/views/docAdmin/docUser/type';
 import {NoticeEntity, NoticeState} from "/@/api/system/notice/type";
 import {noticeApi} from '/@/api/system/notice';
 import { homeApi } from '/@/api/system/home';

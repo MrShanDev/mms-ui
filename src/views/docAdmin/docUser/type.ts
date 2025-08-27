@@ -10,7 +10,8 @@ export declare interface DocUserVo extends BaseEntity {
       avatar: string|number; 
       type: string|number; 
       ctime: string|number; 
-      mtime: string|number; 
+      mtime: string|number;
+      vipDate:string;
 }
 
 /**
@@ -23,5 +24,6 @@ export declare interface DocUserBo extends BaseEntity {
         avatar: string|number; 
         type: string|number; 
         ctime: string|number; 
-        mtime: string|number; 
+        mtime: string|number;
+        vipDate:string;
 }
