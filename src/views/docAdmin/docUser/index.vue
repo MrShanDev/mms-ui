@@ -30,7 +30,11 @@
                             <el-table-column prop="ctime" label="注册时间" header-align="center" align="center"></el-table-column>
                             <el-table-column prop="mtime" label="最后登陆时间" header-align="center" align="center"></el-table-column>
                           <el-table-column prop="vipDate" label="会员到期时间" header-align="center" align="center"></el-table-column>
-                            <fast-table-column prop="status" label="状态" dict-type="SYS_STATE"></fast-table-column>
+                            <el-table-column prop="status" label="状态" dict-type="SYS_STATE">
+                                <template #default="scope">
+                                    <fast-switch v-model="scope.row.status" dict-type="SYS_STATE" placeholder="状态"></fast-switch>
+                                </template>
+                            </el-table-column>
                             <el-table-column prop="sort" label="排序" header-align="center" align="center"></el-table-column>
                             <el-table-column fixed="right" label="操作" width=" 100 ">
                                 <template #default="scope">
@@ -79,6 +83,8 @@
     import { isEmpty, generateUUID } from "/@/utils/mms";
     import {NextLoading} from "/@/utils/loading";
     import FastSelect from "/@/components/fast-select/src/fast-select.vue";
+    import FastSwitch from "/@/components/fast-switch/src/fast-switch.vue";
+    
     import {docUserApi} from '.';
     import {DocUserBo,DocUserVo } from './type';
     const baseApi = docUserApi();

@@ -75,8 +75,13 @@
               ></el-table-column>
               <el-table-column prop="status" label="角色状态" show-overflow-tooltip>
                 <template #default="scope">
-                  <el-tag type="success" v-if="scope.row.status == 0">启用</el-tag>
-                  <el-tag type="info" v-else>禁用</el-tag>
+                  <!-- <el-tag type="success" v-if="scope.row.status == 0">启用</el-tag>
+                  <el-tag type="info" v-else>禁用</el-tag> -->
+                  <fast-switch
+                      v-model="scope.row.status"
+                      dict-type="SYS_STATE"
+                      placeholder="角色状态"
+								></fast-switch>
                 </template>
               </el-table-column>
               <el-table-column
@@ -87,8 +92,11 @@
               <el-table-column
                 prop="level"
                 label="角色级别"
-                show-overflow-tooltip
-              ></el-table-column>
+                show-overflow-tooltip>
+                <template #default="scope">
+                  <el-tag type="warning">{{ scope.row.level }}级</el-tag>
+                </template>
+              </el-table-column>
               <el-table-column
                 prop="createdTime"
                 label="创建时间"
@@ -156,7 +164,9 @@ import { isEmpty, generateUUID } from "/@/utils/mms";
 import { CURDEnum } from "/@/enums/CURDEnum";
 import {NextLoading} from "/@/utils/loading";
 import {RowRoleType, SysRoleState} from "/@/api/system/role/type";
-import {Eleme} from "@element-plus/icons-vue";
+import { Eleme } from "@element-plus/icons-vue";
+import FastSwitch from "/@/components/fast-switch/src/fast-switch.vue";
+
 // 引入组件
 const RoleDialog = defineAsyncComponent(() => import("/@/views/system/role/dialog.vue"));
 const TableTool = defineAsyncComponent(() => import("/@/components/table-tool/index.vue"));

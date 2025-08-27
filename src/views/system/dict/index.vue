@@ -73,8 +73,10 @@
               ></el-table-column>
               <el-table-column prop="status" label="字典状态" show-overflow-tooltip>
                 <template #default="scope">
-                  <el-tag type="success" v-if="scope.row.status == 0">启用</el-tag>
-                  <el-tag type="info" v-else>禁用</el-tag>
+                  <!-- <el-tag type="success" v-if="scope.row.status == 0">启用</el-tag>
+                  <el-tag type="info" v-else>禁用</el-tag> -->
+                  <el-switch v-model="scope.row.status" inline-prompt active-value="0" inactive-value="1"
+								  active-text="启" inactive-text="禁"></el-switch>
                 </template>
               </el-table-column>
               <el-table-column

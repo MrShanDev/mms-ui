@@ -49,7 +49,11 @@
                             <el-table-column v-show="false" prop="id" label="公告ID" header-align="center" align="center"></el-table-column>
                             <el-table-column prop="title" label="公告标题" header-align="center" align="center"></el-table-column>
                             <fast-table-column prop="type" label="公告类型" dict-type="NITICE_TYPE"></fast-table-column>
-                            <fast-table-column prop="status" label="公告状态" dict-type="SYS_STATE"></fast-table-column>
+                            <el-table-column prop="status" label="公告状态" dict-type="SYS_STATE">
+                                <template #default="scope">
+                                    <fast-switch v-model="scope.row.status" dict-type="SYS_STATE" placeholder="状态"></fast-switch>
+                                </template>
+                            </el-table-column>
                             <el-table-column prop="remark" label="备注" header-align="center" align="center"></el-table-column>
                             <el-table-column prop="sort" label="排序" header-align="center" align="center"></el-table-column>
                             <el-table-column fixed="right" label="操作" width=" 100 ">
@@ -100,6 +104,8 @@
     import {noticeApi} from '/@/api/system/notice';
     import FastTableColumn from "/@/components/fast-table-column";
     import FastSelect from "/@/components/fast-select/src/fast-select.vue";
+    import FastSwitch from "/@/components/fast-switch/src/fast-switch.vue";
+    
     import {NoticeEntity, NoticeState} from "/@/api/system/notice/type";
     import {Eleme} from "@element-plus/icons-vue";
     import {NextLoading} from "/@/utils/loading";

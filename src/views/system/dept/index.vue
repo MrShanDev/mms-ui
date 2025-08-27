@@ -39,7 +39,11 @@
                             <el-table-column prop="leader" label="负责人" header-align="center" align="center"></el-table-column>
                             <el-table-column prop="phone" label="联系方式" header-align="center" align="center"></el-table-column>
                             <el-table-column prop="email" label="邮箱" header-align="center" align="center"></el-table-column>
-                            <fast-table-column prop="status" label="状态" dict-type="SYS_STATE"></fast-table-column>
+                            <el-table-column prop="status" label="状态" dict-type="SYS_STATE">
+                                <template #default="scope">
+                                    <fast-switch v-model="scope.row.status" dict-type="SYS_STATE" placeholder="状态"></fast-switch>
+                                </template>
+                            </el-table-column>
                             <el-table-column prop="sort" label="排序" header-align="center" align="center"></el-table-column>
                             <el-table-column fixed="right" label="操作" width=" 120 ">
                                 <template #default="scope">
@@ -76,6 +80,7 @@
     import { isEmpty } from "/@/utils/mms";
     import {deptApi} from '/@/api/system/dept';
     import FastTableColumn from "/@/components/fast-table-column";
+    import FastSwitch from "/@/components/fast-switch/src/fast-switch.vue";
     import {DeptEntity, DeptState} from "/@/api/system/dept/type";
     import {NextLoading} from "/@/utils/loading";
     const deptDialogRef = ref();

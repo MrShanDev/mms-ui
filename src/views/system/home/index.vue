@@ -127,7 +127,7 @@
                 </div>
             </div>
              <div class="flex " style="margin-top: 8px;">
-                <div class="f-16 flex-1" style="line-height: 30px;">
+                <div class="f-16 flex-1 system_title" style="line-height: 30px;">
                   系统名称：
                 </div>
                 <div class="f-14 flex-4" style="color: #858585;line-height: 30px;">
@@ -135,7 +135,7 @@
                 </div>
             </div>
             <div class="flex" >
-                <div class="f-16 flex-1" style="line-height: 30px;">
+                <div class="f-16 flex-1 system_title" style="line-height: 30px;">
                   系统版本：
                 </div>
                 <div class="f-14 flex-4" style="color: #858585;line-height: 30px;">
@@ -143,7 +143,7 @@
                 </div>
             </div>
             <div class="flex" >
-                <div class="f-16 flex-1" style="line-height: 30px;">
+                <div class="f-16 flex-1 system_title" style="line-height: 30px;">
                   系统文档：
                 </div>
                 <div class="f-14 flex-4 shou" style="color: #858585;line-height: 30px;" @click="openWindow(state.systemData.systemInfo.docUrl)">
@@ -151,7 +151,7 @@
                 </div>
             </div>
             <div class="flex" >
-                <div class="f-16 flex-1" style="line-height: 30px;">
+                <div class="f-16 flex-1 system_title" style="line-height: 30px;">
                   系统简述：
                 </div>
                 <div class="f-12 flex-4" style="color: #858585;line-height: 20px;">
@@ -584,6 +584,9 @@ const getNoticeList = () => {
 
 <style scoped lang="scss">
 $homeNavLengh: 8;
+::v-deep .vue-ui-sparkline-title{
+  height: 1rem!important;
+}
 .home-container {
   overflow: hidden;
   .home-card-one,

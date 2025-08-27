@@ -21,12 +21,24 @@
         <el-form-item label="配置键" prop="configKey">
           <el-input v-model="state.ruleForm.configKey" placeholder="配置键"></el-input>
         </el-form-item>
-        <el-form-item label="配置值" prop="configValue">
+        <el-form-item label="配置类型" prop="type">
+          <el-radio-group v-model="state.ruleForm.type">
+              <el-radio value="1" size="large">文字</el-radio>
+              <el-radio value="2" size="large">图片</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item v-if="state.ruleForm.type == 1" label="配置值" prop="configValue">
           <el-input
             type="textarea"
             v-model="state.ruleForm.configValue"
             placeholder="配置值"
           ></el-input>
+        </el-form-item>
+        <el-form-item v-if="state.ruleForm.type == 2" label="配置图" prop="configValue">
+            <fast-img 
+                v-model="state.ruleForm.configValue" 
+                :fileUrl="state.ruleForm.configValue" 
+            />
         </el-form-item>
         <el-form-item label="配置状态" prop="status">
           <fast-switch
@@ -55,6 +67,8 @@ import { reactive, defineAsyncComponent, ref } from "vue";
 // 引入组件
 import FastSwitch from "/@/components/fast-switch/src/fast-switch.vue";
 import { CURDEnum } from "/@/enums/CURDEnum";
+import FastImg from "/@/components/fast-upload/img.vue";
+
 // 定义子组件向父组件传值/事件
 const emit = defineEmits(["refresh"]);
 const ruleForm = reactive<RowSysConfigType>({
@@ -73,6 +87,7 @@ const ruleForm = reactive<RowSysConfigType>({
   updatedBy: "",
   updatedTime: "",
   columnName: "",
+  type: '1'
 });
 const state = reactive({
   ruleForm: ruleForm,
@@ -101,6 +116,7 @@ const resetForm = () => {
     updatedBy: "",
     updatedTime: "",
     columnName: "",
+    type: '1'
   } as RowSysConfigType;
 };
 const openDialog = (type: CURDEnum, row: RowSysConfigType) => {

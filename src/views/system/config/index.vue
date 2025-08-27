@@ -21,7 +21,9 @@
           <el-tab-pane label="微信设置">
             <ConfigWx ref="configWxRef" />
           </el-tab-pane>
-          <el-tab-pane label="其他">Task</el-tab-pane>
+          <el-tab-pane label="网站配置" name="website">
+            <ConfigWebsite ref="configWebsiteRef" />
+          </el-tab-pane>
         </el-tabs>
       </el-tab-pane>
       <el-tab-pane label="自定义" name="user">
@@ -64,7 +66,9 @@ const configEmailRef = ref();
 //7.邮件设置
 const ConfigWx = defineAsyncComponent(() => import('/@/views/system/config/configWx.vue'));
 const configWxRef = ref();
-
+// 8.网站配置
+const ConfigWebsite = defineAsyncComponent(() => import('/@/views/system/config/ConfigWebsite.vue'));
+const configWebsiteRef = ref();
 //一级tab点击事件
 const tabClick = (pane: TabsPaneContext, ev: Event) => {
   //console.log("tab", pane.props.name, pane.props.label, "event", ev)
@@ -101,6 +105,12 @@ const tabClickItem = (pane: TabsPaneContext, ev: Event) => {
   if(pane.props.name==="sms"){
     if (configSmsRef.value) {
       configSmsRef.value.initData(); // 调用子组件的方法
+    }
+  }
+  //website
+  if(pane.props.name==="website"){
+    if (configWebsiteRef.value) {
+      configWebsiteRef.value.initData(); // 调用子组件的方法
     }
   }
 }

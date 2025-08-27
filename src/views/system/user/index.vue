@@ -29,7 +29,7 @@
 					<el-header>
 						<!-- 新增/导入/导出/打印 -->
 						<TableTool
-              v-show="!state.tableData.loading"
+              				v-show="!state.tableData.loading"
 							ref="tableToolRef"
 							tableComment="系统用户"
 							functionName="user"
@@ -67,9 +67,16 @@
 							<el-table-column prop="email" label="邮箱" show-overflow-tooltip></el-table-column>
 							<el-table-column prop="status" label="用户状态" show-overflow-tooltip>
 								<template #default="scope">
-									<el-tag type="success" v-if="scope.row.status == 0">启用</el-tag>
-									<el-tag type="info" v-else>禁用</el-tag>
+									<!-- <el-tag type="success" v-if="scope.row.status == 0">启用</el-tag>
+									<el-tag type="info" v-else>禁用</el-tag> -->
+									<fast-switch
+										v-model="scope.row.status"
+										dict-type="SYS_STATE"
+										placeholder="用户状态"
+										:disabled="$ut.isSuperAdmin(scope.row.roleCodes)"
+									></fast-switch>
 								</template>
+								
 							</el-table-column>
 							<el-table-column prop="remark" label="用户描述"></el-table-column>
 							<el-table-column prop="createdTime" width="170" label="创建时间" show-overflow-tooltip>
@@ -201,7 +208,9 @@ import { roleApi } from '/@/api/system/role';
 import {RowUserType, SysUserState} from "/@/api/system/user/type";
 import {NextLoading} from "/@/utils/loading";
 import {RowRoleType} from "/@/api/system/role/type";
-import {Eleme} from "@element-plus/icons-vue";
+import { Eleme } from "@element-plus/icons-vue";
+import FastSwitch from '/@/components/fast-switch/src/fast-switch.vue';
+
 // 引入组件
 const UserDialog = defineAsyncComponent(() => import('/@/views/system/user/dialog.vue'));
 const TableTool = defineAsyncComponent(() => import('/@/components/table-tool/index.vue'));
@@ -404,6 +413,7 @@ const primaryUserRoleBut = () => {
 			ElMessage.warning(err);
 		});
 };
+
 // 页面加载时
 onMounted(() => {
 	getTableData();

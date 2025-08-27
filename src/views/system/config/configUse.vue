@@ -77,7 +77,15 @@
               ></el-table-column>
               <el-table-column prop="configKey" label="配置键" header-align="center" align="center"></el-table-column>
               <fast-table-column prop="configType" label="配置类型" dict-type="CONFIG_TYPE" />
-              <fast-table-column prop="status" label="状态" dict-type="SYS_STATE" />
+              <el-table-column prop="status" label="状态" dict-type="SYS_STATE">
+                <template #default="scope">
+                  <fast-switch
+                      v-model="scope.row.status"
+                      dict-type="SYS_STATE"
+                      placeholder="配置状态"
+                  ></fast-switch>
+                </template>
+              </el-table-column>
               <el-table-column
                 prop="createdTime"
                 width="170"
@@ -142,6 +150,7 @@ import { defineAsyncComponent, onMounted, reactive, ref } from "vue";
 import { sysConfigApi } from "/@/api/system/config";
 import { ElMessage, ElMessageBox } from "element-plus";
 import FastTableColumn from "/@/components/fast-table-column/src/fast-table-column.vue";
+import FastSwitch from "/@/components/fast-switch/src/fast-switch.vue";
 import { CURDEnum } from "/@/enums/CURDEnum";
 import { isEmpty, generateUUID } from "/@/utils/mms";
 const baseApi = sysConfigApi();
