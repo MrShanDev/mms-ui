@@ -150,6 +150,23 @@ npm run format
 npm run lint
 ```
 
+```text 启动命令备注
+		"dev": "vite --mode development --open",           // 开发环境启动
+		"preview": "vite --mode preview --open",          // 预览构建结果
+		"prod": "vite --mode production --open",          // 生产环境启动（建议移除，生产环境不应使用vite serve）
+		"build": "vite build --mode production",          // 生产环境构建
+		"lint": "eslint --ext .js,.jsx,.ts,.tsx,.vue src/", // ESLint检查
+		"lint:fix": "eslint --ext .js,.jsx,.ts,.tsx,.vue src/ --fix", // ESLint自动修复
+		"type-check": "vue-tsc --noEmit",                 // TypeScript类型检查
+		"format": "prettier --write \"src/**/*.{vue,js,jsx,ts,tsx,json,css,scss,md}\"", // 代码格式化
+		"format:check": "prettier --check \"src/**/*.{vue,js,jsx,ts,tsx,json,css,scss,md}\"", // 格式化检查
+		"format:lint": "npm run lint && npm run format",  // 组合命令：先lint后format
+		"pre-commit": "npm run lint && npm run format:check", // Git预提交钩子检查
+		
+		"serve": "vite preview",                         // 预览生产构建
+		"build:dev": "vite build --mode development",    // 开发环境构建
+		"clean": "rm -rf dist node_modules/.vite"        // 清理构建缓存
+```
 
 
 #### 💯 🐱 🙋‍♂️ 💫 📢 🔥常见问题

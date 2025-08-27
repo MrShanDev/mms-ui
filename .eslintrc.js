@@ -74,6 +74,10 @@ module.exports = {
         'no-console': 'error',// "代码时不符合规则规范，页面将会出现 红色波浪线
         'no-redeclare': 'off',
         "vue/no-unused-components": "off", // 当存在定义而未使用的组件时，关闭报错
-        "no-unused-vars":"off" // 当存在定义而未使用的变量时，关闭报错
+        "no-unused-vars":"off", // 当存在定义而未使用的变量时，关闭报错
+        "no-tabs": "off",
+        "no-irregular-whitespace": "off",
+        "no-debugger": "off",
+        "no-mixed-spaces-and-tabs": "error"
     },
 };
