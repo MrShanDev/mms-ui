@@ -91,6 +91,7 @@
       </el-col>
     </el-row>
     <el-row :gutter="15" class="home-card-three">
+      <Auth :value="'docAdmin:docUser:list'">
       <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
         <div class="home-card-item mb15">
           <div class="home-card-item-title">用户分析</div>
@@ -120,6 +121,7 @@
           </div>
         </div>
       </el-col>
+      </Auth>
       <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
         <div class="home-card-item mb15">
           <div class="home-card-item-title">系统公告</div>
@@ -138,48 +140,56 @@
           </div>
         </div>
       </el-col>
-      <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
+      <el-col :xs="24" :sm="24" :md="auth('docAdmin:docUser:list')?8:16" :lg="auth('docAdmin:docUser:list')?8:16" :xl="auth('docAdmin:docUser:list')?8:16">
         <div class="home-card-item mb15 setting">
           <div class="home-card-item-title">系统信息</div>
           <div class="home-card-item-content flex-col row-between col-between p-20">
-            <div class="flex">
-              <div class="f-16 flex-1" style="color: #858585">
-                <VueDataUi component="VueUiSparkline" :dataset="dataset1" :config="config1" />
-              </div>
-            </div>
-            <div class="flex">
-              <div class="f-16 flex-1" style="color: #858585">
-                <VueDataUi component="VueUiSparkline" :dataset="dataset2" :config="config2" />
-              </div>
-            </div>
-            <div class="flex" style="margin-top: 8px">
-              <div class="f-16 flex-1 system_title" style="line-height: 30px">系统名称：</div>
-              <div class="f-14 flex-4" style="color: #858585; line-height: 30px">
-                {{ state.systemData.systemInfo.name }}
-              </div>
-            </div>
-            <div class="flex">
-              <div class="f-16 flex-1 system_title" style="line-height: 30px">系统版本：</div>
-              <div class="f-14 flex-4" style="color: #858585; line-height: 30px">
-                {{ state.systemData.systemInfo.version }}
-              </div>
-            </div>
-            <div class="flex">
-              <div class="f-16 flex-1 system_title" style="line-height: 30px">系统文档：</div>
-              <div
-                class="f-14 flex-4 shou"
-                style="color: #858585; line-height: 30px"
-                @click="openWindow(state.systemData.systemInfo.docUrl)"
-              >
-                {{ state.systemData.systemInfo.docUrl }}
-              </div>
-            </div>
-            <div class="flex">
-              <div class="f-16 flex-1 system_title" style="line-height: 30px">系统简述：</div>
-              <div class="f-12 flex-4" style="color: #858585; line-height: 20px">
-                {{ state.systemData.systemInfo.describe }}
-              </div>
-            </div>
+            <el-row :gutter="30">
+              <el-col :xs="24" :sm="24" :md="auth('docAdmin:docUser:list')?24:8" :lg="auth('docAdmin:docUser:list')?24:8" :xl="auth('docAdmin:docUser:list')?24:8">
+                <div class="flex">
+                  <div class="f-16 flex-1" style="color: #858585" :style="{'marginTop':auth('docAdmin:docUser:list')?'':'20%'}">
+                    <VueDataUi component="VueUiSparkline" :dataset="dataset1" :config="config1" />
+                  </div>
+                </div>
+                <div class="flex" >
+                  <div class="f-16 flex-1" style="color: #858585" :style="{'marginTop':auth('docAdmin:docUser:list')?'':'20%'}">
+                    <VueDataUi component="VueUiSparkline" :dataset="dataset2" :config="config2" />
+                  </div>
+                </div>
+              </el-col>
+              <el-col :xs="24" :sm="24" :md="auth('docAdmin:docUser:list')?24:16" :lg="auth('docAdmin:docUser:list')?24:16" :xl="auth('docAdmin:docUser:list')?24:16">
+                <div class="flex" style="margin-top: 8px">
+                  <div class="f-16 flex-1 system_title" style="line-height: 30px">系统名称：</div>
+                  <div class="f-14 flex-4" style="color: #858585; line-height: 30px">
+                    {{ state.systemData.systemInfo.name }}
+                  </div>
+                </div>
+                <div :class="!auth('docAdmin:docUser:list')?'mt20':''" class="flex">
+                  <div class="f-16 flex-1 system_title" style="line-height: 30px">系统版本：</div>
+                  <div class="f-14 flex-4" style="color: #858585; line-height: 30px">
+                    {{ state.systemData.systemInfo.version }}
+                  </div>
+                </div>
+                <div :class="!auth('docAdmin:docUser:list')?'mt20':''" class="flex">
+                  <div class="f-16 flex-1 system_title" style="line-height: 30px">系统文档：</div>
+                  <div
+                      class="f-14 flex-4 shou"
+                      style="color: #858585; line-height: 30px"
+                      @click="openWindow(state.systemData.systemInfo.docUrl)"
+                  >
+                    {{ state.systemData.systemInfo.docUrl }}
+                  </div>
+                </div>
+                <div :class="!auth('docAdmin:docUser:list')?'mt20':''" class="flex">
+                  <div class="f-16 flex-1 system_title" style="line-height: 30px">系统简述：</div>
+                  <div class="f-12 flex-4" style="color: #858585; line-height: 20px">
+                    {{ state.systemData.systemInfo.describe }}
+                  </div>
+                </div>
+              </el-col>
+            </el-row>
+
+
           </div>
         </div>
       </el-col>
@@ -261,7 +271,12 @@
     type VueUiSparklineDatasetItem,
     type VueUiSparklineConfig,
   } from 'vue-data-ui';
-
+  import Auth from "/@/components/auth/auth.vue";
+  import { auth, auths, authAll } from '/@/utils/authFunction';
+  const onAuthClick = () => {
+    if (!auth('docAdmin:docUser:list')) ElMessage.error('抱歉，您没有权限！');
+    else ElMessage.success('恭喜，您有权限！');
+  };
   const config1 = ref({
     style: {
       // backgroundColor: '#2A2A2A',
@@ -286,8 +301,8 @@
   });
   const dataset1 = ref([
     {
-      period: 'T1',
-      value: 55,
+      period: '%',
+      value: 39,
     },
     {
       period: 'T0',
@@ -366,8 +381,8 @@
       value: 8,
     },
     {
-      period: 'T19',
-      value: 55,
+      period: '%',
+      value: 39,
     },
   ]);
 
@@ -535,12 +550,24 @@
     },
     sysNoticeData: [] as Array<NoticeEntity>,
   });
-
+  const generateData = (title:string) => {
+    return { period: title,
+      value: Math.floor(Math.random() * 96) + 5
+    };
+  };
   // 页面加载时
   onMounted(() => {
     getHomeInfo();
     getUserList();
     getNoticeList();
+
+    // setInterval(() => {
+    //   let d=dataset1.value;
+    //   if(d.length>10){
+    //     d.shift();
+    //   }
+    //   dataset1.value.push(generateData("%"));
+    // },3000);
   });
   // 当前时间提示语
   const currentTime = computed(() => {
@@ -587,6 +614,7 @@
    * 获取用户列表
    */
   const getUserList = () => {
+    if(!auth('docAdmin:docUser:list')) return;
     baseApi
       .list(state.docUserData.param)
       .then((res) => {
