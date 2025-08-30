@@ -2,6 +2,7 @@ import { IHooksOptions } from '/@/hooks/interface';
 import service from '/@/utils/request';
 import { onMounted } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { NextLoading } from '/@/utils/loading';
 
 export const useCrud = (options: IHooksOptions) => {
   const defaultOptions: IHooksOptions = {
@@ -150,7 +151,12 @@ export const useCrud = (options: IHooksOptions) => {
           });
         }
       })
-      .catch(() => {});
+      .catch(async (err) => {
+        ElMessage.warning(err);
+      })
+      .finally(() => {
+        NextLoading.close();
+      });
   };
 
   return {

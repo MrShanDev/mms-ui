@@ -113,7 +113,7 @@
                     dict-type="SYS_STATE"
                     placeholder="用户状态"
                     :disabled="$ut.isSuperAdmin(scope.row.roleCodes)"
-                    @change="updateStatus(scope.row,scope.row.status )"
+                    @change="updateStatus(scope.row, scope.row.status)"
                   ></fast-switch>
                 </template>
               </el-table-column>
@@ -387,7 +387,7 @@
           getTableData();
         }, 1000);
       });
-  }
+  };
   // 接受子组件传值
   const formSubmit = (row: RowUserType) => {
     if (isEmpty(row.userId)) {

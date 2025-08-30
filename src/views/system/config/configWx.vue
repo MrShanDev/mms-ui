@@ -156,7 +156,7 @@
   import { sysConfigApi } from '/@/views/system/config';
   const baseApi = sysConfigApi();
   import { ElMessage } from 'element-plus';
-  import {SysEnum} from "/@/enums/SysEnum";
+  import { SysEnum } from '/@/enums/SysEnum';
   const props = defineProps({
     value: {
       type: Array,

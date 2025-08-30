@@ -186,7 +186,7 @@
   } from '/@/views/system/generate';
   import { useMenuApi } from '/@/views/system/menu';
   import { RouteItems } from '/@/types/global';
-  import {NextLoading} from "/@/utils/loading";
+  import { NextLoading } from '/@/utils/loading';
   const emit = defineEmits(['refreshDataList']);
 
   const visible = ref(false);
@@ -244,23 +244,29 @@
   };
 
   const getBaseClassList = () => {
-    useBaseClassListApi().then((res) => {
-      baseClassList.value = res.data;
-    }).catch(async (err) => {
-      ElMessage.warning(err);
-    }).finally(() => {
-      NextLoading.close();
-    });
+    useBaseClassListApi()
+      .then((res) => {
+        baseClassList.value = res.data;
+      })
+      .catch(async (err) => {
+        ElMessage.warning(err);
+      })
+      .finally(() => {
+        NextLoading.close();
+      });
   };
 
   const getTable = (id: number) => {
-    useTableApi(id).then((res) => {
-      Object.assign(dataForm, res.data);
-    }).catch(async (err) => {
-      ElMessage.warning(err);
-    }).finally(() => {
-      NextLoading.close();
-    });
+    useTableApi(id)
+      .then((res) => {
+        Object.assign(dataForm, res.data);
+      })
+      .catch(async (err) => {
+        ElMessage.warning(err);
+      })
+      .finally(() => {
+        NextLoading.close();
+      });
   };
 
   const dataRules = ref({
@@ -284,20 +290,23 @@
         return false;
       }
 
-      useTableSubmitApi(dataForm).then(() => {
-        ElMessage.success({
-          message: '操作成功',
-          duration: 500,
-          onClose: () => {
-            visible.value = false;
-            emit('refreshDataList');
-          },
+      useTableSubmitApi(dataForm)
+        .then(() => {
+          ElMessage.success({
+            message: '操作成功',
+            duration: 500,
+            onClose: () => {
+              visible.value = false;
+              emit('refreshDataList');
+            },
+          });
+        })
+        .catch(async (err) => {
+          ElMessage.warning(err);
+        })
+        .finally(() => {
+          NextLoading.close();
         });
-      }).catch(async (err) => {
-        ElMessage.warning(err);
-      }).finally(() => {
-        NextLoading.close();
-      });
     });
   };
 
@@ -319,20 +328,23 @@
       }
 
       // 生成代码，自定义路径
-      useGeneratorApi([dataForm.id]).then(() => {
-        ElMessage.success({
-          message: '操作成功',
-          duration: 500,
-          onClose: () => {
-            visible.value = false;
-            emit('refreshDataList');
-          },
+      useGeneratorApi([dataForm.id])
+        .then(() => {
+          ElMessage.success({
+            message: '操作成功',
+            duration: 500,
+            onClose: () => {
+              visible.value = false;
+              emit('refreshDataList');
+            },
+          });
+        })
+        .catch(async (err) => {
+          ElMessage.warning(err);
+        })
+        .finally(() => {
+          NextLoading.close();
         });
-      }).catch(async (err) => {
-        ElMessage.warning(err);
-      }).finally(() => {
-        NextLoading.close();
-      });
     });
   };
 

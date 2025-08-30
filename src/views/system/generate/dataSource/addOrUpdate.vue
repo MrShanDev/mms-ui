@@ -52,7 +52,7 @@
   import { ElMessage } from 'element-plus/es';
   import { useDataSourceApi, useDataSourceSubmitApi } from '/@/views/system/generate';
   import { decrypt, encrypt } from '/@/utils/mms';
-  import {NextLoading} from "/@/utils/loading";
+  import { NextLoading } from '/@/utils/loading';
 
   const emit = defineEmits(['refreshDataList']);
 
@@ -105,20 +105,23 @@
         return false;
       }
       NextLoading.open();
-      useDataSourceSubmitApi({ ...dataForm, password: encrypt(dataForm.password) }).then(() => {
-        ElMessage.success({
-          message: '操作成功',
-          duration: 500,
-          onClose: () => {
-            visible.value = false;
-            emit('refreshDataList');
-          },
+      useDataSourceSubmitApi({ ...dataForm, password: encrypt(dataForm.password) })
+        .then(() => {
+          ElMessage.success({
+            message: '操作成功',
+            duration: 500,
+            onClose: () => {
+              visible.value = false;
+              emit('refreshDataList');
+            },
+          });
+        })
+        .catch(async (err) => {
+          ElMessage.warning(err);
+        })
+        .finally(() => {
+          NextLoading.close();
         });
-      }).catch(async (err) => {
-        ElMessage.warning(err);
-      }).finally(() => {
-        NextLoading.close();
-      });
     });
   };
 

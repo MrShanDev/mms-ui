@@ -120,7 +120,7 @@
   import { useTableSyncApi, useDownloadApi, usePreviewApi } from '/@/views/system/generate';
   import { ElMessage, ElMessageBox } from 'element-plus';
   import { getEnv, generateUUID } from '/@/utils/mms';
-  import {NextLoading} from "/@/utils/loading";
+  import { NextLoading } from '/@/utils/loading';
   const componentKey = ref(generateUUID());
   const state: IHooksOptions = reactive({
     dataListUrl: getEnv() + '/gen/table/page',
@@ -140,12 +140,12 @@
   };
 
   const editHandle = (id?: number) => {
-    NextLoading.open()
+    NextLoading.open();
     editRef.value.init(id);
   };
 
   const generatorHandle = (id?: number) => {
-    NextLoading.open()
+    NextLoading.open();
     generatorRef.value.init(id);
   };
 
@@ -172,11 +172,13 @@
         useTableSyncApi(row.id).then(() => {
           ElMessage.success('同步成功');
         });
-      }).catch(async (err) => {
-      ElMessage.warning(err);
-    }).finally(() => {
-      NextLoading.close();
-    });
+      })
+      .catch(async (err) => {
+        ElMessage.warning(err);
+      })
+      .finally(() => {
+        NextLoading.close();
+      });
   };
 
   const previewHandle = (id: any) => {

@@ -329,13 +329,16 @@
   };
 
   const getTable = (id: number) => {
-    useTableApi(id).then((res) => {
-      fieldList.value = res.data.fieldList;
-    }).catch(async (err) => {
-      ElMessage.warning(err);
-    }).finally(() => {
-      NextLoading.close();
-    });
+    useTableApi(id)
+      .then((res) => {
+        fieldList.value = res.data.fieldList;
+      })
+      .catch(async (err) => {
+        ElMessage.warning(err);
+      })
+      .finally(() => {
+        NextLoading.close();
+      });
   };
 
   const getFieldTypeList = async () => {
@@ -352,21 +355,24 @@
   // 表单提交
   const submitHandle = () => {
     NextLoading.open();
-    useTableFieldSubmitApi(tableId.value, fieldList.value).then(() => {
-      NextLoading.close();
-      ElMessage.success({
-        message: '操作成功',
-        duration: 500,
-        onClose: () => {
-          visible.value = false;
-          emit('refreshDataList');
-        },
+    useTableFieldSubmitApi(tableId.value, fieldList.value)
+      .then(() => {
+        NextLoading.close();
+        ElMessage.success({
+          message: '操作成功',
+          duration: 500,
+          onClose: () => {
+            visible.value = false;
+            emit('refreshDataList');
+          },
+        });
+      })
+      .catch(async (err) => {
+        ElMessage.warning(err);
+      })
+      .finally(() => {
+        NextLoading.close();
       });
-    }).catch(async (err) => {
-      ElMessage.warning(err);
-    }).finally(() => {
-          NextLoading.close();
-    });
   };
 
   const getTableData = () => {

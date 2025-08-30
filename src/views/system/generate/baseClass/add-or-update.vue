@@ -38,7 +38,7 @@
   import { reactive, ref } from 'vue';
   import { ElMessage } from 'element-plus/es';
   import { useBaseClassApi, useBaseClassSubmitApi } from '/@/views/system/generate';
-  import {NextLoading} from "/@/utils/loading";
+  import { NextLoading } from '/@/utils/loading';
 
   const emit = defineEmits(['refreshDataList']);
 
@@ -87,20 +87,23 @@
         return false;
       }
       NextLoading.open();
-      useBaseClassSubmitApi(dataForm).then(() => {
-        ElMessage.success({
-          message: '操作成功',
-          duration: 500,
-          onClose: () => {
-            visible.value = false;
-            emit('refreshDataList');
-          },
+      useBaseClassSubmitApi(dataForm)
+        .then(() => {
+          ElMessage.success({
+            message: '操作成功',
+            duration: 500,
+            onClose: () => {
+              visible.value = false;
+              emit('refreshDataList');
+            },
+          });
+        })
+        .catch(async (err) => {
+          ElMessage.warning(err);
+        })
+        .finally(() => {
+          NextLoading.close();
         });
-      }).catch(async (err) => {
-        ElMessage.warning(err);
-      }).finally(() => {
-        NextLoading.close();
-      });
     });
   };
 

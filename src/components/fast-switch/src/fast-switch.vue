@@ -49,10 +49,10 @@
       default: () => false,
     },
   });
-  const updateEvent=(value:any)=>{
+  const updateEvent = (value: any) => {
     emit('update:modelValue', value);
     emit('change', value);
-  }
+  };
 
   const dataList = getDictDataList(appStore.dictList, props.dictType);
 </script>

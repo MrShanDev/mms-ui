@@ -118,21 +118,24 @@
       return;
     }
     NextLoading.open();
-    useTableImportSubmitApi(dataForm.datasourceId, tableNameList).then(() => {
-      NextLoading.close();
-      ElMessage.success({
-        message: '操作成功',
-        duration: 500,
-        onClose: () => {
-          visible.value = false;
-          emit('refreshDataList');
-        },
+    useTableImportSubmitApi(dataForm.datasourceId, tableNameList)
+      .then(() => {
+        NextLoading.close();
+        ElMessage.success({
+          message: '操作成功',
+          duration: 500,
+          onClose: () => {
+            visible.value = false;
+            emit('refreshDataList');
+          },
+        });
+      })
+      .catch(async (err) => {
+        ElMessage.warning(err);
+      })
+      .finally(() => {
+        NextLoading.close();
       });
-    }).catch(async (err) => {
-      ElMessage.warning(err);
-    }).finally(() => {
-      NextLoading.close();
-    });
   };
 
   defineExpose({
