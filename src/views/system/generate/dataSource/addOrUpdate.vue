@@ -50,7 +50,7 @@
 <script setup lang="ts">
   import { reactive, ref } from 'vue';
   import { ElMessage } from 'element-plus/es';
-  import { useDataSourceApi, useDataSourceSubmitApi } from '/@/api/gen';
+  import { useDataSourceApi, useDataSourceSubmitApi } from '/@/views/system/generate';
   import { decrypt, encrypt } from '/@/utils/mms';
 
   const emit = defineEmits(['refreshDataList']);

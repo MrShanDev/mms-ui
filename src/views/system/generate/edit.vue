@@ -211,11 +211,15 @@
   import { nextTick, reactive, ref } from 'vue';
   import { ElMessage, TabsPaneContext } from 'element-plus/es';
   import Sortable from 'sortablejs';
-  import { useTableFieldSubmitApi, useTableApi, useFieldTypeListApi } from '/@/api/gen';
-  import { dictApi } from '/@/api/system/dict';
+  import {
+    useTableFieldSubmitApi,
+    useTableApi,
+    useFieldTypeListApi,
+  } from '/@/views/system/generate';
+  import { dictApi } from '/@/views/system/dict';
   import { VxeTableInstance } from 'vxe-table';
   import { NextLoading } from '/@/utils/loading';
-  import { RowDictType } from '/@/api/system/dict/type';
+  import { RowDictType } from '/@/views/system/dict/type';
   // 引入 api 请求接口
   const baseApi = dictApi();
 
@@ -301,6 +305,7 @@
     getTable(id);
     getFieldTypeList();
     getTableData();
+    NextLoading.close();
   };
   const changeFormType = (row: any) => {
     row.formType = 'select';

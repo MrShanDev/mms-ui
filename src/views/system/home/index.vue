@@ -275,14 +275,14 @@
   const { themeConfig } = storeToRefs(storesThemeConfig);
   const { isTagsViewCurrenFull } = storeToRefs(storesTagsViewRoutes);
   import { DocUserBo, DocUserVo } from '/@/views/docAdmin/docUser/type';
-  import { NoticeEntity, NoticeState } from '/@/api/system/notice/type';
-  import { noticeApi } from '/@/api/system/notice';
-  import { homeApi } from '/@/api/system/home';
+  import { NoticeEntity, NoticeState } from '/@/views/system/notice/type';
+  import { noticeApi } from '/@/views/system/notice';
+  import { homeApi } from '/@/views/system/home';
   import { ElMessage } from 'element-plus';
   import { useRoute, useRouter } from 'vue-router';
   import FastImg from '/@/components/fast-upload/img.vue';
   import { generateUUID } from '/@/utils/mms';
-  import { sysConfigApi } from '/@/api/system/config';
+  import { sysConfigApi } from '/@/views/system/config';
   const baseApiConfig = sysConfigApi();
   const stores = useUserInfo();
   const { userInfos } = storeToRefs(stores);

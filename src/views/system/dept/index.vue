@@ -127,10 +127,10 @@
   import { ElMessageBox, ElMessage } from 'element-plus';
   import { CURDEnum } from '/@/enums/CURDEnum';
   import { isEmpty } from '/@/utils/mms';
-  import { deptApi } from '/@/api/system/dept';
+  import { deptApi } from '/@/views/system/dept';
   import FastTableColumn from '/@/components/fast-table-column';
   import FastSwitch from '/@/components/fast-switch/src/fast-switch.vue';
-  import { DeptEntity, DeptState } from '/@/api/system/dept/type';
+  import { DeptEntity, DeptState } from '/@/views/system/dept/type';
   import { NextLoading } from '/@/utils/loading';
   const deptDialogRef = ref();
   const DeptDialog = defineAsyncComponent(() => import('/@/views/system/dept/dialog.vue'));

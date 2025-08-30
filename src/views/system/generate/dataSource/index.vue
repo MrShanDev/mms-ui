@@ -124,7 +124,7 @@
 <script setup lang="ts">
   import { reactive, ref } from 'vue';
   import { IHooksOptions } from '/@/hooks/interface';
-  import { useDataSourceTestApi } from '/@/api/gen';
+  import { useDataSourceTestApi } from '/@/views/system/generate';
   import { useCrud } from '/@/hooks';
   import { ElMessage } from 'element-plus';
   import AddOrUpdate from './addOrUpdate.vue';

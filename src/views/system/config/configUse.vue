@@ -145,14 +145,14 @@
 </template>
 <script setup lang="ts">
   import { defineAsyncComponent, onMounted, reactive, ref } from 'vue';
-  import { sysConfigApi } from '/@/api/system/config';
+  import { sysConfigApi } from '/@/views/system/config';
   import { ElMessage, ElMessageBox } from 'element-plus';
   import FastTableColumn from '/@/components/fast-table-column/src/fast-table-column.vue';
   import FastSwitch from '/@/components/fast-switch/src/fast-switch.vue';
   import { CURDEnum } from '/@/enums/CURDEnum';
   import { isEmpty, generateUUID } from '/@/utils/mms';
   const baseApi = sysConfigApi();
-  const SysConfigDialog = defineAsyncComponent(() => import('/src/views/system/config/dialog.vue'));
+  const SysConfigDialog = defineAsyncComponent(() => import('/@/views/system/config/dialog.vue'));
   const TableTool = defineAsyncComponent(() => import('/@/components/table-tool/index.vue'));
   const sysConfigDialogRef = ref();
   const curdEnum = CURDEnum;

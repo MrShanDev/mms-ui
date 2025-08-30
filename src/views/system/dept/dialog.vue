@@ -91,9 +91,9 @@
   import { CURDEnum } from '/@/enums/CURDEnum';
   const dialogWidth = ref('50vw');
   import FastSwitch from '/@/components/fast-switch/src/fast-switch.vue';
-  import { deptApi } from '/@/api/system/dept';
+  import { deptApi } from '/@/views/system/dept';
   import { Eleme } from '@element-plus/icons-vue';
-  import { DeptEntity } from '/@/api/system/dept/type';
+  import { DeptEntity } from '/@/views/system/dept/type';
   const baseApi = deptApi();
   // 定义子组件向父组件传值/事件
   const emit = defineEmits(['refresh']);

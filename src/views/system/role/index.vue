@@ -146,11 +146,11 @@
 <script setup lang="ts" name="systemRole">
   import { defineAsyncComponent, reactive, onMounted, ref } from 'vue';
   import { ElMessageBox, ElMessage, tabBarProps } from 'element-plus';
-  import { roleApi } from '/@/api/system/role';
+  import { roleApi } from '/@/views/system/role';
   import { isEmpty, generateUUID } from '/@/utils/mms';
   import { CURDEnum } from '/@/enums/CURDEnum';
   import { NextLoading } from '/@/utils/loading';
-  import { RowRoleType, SysRoleState } from '/@/api/system/role/type';
+  import { RowRoleType, SysRoleState } from '/@/views/system/role/type';
   import { Eleme } from '@element-plus/icons-vue';
   import FastSwitch from '/@/components/fast-switch/src/fast-switch.vue';
 

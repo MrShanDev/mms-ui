@@ -3,4 +3,5 @@ export enum CURDEnum {
   EDIT = 'edit',
   DELETE = 'delete',
   SELECT = 'select',
+  STATE = 'state',
 }

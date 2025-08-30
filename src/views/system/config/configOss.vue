@@ -34,8 +34,8 @@
           inline-prompt
           active-text="启用"
           inactive-text="禁用"
-          :active-value="0"
-          :inactive-value="1"
+          :active-value="SysEnum.SYS_COMMON_STATE_OPEN"
+          :inactive-value="SysEnum.SYS_COMMON_STATE_CLOSE"
         ></el-switch>
       </el-form-item>
       <el-form-item label="空间域名 Domain" prop="domain">
@@ -103,7 +103,9 @@
   import { reactive, defineAsyncComponent, ref } from 'vue';
   import FastImg from '/@/components/fast-upload/img.vue';
   import { ElMessage } from 'element-plus';
-  import { ossApi } from '/@/api/system/oss';
+  import { ossApi } from '/@/views/system/oss';
+  import { SysEnum } from '/@/enums/SysEnum';
+  import { SysOssConfigBo } from '/@/views/system/oss/type';
   const testImage = ref('');
   const props = defineProps({
     value: {
@@ -198,8 +200,8 @@
     accessPolicy: 'public-read',
     ext1: '',
     sort: 1,
-    status: 1,
-    revision: '',
+    status: 0,
+    revision: 1,
     tenantId: '',
     createdBy: '',
     createdTime: '',
@@ -219,10 +221,10 @@
     ruleForm.isHttps = 'N';
     ruleForm.region = '';
     ruleForm.accessPolicy = 'public-read';
-    ruleForm.status = 1;
+    ruleForm.status = 0;
     ruleForm.ext1 = '';
     ruleForm.sort = 1;
-    ruleForm.revision = '';
+    ruleForm.revision = 1;
     ruleForm.tenantId = '';
     ruleForm.createdBy = '';
     ruleForm.createdTime = '';

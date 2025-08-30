@@ -102,7 +102,7 @@
     ElMessage,
   } from 'element-plus';
   import printJs from 'print-js';
-  import { importData, downloadTemplate, exportData, printData } from '/@/api/system/upload';
+  import { importData, downloadTemplate, exportData, printData } from '/src/views/system/upload';
   import { Session } from '/@/utils/storage';
   import { isEmpty } from '/@/utils/mms';
   import { CURDEnum } from '/@/enums/CURDEnum';

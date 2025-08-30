@@ -60,6 +60,7 @@
   import FastSwitch from '/@/components/fast-switch/src/fast-switch.vue';
   import { CURDEnum } from '/@/enums/CURDEnum';
   import FastImg from '/@/components/fast-upload/img.vue';
+  import { RowSysConfigType } from '/@/views/system/config/type';
 
   // 定义子组件向父组件传值/事件
   const emit = defineEmits(['refresh']);
@@ -70,10 +71,10 @@
     configValue: '',
     configType: 2,
     tenantId: '',
-    revision: '',
+    revision: 1,
     remark: '',
     status: 0,
-    sort: '',
+    sort: 0,
     createdBy: '',
     createdTime: '',
     updatedBy: '',
@@ -99,10 +100,10 @@
       configValue: '',
       configType: 2,
       tenantId: '',
-      revision: '',
+      revision: 1,
       remark: '',
       status: 0,
-      sort: '',
+      sort: 0,
       createdBy: '',
       createdTime: '',
       updatedBy: '',

@@ -34,7 +34,7 @@
 <script setup lang="ts">
   import { reactive, ref } from 'vue';
   import { ElMessage } from 'element-plus/es';
-  import { useProjectApi, useProjectSubmitApi } from '/@/api/gen';
+  import { useProjectApi, useProjectSubmitApi } from '/@/views/system/generate';
 
   const emit = defineEmits(['refreshDataList']);
 

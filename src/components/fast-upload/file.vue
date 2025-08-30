@@ -17,11 +17,11 @@
     <template v-if="isShowMsg" #tip>
       <div class="el-upload__tip">all files with a size less than 100M.</div>
     </template>
-    <VideoPlayer  :url="videoUrl" ref="videoPlayer"></VideoPlayer>
+    <VideoPlayer :url="videoUrl" ref="videoPlayer"></VideoPlayer>
   </el-upload>
 </template>
 <script lang="ts" setup>
-import {ref, computed, inject, onMounted, nextTick} from 'vue';
+  import { ref, computed, inject, onMounted, nextTick } from 'vue';
   import {
     UploadProps,
     UploadRequestOptions,
@@ -32,12 +32,12 @@ import {ref, computed, inject, onMounted, nextTick} from 'vue';
     UploadFile,
     UploadUserFile,
   } from 'element-plus';
-  import { uploadImg } from '/@/api/system/upload';
+  import { uploadImg } from '/src/views/system/upload';
   import { Session } from '/@/utils/storage';
-  import {NextLoading} from "/@/utils/loading";
-  import VideoPlayer from "/@/components/video-player/index.vue";
-  const videoPlayer=ref();
-  const videoUrl=ref<any>()
+  import { NextLoading } from '/@/utils/loading';
+  import VideoPlayer from '/@/components/video-player/index.vue';
+  const videoPlayer = ref();
+  const videoUrl = ref<any>();
   const httpFileHeaders = ref({
     Authorization: `${Session.get('token')}`,
   });
@@ -123,16 +123,18 @@ import {ref, computed, inject, onMounted, nextTick} from 'vue';
     let formData = new FormData();
     formData.append('file', options.file);
     try {
-      NextLoading.open()
-      await uploadImg(formData).then((res) => {
-        emit('update:modelValue', res.data.url);
-        emit('success', res.data);
-        videoUrl.value=res.data.url;
-        // 调用 el-form 内部的校验方法（可自动校验）
-        formItemContext?.prop && formContext?.validateField([formItemContext.prop as string]);
-      }).finally(()=>{
-        NextLoading.close();
-      });
+      NextLoading.open();
+      await uploadImg(formData)
+        .then((res) => {
+          emit('update:modelValue', res.data.url);
+          emit('success', res.data);
+          videoUrl.value = res.data.url;
+          // 调用 el-form 内部的校验方法（可自动校验）
+          formItemContext?.prop && formContext?.validateField([formItemContext.prop as string]);
+        })
+        .finally(() => {
+          NextLoading.close();
+        });
     } catch (error) {
       options.onError(error as any);
     }
@@ -143,9 +145,9 @@ import {ref, computed, inject, onMounted, nextTick} from 'vue';
   };
   // 点击
   const handlePreview: UploadProps['onPreview'] = (uploadFile) => {
-    if(props.fileType.find((e)=> e === 'video/mp4')){
-      if(uploadFile.url!=undefined&&uploadFile.url.length>10){
-        videoUrl.value=uploadFile.url;
+    if (props.fileType.find((e) => e === 'video/mp4')) {
+      if (uploadFile.url != undefined && uploadFile.url.length > 10) {
+        videoUrl.value = uploadFile.url;
       }
       videoPlayer.value.openDialog();
     }

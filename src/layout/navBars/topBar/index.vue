@@ -16,7 +16,7 @@
   import mittBus from '/@/utils/mitt';
   import { useUserInfo } from '/@/stores/userInfo';
   import { Session } from '/@/utils/storage';
-  import { logout } from '/@/api/system/login';
+  import { logout } from '/src/views/system/login';
   // 引入组件
   const Breadcrumb = defineAsyncComponent(() => import('/@/layout/navBars/topBar/breadcrumb.vue'));
   const User = defineAsyncComponent(() => import('/@/layout/navBars/topBar/user.vue'));

@@ -93,7 +93,6 @@
   }
   pre {
     margin: 0;
-    padding: 0;
     background-color: #f6f8fa;
     border-radius: 5px;
     padding: 10px;

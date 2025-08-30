@@ -9,7 +9,7 @@
     :active-text="dataList[0].dictLabel"
     :inactive-text="dataList[1].dictLabel"
     :disabled="disabled"
-    @change="$emit('update:modelValue', $event)"
+    @change="updateEvent"
   ></el-switch>
   <span v-if="dataList.length == 0">字典为空</span>
   <span v-if="dataList.length == 1">字典数量应该是2个</span>
@@ -19,7 +19,10 @@
 <script setup lang="ts" name="FastSelect">
   import { getDictDataList } from '/@/utils/mms';
   import { useAppStore } from '/@/stores/app';
-
+  const emit = defineEmits<{
+    'update:modelValue': [value: any];
+    change: [value: any];
+  }>();
   const appStore = useAppStore();
   const props = defineProps({
     modelValue: {
@@ -46,6 +49,10 @@
       default: () => false,
     },
   });
+  const updateEvent=(value:any)=>{
+    emit('update:modelValue', value);
+    emit('change', value);
+  }
 
   const dataList = getDictDataList(appStore.dictList, props.dictType);
 </script>

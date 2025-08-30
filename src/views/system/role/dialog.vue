@@ -99,10 +99,10 @@
 <script setup lang="ts" name="systemRoleDialog">
   import { reactive, ref, nextTick } from 'vue';
   import { ElTree, ElMessage } from 'element-plus';
-  import { roleApi } from '/@/api/system/role';
+  import { roleApi } from '/@/views/system/role';
   import { CURDEnum } from '/@/enums/CURDEnum';
   import FastSwitch from '/@/components/fast-switch/src/fast-switch.vue';
-  import { RowRoleType } from '/@/api/system/role/type';
+  import { RowRoleType } from '/@/views/system/role/type';
   import { Eleme } from '@element-plus/icons-vue';
   const baseApi = roleApi();
   // 定义子组件向父组件传值/事件

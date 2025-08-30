@@ -39,8 +39,8 @@
             inline-prompt
             active-text="启用"
             inactive-text="禁用"
-            active-value="0"
-            inactive-value="1"
+            :active-value="SysEnum.SYS_COMMON_STATE_OPEN"
+            :inactive-value="SysEnum.SYS_COMMON_STATE_CLOSE"
           ></el-switch>
         </el-form-item>
         <el-form-item label="登录方式" prop="status">
@@ -62,10 +62,11 @@
 </template>
 <script setup lang="ts">
   import { onMounted, reactive } from 'vue';
-  import { sysConfigApi } from '/@/api/system/config';
+  import { sysConfigApi } from '/@/views/system/config';
   const baseApi = sysConfigApi();
   import FastImg from '/@/components/fast-upload/img.vue';
   import { ElMessage } from 'element-plus';
+  import { SysEnum } from '/@/enums/SysEnum';
   const props = defineProps({
     value: {
       type: Array,

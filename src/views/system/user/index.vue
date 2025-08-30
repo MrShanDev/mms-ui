@@ -113,6 +113,7 @@
                     dict-type="SYS_STATE"
                     placeholder="用户状态"
                     :disabled="$ut.isSuperAdmin(scope.row.roleCodes)"
+                    @change="updateStatus(scope.row,scope.row.status )"
                   ></fast-switch>
                 </template>
               </el-table-column>
@@ -262,11 +263,11 @@
   import { ElMessageBox, ElMessage } from 'element-plus';
   import { CURDEnum } from '/@/enums/CURDEnum';
   import { isEmpty, generateUUID } from '/@/utils/mms';
-  import { userApi } from '/@/api/system/user';
-  import { roleApi } from '/@/api/system/role';
-  import { RowUserType, SysUserState } from '/@/api/system/user/type';
+  import { userApi } from '/@/views/system/user';
+  import { roleApi } from '/@/views/system/role';
+  import { RowUserType, SysUserState } from '/@/views/system/user/type';
   import { NextLoading } from '/@/utils/loading';
-  import { RowRoleType } from '/@/api/system/role/type';
+  import { RowRoleType } from '/@/views/system/role/type';
   import { Eleme } from '@element-plus/icons-vue';
   import FastSwitch from '/@/components/fast-switch/src/fast-switch.vue';
 
@@ -370,6 +371,23 @@
         .catch(() => {});
     }
   };
+  //更新状态
+  const updateStatus = (row: RowUserType, status: number) => {
+    row.status = status;
+    baseApi
+      .edit(row)
+      .then((res) => {
+        ElMessage.success('更新状态成功');
+      })
+      .catch(async (err) => {
+        ElMessage.warning(err);
+      })
+      .finally(() => {
+        setTimeout(() => {
+          getTableData();
+        }, 1000);
+      });
+  }
   // 接受子组件传值
   const formSubmit = (row: RowUserType) => {
     if (isEmpty(row.userId)) {

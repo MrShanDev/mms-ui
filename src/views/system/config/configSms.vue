@@ -81,7 +81,7 @@
     },
   });
   import { onMounted, reactive, ref } from 'vue';
-  import { sysConfigApi } from '/@/api/system/config';
+  import { sysConfigApi } from '/@/views/system/config';
   import { ElMessage } from 'element-plus';
   const baseApi = sysConfigApi();
   const testPhone = ref('');

@@ -31,7 +31,7 @@
 
 <script setup lang="ts" name="loginScan">
   import { ref, onMounted, nextTick, onUnmounted } from 'vue';
-  import { getWxCode, queryWxCodeState } from '/@/api/system/init';
+  import { getWxCode, queryWxCodeState } from '/@/views/system/init';
   import { generateUUID } from '/@/utils/mms';
   import { ElMessage } from 'element-plus';
   import { useI18n } from 'vue-i18n';

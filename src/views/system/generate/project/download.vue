@@ -71,7 +71,11 @@
 
 <script setup lang="ts">
   import { reactive, ref } from 'vue';
-  import { useProjectApi, useProjectSubmitApi, useSourceDownloadApi } from '/@/api/gen';
+  import {
+    useProjectApi,
+    useProjectSubmitApi,
+    useSourceDownloadApi,
+  } from '/@/views/system/generate';
 
   const visible = ref(false);
   const dataFormRef = ref();

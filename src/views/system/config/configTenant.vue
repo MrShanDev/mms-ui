@@ -33,7 +33,7 @@
 </template>
 <script setup lang="ts">
   import { onMounted, reactive } from 'vue';
-  import { sysConfigApi } from '/@/api/system/config';
+  import { sysConfigApi } from '/@/views/system/config';
   const baseApi = sysConfigApi();
   import { ElMessage } from 'element-plus';
   const props = defineProps({

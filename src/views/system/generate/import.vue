@@ -58,7 +58,7 @@
     useDataSourceListApi,
     useDataSourceTableListApi,
     useTableImportSubmitApi,
-  } from '/@/api/gen';
+  } from '/@/views/system/generate';
   import { NextLoading } from '/@/utils/loading';
 
   const emit = defineEmits(['refreshDataList']);
@@ -94,6 +94,7 @@
     dataForm.tableList = [];
 
     getDataSourceList();
+    NextLoading.close();
   };
 
   const getDataSourceList = () => {

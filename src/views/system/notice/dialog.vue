@@ -86,8 +86,8 @@
   import FastSelect from '/@/components/fast-select/src/fast-select.vue';
   import FastFile from '/@/components/fast-upload/file.vue';
   import FastSwitch from '/@/components/fast-switch/src/fast-switch.vue';
-  import { NoticeEntity } from '/@/api/system/notice/type';
-  import { DeptEntity } from '/@/api/system/dept/type';
+  import { NoticeEntity } from '/@/views/system/notice/type';
+  import { DeptEntity } from '/@/views/system/dept/type';
   import { Eleme } from '@element-plus/icons-vue';
   // 定义子组件向父组件传值/事件
   const emit = defineEmits(['refresh']);

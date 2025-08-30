@@ -57,7 +57,7 @@
 <script setup lang="ts">
   import { onMounted, reactive } from 'vue';
   import { ElMessage } from 'element-plus';
-  import { sysConfigApi } from '/@/api/system/config';
+  import { sysConfigApi } from '/@/views/system/config';
   const baseApi = sysConfigApi();
 
   import FastImg from '/@/components/fast-upload/img.vue';

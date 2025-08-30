@@ -27,8 +27,8 @@
               <el-switch
                 v-model="state.ruleForm.status"
                 inline-prompt
-                active-value="0"
-                inactive-value="1"
+                :active-value="SysEnum.SYS_COMMON_STATE_OPEN"
+                :inactive-value="SysEnum.SYS_COMMON_STATE_CLOSE"
                 active-text="启"
                 inactive-text="禁"
               ></el-switch>
@@ -49,12 +49,12 @@
                         <ele-Delete />
                       </el-icon>
                     </el-button>
-                    <span class="ml10">字段</span>
+                    <span class="ml10">编码</span>
                   </template>
                   <el-input
                     v-model="v.label"
                     style="width: 100%"
-                    placeholder="请输入字段名"
+                    placeholder="请输入字典编码"
                   ></el-input>
                 </el-form-item>
               </el-col>
@@ -97,8 +97,8 @@
                   <el-switch
                     v-model="v.status"
                     inline-prompt
-                    active-value="0"
-                    inactive-value="1"
+                    :active-value="SysEnum.SYS_COMMON_STATE_OPEN"
+                    :inactive-value="SysEnum.SYS_COMMON_STATE_CLOSE"
                     active-text="启"
                     inactive-text="禁"
                   ></el-switch>
@@ -153,6 +153,8 @@
   import { reactive, ref } from 'vue';
   import { CURDEnum } from '/@/enums/CURDEnum';
   import { Eleme } from '@element-plus/icons-vue';
+  import { SysEnum } from '/@/enums/SysEnum';
+  import { ListType } from '/@/views/system/dict/type';
   // 定义子组件向父组件传值/事件
   const emit = defineEmits(['refresh']);
 
@@ -204,6 +206,7 @@
       state.dialog.submitTxt = '新 增';
       state.dialog.type = CURDEnum.INSERT;
     }
+    state.dialog.loading = false;
     state.dialog.isShowDialog = true;
   };
   // 关闭弹窗

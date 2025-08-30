@@ -58,8 +58,8 @@
   import { reactive } from 'vue';
   import { phone } from '/@/utils/toolsValidate';
   import { ElMessage } from 'element-plus';
-  import { smsCode } from '/@/api/system/init';
-  import { loginByPhone } from '/@/api/system/login';
+  import { smsCode } from '/@/views/system/init';
+  import { loginByPhone } from '/@/views/system/login';
   import { Session } from '/@/utils/storage';
   import Cookies from 'js-cookie';
   import { useThemeConfig } from '/@/stores/themeConfig';

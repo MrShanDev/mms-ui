@@ -87,7 +87,7 @@
   import { formatAxis } from '/@/utils/formatTime';
   import { NextLoading } from '/@/utils/loading';
 
-  import { sysInfo, captcha, login } from '/@/api/system/login';
+  import { sysInfo, captcha, login } from '/@/views/system/login';
   import { SysEnum } from '/@/enums/SysEnum';
   // 接受父组件参数
   const props = defineProps({

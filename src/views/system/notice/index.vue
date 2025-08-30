@@ -168,12 +168,12 @@
   import { ElMessageBox, ElMessage } from 'element-plus';
   import { CURDEnum } from '/@/enums/CURDEnum';
   import { isEmpty, generateUUID } from '/@/utils/mms';
-  import { noticeApi } from '/@/api/system/notice';
+  import { noticeApi } from '/@/views/system/notice';
   import FastTableColumn from '/@/components/fast-table-column';
   import FastSelect from '/@/components/fast-select/src/fast-select.vue';
   import FastSwitch from '/@/components/fast-switch/src/fast-switch.vue';
 
-  import { NoticeEntity, NoticeState } from '/@/api/system/notice/type';
+  import { NoticeEntity, NoticeState } from '/@/views/system/notice/type';
   import { Eleme } from '@element-plus/icons-vue';
   import { NextLoading } from '/@/utils/loading';
   const noticeDialogRef = ref();

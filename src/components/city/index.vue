@@ -40,8 +40,8 @@
 
 <script lang="ts" setup>
   import { ref, computed, watch, onMounted } from 'vue';
-  import { sysAreaApi } from '/@/api/system/sysArea';
-  import { SysAreaBo, SysAreaVo } from '/@/api/system/sysArea/type';
+  import { sysAreaApi } from '/src/views/system/area';
+  import { SysAreaBo, SysAreaVo } from '/src/views/system/area/type';
 
   // 向父组件传递消息，可以传递任意类型的数据，需要 @ 符号 监听捕获
   const emit = defineEmits<{

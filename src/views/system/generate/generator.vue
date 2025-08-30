@@ -183,8 +183,10 @@
     useDownloadApi,
     useTableApi,
     useTableSubmitApi,
-  } from '/@/api/gen';
-  import { useMenuApi } from '/@/api/system/menu/index';
+  } from '/@/views/system/generate';
+  import { useMenuApi } from '/@/views/system/menu';
+  import { RouteItems } from '/@/types/global';
+  import {NextLoading} from "/@/utils/loading";
   const emit = defineEmits(['refreshDataList']);
 
   const visible = ref(false);
@@ -238,6 +240,7 @@
 
     getBaseClassList();
     getTable(id);
+    NextLoading.close();
   };
 
   const getBaseClassList = () => {

@@ -117,9 +117,10 @@
   import Edit from './edit.vue';
   import Generator from './generator.vue';
   import Setting from './setting.vue';
-  import { useTableSyncApi, useDownloadApi, usePreviewApi } from '/@/api/gen';
+  import { useTableSyncApi, useDownloadApi, usePreviewApi } from '/@/views/system/generate';
   import { ElMessage, ElMessageBox } from 'element-plus';
   import { getEnv, generateUUID } from '/@/utils/mms';
+  import {NextLoading} from "/@/utils/loading";
   const componentKey = ref(generateUUID());
   const state: IHooksOptions = reactive({
     dataListUrl: getEnv() + '/gen/table/page',
@@ -139,10 +140,12 @@
   };
 
   const editHandle = (id?: number) => {
+    NextLoading.open()
     editRef.value.init(id);
   };
 
   const generatorHandle = (id?: number) => {
+    NextLoading.open()
     generatorRef.value.init(id);
   };
 

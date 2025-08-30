@@ -14,7 +14,7 @@
             <el-input
               size="default"
               v-model="state.tableData.param.name"
-              placeholder="请输入字典名称"
+              placeholder="请输入字典名称/编码"
               style="max-width: 180px"
               clearable
             ></el-input>
@@ -63,7 +63,7 @@
               <el-table-column prop="name" label="字典名称" show-overflow-tooltip></el-table-column>
               <el-table-column
                 prop="fieldName"
-                label="字段名"
+                label="字典编码"
                 show-overflow-tooltip
               ></el-table-column>
               <el-table-column prop="status" label="字典状态" show-overflow-tooltip>
@@ -73,8 +73,8 @@
                   <el-switch
                     v-model="scope.row.status"
                     inline-prompt
-                    active-value="0"
-                    inactive-value="1"
+                    :active-value="SysEnum.SYS_COMMON_STATE_OPEN"
+                    :inactive-value="SysEnum.SYS_COMMON_STATE_CLOSE"
                     active-text="启"
                     inactive-text="禁"
                   ></el-switch>
@@ -147,10 +147,11 @@
 <script setup lang="ts" name="systemDic">
   import { defineAsyncComponent, reactive, onMounted, ref } from 'vue';
   import { ElMessageBox, ElMessage } from 'element-plus';
-  import { dictApi } from '/@/api/system/dict';
+  import { dictApi } from '/@/views/system/dict';
   import { isEmpty, generateUUID } from '/@/utils/mms';
   import { CURDEnum } from '/@/enums/CURDEnum';
-  import { RowDictType, SysDictState } from '/@/api/system/dict/type';
+  import { SysEnum } from '/@/enums/SysEnum';
+  import { RowDictType, SysDictState } from '/@/views/system/dict/type';
   import { NextLoading } from '/@/utils/loading';
   import { Eleme } from '@element-plus/icons-vue';
   // 引入组件

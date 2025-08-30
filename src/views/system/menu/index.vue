@@ -141,7 +141,7 @@
   import { defineAsyncComponent, ref, onMounted, reactive } from 'vue';
   import { RouteRecordRaw } from 'vue-router';
   import { ElMessageBox, ElMessage } from 'element-plus';
-  import { useMenuApi } from '/@/api/system/menu';
+  import { useMenuApi } from '/@/views/system/menu';
   import { isEmpty, tansParams } from '/@/utils/mms';
   import { CURDEnum } from '/@/enums/CURDEnum';
   import { NextLoading } from '/@/utils/loading';

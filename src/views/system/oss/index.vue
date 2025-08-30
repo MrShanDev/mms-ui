@@ -137,13 +137,14 @@
 <script setup lang="ts" name="systemDic">
   import { defineAsyncComponent, reactive, onMounted, ref } from 'vue';
   import { ElMessageBox, ElMessage, genFileId } from 'element-plus';
-  import { ossApi } from '/@/api/system/oss';
+  import { ossApi } from '/@/views/system/oss';
   import { isEmpty, getEnv } from '/@/utils/mms';
   import { Session } from '/@/utils/storage';
   import type { UploadInstance, UploadProps, UploadRawFile } from 'element-plus';
   import FastTableColumn from '/@/components/fast-table-column/src/fast-table-column.vue';
   import { Hide, Share, Tools, View } from '@element-plus/icons-vue';
   import useClipboard from 'vue-clipboard3';
+  import { SysOssState } from '/@/views/system/oss/type';
 
   // 引入 api 请求接口
   const baseApi = ossApi();

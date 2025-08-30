@@ -325,12 +325,12 @@
   import { formatAxis } from '/@/utils/formatTime';
   import { useUserInfo } from '/@/stores/userInfo';
   import { storeToRefs } from 'pinia';
-  import { uploadImg } from '/@/api/system/upload';
+  import { uploadImg } from '/@/views/system/upload';
   import { Action, ElMessage, ElMessageBox, UploadRequestOptions } from 'element-plus';
   import { generateUUID } from '/@/utils/mms';
-  import { smsCode, emailCode } from '/@/api/system/init';
-  import { userApi } from '/@/api/system/user';
-  import { noticeApi } from '/@/api/system/notice';
+  import { smsCode, emailCode } from '/@/views/system/init';
+  import { userApi } from '/@/views/system/user';
+  import { noticeApi } from '/@/views/system/notice';
   import { Session } from '/@/utils/storage';
   import { elEmail, elPhone, email, phone } from '/@/utils/toolsValidate';
   import type { ComponentSize, FormInstance, FormRules } from 'element-plus';
@@ -346,7 +346,7 @@
   const baseUserApi = userApi();
   // 倒计时
   const exitTime = ref(60);
-  let intervalId: number | undefined;
+  let intervalId: NodeJS.Timeout;
   // 生成组件唯一id
   const uuid = ref('id-' + generateUUID());
   const dialogFormVisible = ref(false);
@@ -649,7 +649,7 @@
     },
     rules: {},
   });
-  let intervalIdWxState: number | undefined;
+  let intervalIdWxState: NodeJS.Timeout;
   // 查询二维码状态
   const queryWxCodeState = () => {
     intervalIdWxState = setInterval(() => {
