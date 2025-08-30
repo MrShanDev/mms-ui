@@ -92,35 +92,35 @@
     </el-row>
     <el-row :gutter="15" class="home-card-three">
       <Auth :value="'docAdmin:docUser:list'">
-      <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
-        <div class="home-card-item mb15">
-          <div class="home-card-item-title">用户分析</div>
-          <div
-            v-infinite-scroll="load"
-            style="height: 450px; overflow-y: auto"
-            class="home-card-item-content flex-col row-between"
-          >
+        <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
+          <div class="home-card-item mb15">
+            <div class="home-card-item-title">用户分析</div>
             <div
-              v-for="(v, k) in state.docUserData.data"
-              :key="k"
-              class="item-content-term flex row-between"
+              v-infinite-scroll="load"
+              style="height: 450px; overflow-y: auto"
+              class="home-card-item-content flex-col row-between"
             >
-              <div class="flex">
-                <div class="user flex-col row-between">
-                  <div class="f-18">{{ v.nickname }}</div>
-                  <div class="f-14">
-                    最后登录日期：
-                    <span style="color: #858585">{{ v.mtime }}</span>
+              <div
+                v-for="(v, k) in state.docUserData.data"
+                :key="k"
+                class="item-content-term flex row-between"
+              >
+                <div class="flex">
+                  <div class="user flex-col row-between">
+                    <div class="f-18">{{ v.nickname }}</div>
+                    <div class="f-14">
+                      最后登录日期：
+                      <span style="color: #858585">{{ v.mtime }}</span>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div class="f-14" style="color: #858585">
-                {{ v.type === 'vip' ? 'VIP会员' : '普通会员' }}
+                <div class="f-14" style="color: #858585">
+                  {{ v.type === 'vip' ? 'VIP会员' : '普通会员' }}
+                </div>
               </div>
             </div>
           </div>
-        </div>
-      </el-col>
+        </el-col>
       </Auth>
       <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
         <div class="home-card-item mb15">
@@ -140,47 +140,73 @@
           </div>
         </div>
       </el-col>
-      <el-col :xs="24" :sm="24" :md="auth('docAdmin:docUser:list')?8:16" :lg="auth('docAdmin:docUser:list')?8:16" :xl="auth('docAdmin:docUser:list')?8:16">
+      <el-col
+        :xs="24"
+        :sm="24"
+        :md="auth('docAdmin:docUser:list') ? 8 : 16"
+        :lg="auth('docAdmin:docUser:list') ? 8 : 16"
+        :xl="auth('docAdmin:docUser:list') ? 8 : 16"
+      >
         <div class="home-card-item mb15 setting">
           <div class="home-card-item-title">系统信息</div>
           <div class="home-card-item-content flex-col row-between col-between p-20">
             <el-row :gutter="30">
-              <el-col :xs="24" :sm="24" :md="auth('docAdmin:docUser:list')?24:8" :lg="auth('docAdmin:docUser:list')?24:8" :xl="auth('docAdmin:docUser:list')?24:8">
+              <el-col
+                :xs="24"
+                :sm="24"
+                :md="auth('docAdmin:docUser:list') ? 24 : 8"
+                :lg="auth('docAdmin:docUser:list') ? 24 : 8"
+                :xl="auth('docAdmin:docUser:list') ? 24 : 8"
+              >
                 <div class="flex">
-                  <div class="f-16 flex-1" style="color: #858585" :style="{'marginTop':auth('docAdmin:docUser:list')?'':'20%'}">
+                  <div
+                    class="f-16 flex-1"
+                    style="color: #858585"
+                    :style="{ marginTop: auth('docAdmin:docUser:list') ? '' : '20%' }"
+                  >
                     <VueDataUi component="VueUiSparkline" :dataset="dataset1" :config="config1" />
                   </div>
                 </div>
-                <div class="flex" >
-                  <div class="f-16 flex-1" style="color: #858585" :style="{'marginTop':auth('docAdmin:docUser:list')?'':'20%'}">
+                <div class="flex">
+                  <div
+                    class="f-16 flex-1"
+                    style="color: #858585"
+                    :style="{ marginTop: auth('docAdmin:docUser:list') ? '' : '20%' }"
+                  >
                     <VueDataUi component="VueUiSparkline" :dataset="dataset2" :config="config2" />
                   </div>
                 </div>
               </el-col>
-              <el-col :xs="24" :sm="24" :md="auth('docAdmin:docUser:list')?24:16" :lg="auth('docAdmin:docUser:list')?24:16" :xl="auth('docAdmin:docUser:list')?24:16">
+              <el-col
+                :xs="24"
+                :sm="24"
+                :md="auth('docAdmin:docUser:list') ? 24 : 16"
+                :lg="auth('docAdmin:docUser:list') ? 24 : 16"
+                :xl="auth('docAdmin:docUser:list') ? 24 : 16"
+              >
                 <div class="flex" style="margin-top: 8px">
                   <div class="f-16 flex-1 system_title" style="line-height: 30px">系统名称：</div>
                   <div class="f-14 flex-4" style="color: #858585; line-height: 30px">
                     {{ state.systemData.systemInfo.name }}
                   </div>
                 </div>
-                <div :class="!auth('docAdmin:docUser:list')?'mt20':''" class="flex">
+                <div :class="!auth('docAdmin:docUser:list') ? 'mt20' : ''" class="flex">
                   <div class="f-16 flex-1 system_title" style="line-height: 30px">系统版本：</div>
                   <div class="f-14 flex-4" style="color: #858585; line-height: 30px">
                     {{ state.systemData.systemInfo.version }}
                   </div>
                 </div>
-                <div :class="!auth('docAdmin:docUser:list')?'mt20':''" class="flex">
+                <div :class="!auth('docAdmin:docUser:list') ? 'mt20' : ''" class="flex">
                   <div class="f-16 flex-1 system_title" style="line-height: 30px">系统文档：</div>
                   <div
-                      class="f-14 flex-4 shou"
-                      style="color: #858585; line-height: 30px"
-                      @click="openWindow(state.systemData.systemInfo.docUrl)"
+                    class="f-14 flex-4 shou"
+                    style="color: #858585; line-height: 30px"
+                    @click="openWindow(state.systemData.systemInfo.docUrl)"
                   >
                     {{ state.systemData.systemInfo.docUrl }}
                   </div>
                 </div>
-                <div :class="!auth('docAdmin:docUser:list')?'mt20':''" class="flex">
+                <div :class="!auth('docAdmin:docUser:list') ? 'mt20' : ''" class="flex">
                   <div class="f-16 flex-1 system_title" style="line-height: 30px">系统简述：</div>
                   <div class="f-12 flex-4" style="color: #858585; line-height: 20px">
                     {{ state.systemData.systemInfo.describe }}
@@ -188,8 +214,6 @@
                 </div>
               </el-col>
             </el-row>
-
-
           </div>
         </div>
       </el-col>
@@ -271,7 +295,7 @@
     type VueUiSparklineDatasetItem,
     type VueUiSparklineConfig,
   } from 'vue-data-ui';
-  import Auth from "/@/components/auth/auth.vue";
+  import Auth from '/@/components/auth/auth.vue';
   import { auth, auths, authAll } from '/@/utils/authFunction';
   const onAuthClick = () => {
     if (!auth('docAdmin:docUser:list')) ElMessage.error('抱歉，您没有权限！');
@@ -550,10 +574,8 @@
     },
     sysNoticeData: [] as Array<NoticeEntity>,
   });
-  const generateData = (title:string) => {
-    return { period: title,
-      value: Math.floor(Math.random() * 96) + 5
-    };
+  const generateData = (title: string) => {
+    return { period: title, value: Math.floor(Math.random() * 96) + 5 };
   };
   // 页面加载时
   onMounted(() => {
@@ -614,7 +636,7 @@
    * 获取用户列表
    */
   const getUserList = () => {
-    if(!auth('docAdmin:docUser:list')) return;
+    if (!auth('docAdmin:docUser:list')) return;
     baseApi
       .list(state.docUserData.param)
       .then((res) => {

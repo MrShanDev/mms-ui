@@ -1,5 +1,5 @@
 <template>
-  <div class="system-sysConfig-container layout-padding mt-5">
+  <div class="system-sysConfig-container layout-padding">
     <el-tabs v-model="selectedName" @tab-click="tabClick" type="border-card">
       <el-tab-pane label="系统配置" name="system">
         <el-tabs

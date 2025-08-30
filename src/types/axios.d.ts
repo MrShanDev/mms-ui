@@ -8,6 +8,7 @@ declare module 'axios' {
     data: T;
     msg: string;
     type?: string;
+    rows: T;
     total: number;
     status: number;
     [key: string]: T;

@@ -1,8 +1,8 @@
 export enum SysEnum {
   // 系统状态开启
-  SYS_COMMON_STATE_OPEN = 0,
+  SYS_COMMON_STATE_OPEN = 1,
   // 系统状态关闭
-  SYS_COMMON_STATE_CLOSE = 1,
+  SYS_COMMON_STATE_CLOSE = 0,
   // 超级管理员ID
   SUPER_ADMIN_ID = 1,
   // 超级管理员CODE

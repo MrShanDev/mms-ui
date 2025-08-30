@@ -42,7 +42,7 @@
       </el-col>
       <el-col class="mt-5" :span="24">
         <el-form-item label="备案号" prop="websiteRecord">
-          <el-input v-model="configRuleForm[6].configValue"></el-input>
+          <el-input v-model="configRuleForm[7].configValue"></el-input>
         </el-form-item>
       </el-col>
 

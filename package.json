@@ -52,6 +52,8 @@
 		"screenfull": "^6.0.2",
 		"sortablejs": "^1.15.0",
 		"splitpanes": "^3.1.5",
+		"video.js": "^8.23.4",
+		"videojs": "^1.0.0",
 		"vue": "^3.5.11",
 		"vue-clipboard3": "^2.0.0",
 		"vue-data-ui": "^3.0.2",
