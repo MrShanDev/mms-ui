@@ -331,6 +331,10 @@
   const getTable = (id: number) => {
     useTableApi(id).then((res) => {
       fieldList.value = res.data.fieldList;
+    }).catch(async (err) => {
+      ElMessage.warning(err);
+    }).finally(() => {
+      NextLoading.close();
     });
   };
 
@@ -358,6 +362,10 @@
           emit('refreshDataList');
         },
       });
+    }).catch(async (err) => {
+      ElMessage.warning(err);
+    }).finally(() => {
+          NextLoading.close();
     });
   };
 

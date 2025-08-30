@@ -172,8 +172,11 @@
         useTableSyncApi(row.id).then(() => {
           ElMessage.success('同步成功');
         });
-      })
-      .catch(() => {});
+      }).catch(async (err) => {
+      ElMessage.warning(err);
+    }).finally(() => {
+      NextLoading.close();
+    });
   };
 
   const previewHandle = (id: any) => {

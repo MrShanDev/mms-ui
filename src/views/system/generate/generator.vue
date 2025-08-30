@@ -246,12 +246,20 @@
   const getBaseClassList = () => {
     useBaseClassListApi().then((res) => {
       baseClassList.value = res.data;
+    }).catch(async (err) => {
+      ElMessage.warning(err);
+    }).finally(() => {
+      NextLoading.close();
     });
   };
 
   const getTable = (id: number) => {
     useTableApi(id).then((res) => {
       Object.assign(dataForm, res.data);
+    }).catch(async (err) => {
+      ElMessage.warning(err);
+    }).finally(() => {
+      NextLoading.close();
     });
   };
 
@@ -285,6 +293,10 @@
             emit('refreshDataList');
           },
         });
+      }).catch(async (err) => {
+        ElMessage.warning(err);
+      }).finally(() => {
+        NextLoading.close();
       });
     });
   };
@@ -316,6 +328,10 @@
             emit('refreshDataList');
           },
         });
+      }).catch(async (err) => {
+        ElMessage.warning(err);
+      }).finally(() => {
+        NextLoading.close();
       });
     });
   };

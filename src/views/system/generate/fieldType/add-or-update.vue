@@ -32,6 +32,7 @@
   import { reactive, ref } from 'vue';
   import { ElMessage } from 'element-plus/es';
   import { useFieldTypeApi, useFieldTypeSubmitApi } from '/@/views/system/generate';
+  import {NextLoading} from "/@/utils/loading";
 
   const emit = defineEmits(['refreshDataList']);
 
@@ -78,6 +79,7 @@
       if (!valid) {
         return false;
       }
+      NextLoading.open();
       useFieldTypeSubmitApi(dataForm).then(() => {
         ElMessage.success({
           message: '操作成功',
@@ -87,6 +89,10 @@
             emit('refreshDataList');
           },
         });
+      }).catch(async (err) => {
+        ElMessage.warning(err);
+      }).finally(() => {
+        NextLoading.close();
       });
     });
   };

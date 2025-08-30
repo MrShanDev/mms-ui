@@ -52,6 +52,7 @@
   import { ElMessage } from 'element-plus/es';
   import { useDataSourceApi, useDataSourceSubmitApi } from '/@/views/system/generate';
   import { decrypt, encrypt } from '/@/utils/mms';
+  import {NextLoading} from "/@/utils/loading";
 
   const emit = defineEmits(['refreshDataList']);
 
@@ -103,7 +104,7 @@
       if (!valid) {
         return false;
       }
-
+      NextLoading.open();
       useDataSourceSubmitApi({ ...dataForm, password: encrypt(dataForm.password) }).then(() => {
         ElMessage.success({
           message: '操作成功',
@@ -113,6 +114,10 @@
             emit('refreshDataList');
           },
         });
+      }).catch(async (err) => {
+        ElMessage.warning(err);
+      }).finally(() => {
+        NextLoading.close();
       });
     });
   };

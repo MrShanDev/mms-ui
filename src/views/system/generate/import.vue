@@ -128,6 +128,10 @@
           emit('refreshDataList');
         },
       });
+    }).catch(async (err) => {
+      ElMessage.warning(err);
+    }).finally(() => {
+      NextLoading.close();
     });
   };
 
