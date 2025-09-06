@@ -32,7 +32,7 @@
     UploadFile,
     UploadUserFile,
   } from 'element-plus';
-  import { uploadImg } from '/src/views/system/upload';
+  import { uploadImg } from '/@/views/system/upload';
   import { Session } from '/@/utils/storage';
   import { NextLoading } from '/@/utils/loading';
   import VideoPlayer from '/@/components/video-player/index.vue';

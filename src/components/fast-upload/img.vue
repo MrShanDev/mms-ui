@@ -174,7 +174,7 @@
   import Cropper from 'cropperjs';
   import 'cropperjs/dist/cropper.css';
   import { Delete, Plus, UploadFilled, ZoomIn, Edit } from '@element-plus/icons-vue';
-  import { uploadImg } from '/src/views/system/upload';
+  import { uploadImg } from '/@/views/system/upload';
   import { generateUUID } from '/@/utils/mms';
   import { RefType } from '/@/types/global';
   import { Session } from '/@/utils/storage';

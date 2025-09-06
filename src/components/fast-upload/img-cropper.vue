@@ -115,7 +115,7 @@
 <script setup lang="ts" name="UploadImgs">
   import { ref, computed, inject, watch, reactive, nextTick, onMounted } from 'vue';
   import { Delete, Plus, UploadFilled, ZoomIn } from '@element-plus/icons-vue';
-  import { uploadImg } from '/src/views/system/upload';
+  import { uploadImg } from '/@/views/system/upload';
   import {
     UploadProps,
     UploadFile,
