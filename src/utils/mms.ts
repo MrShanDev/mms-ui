@@ -49,12 +49,13 @@ export const withInstall = <T>(component: T, alias?: string) => {
 /**
  * 日期格式化
  * @param time 时间戳
- * @param pattern 格式化样式 默认：'{y}-{m}-{d} {h}:{i}:{s}'
+ * @param pattern 格式化样式 默认：'{y}-{m}-{d} {h}:{i}:{s}' / 'a' 星期几
  * @returns 格式化时间字符串
  */
-export function parseTime(time: any, pattern?: string) {
+export function parseTime(time: any, pattern?: string):string {
+
   if (arguments.length === 0 || !time) {
-    return null;
+    return "";
   }
   const format = pattern || '{y}-{m}-{d} {h}:{i}:{s}';
   let date;
@@ -65,9 +66,9 @@ export function parseTime(time: any, pattern?: string) {
       time = parseInt(time);
     } else if (typeof time === 'string') {
       time = time
-        .replace(new RegExp(/-/gm), '/')
-        .replace('T', ' ')
-        .replace(new RegExp(/\.[\d]{3}/gm), '');
+          .replace(new RegExp(/-/gm), '/')
+          .replace('T', ' ')
+          .replace(new RegExp(/\.[\d]{3}/gm), '');
     }
     if (typeof time === 'number' && time.toString().length === 10) {
       time = time * 1000;
@@ -81,18 +82,18 @@ export function parseTime(time: any, pattern?: string) {
     h: date.getHours(),
     i: date.getMinutes(),
     s: date.getSeconds(),
-    a: date.getDay(),
+    a: date.getDay()
   };
-  return format.replace(/{(y|m|d|h|i|s|a)+}/g, (result: string, key: string) => {
-    let value = formatObj[key];
-    // Note: getDay() returns 0 on Sunday
+  return format.replace(/(yyyy|MM|dd|HH|mm|ss|a)/g, (result, key) => {
+    let value = formatObj[key.charAt(0).toLowerCase()];
     if (key === 'a') {
       return ['日', '一', '二', '三', '四', '五', '六'][value];
     }
-    if (result.length > 0 && value < 10) {
-      value = '0' + value;
+    // 对于两位数的格式进行补零
+    if (key.length > 1 && value < 10) {
+      return '0' + value;
     }
-    return value || 0;
+    return value.toString();
   });
 }
 
