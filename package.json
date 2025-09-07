@@ -18,7 +18,13 @@
 		"pre-commit": "npm run lint && npm run format:check",
 		"serve": "vite preview",
 		"build:dev": "vite build --mode development",
-		"clean": "rm -rf dist node_modules/.vite"
+		"clean": "rm -rf dist node_modules/.vite",
+		"mirror:setup": "bash scripts/setup-npm-mirrors.sh",
+		"mirror:verify": "bash scripts/verify-mirrors.sh",
+		"mirror:taobao": "npm config set registry https://registry.npmmirror.com",
+		"mirror:official": "npm config set registry https://registry.npmjs.org/",
+		"mirror:test": "npm config get registry && npm view vue version",
+		"install:fast": "npm install --registry=https://registry.npmmirror.com"
 	},
 	"dependencies": {
 		"@element-plus/icons-vue": "^2.3.2",
