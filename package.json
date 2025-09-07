@@ -7,7 +7,6 @@
 	"scripts": {
 		"dev": "vite --mode development --open",
 		"preview": "vite --mode preview --open",
-		"prod": "vite --mode production --open",
 		"build": "vite build --mode production",
 		"lint": "eslint --ext .js,.jsx,.ts,.tsx,.vue src/",
 		"lint:fix": "eslint --ext .js,.jsx,.ts,.tsx,.vue src/ --fix",
@@ -16,7 +15,6 @@
 		"format:check": "prettier --check \"src/**/*.{vue,js,jsx,ts,tsx,json,css,scss,md}\"",
 		"format:lint": "npm run lint && npm run format",
 		"pre-commit": "npm run lint && npm run format:check",
-		"serve": "vite preview",
 		"build:dev": "vite build --mode development",
 		"clean": "rm -rf dist node_modules/.vite",
 		"mirror:setup": "bash scripts/setup-npm-mirrors.sh",
@@ -24,7 +22,12 @@
 		"mirror:taobao": "npm config set registry https://registry.npmmirror.com",
 		"mirror:official": "npm config set registry https://registry.npmjs.org/",
 		"mirror:test": "npm config get registry && npm view vue version",
-		"install:fast": "npm install --registry=https://registry.npmmirror.com"
+		"install:fast": "npm install --registry=https://registry.npmmirror.com",
+		"pnpm:install": "pnpm install --registry=https://registry.npmmirror.com",
+		"pnpm:clean": "pnpm store prune && rm -rf node_modules",
+		"start:pnpm": "./start-pnpm.sh",
+		"mms": "./scripts/mms.sh",
+		"mms:win": "powershell -ExecutionPolicy Bypass -File ./scripts/mms.ps1"
 	},
 	"dependencies": {
 		"@element-plus/icons-vue": "^2.3.2",
@@ -70,7 +73,6 @@
 		"vxe-table": "4.7.87"
 	},
 	"devDependencies": {
-		"@babel/core": "^7.28.3",
 		"@types/crypto-js": "^4.1.1",
 		"@types/file-saver": "^2.0.7",
 		"@types/js-cookie": "^3.0.0",
