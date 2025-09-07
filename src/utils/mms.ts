@@ -52,10 +52,9 @@ export const withInstall = <T>(component: T, alias?: string) => {
  * @param pattern 格式化样式 默认：'{y}-{m}-{d} {h}:{i}:{s}' / 'a' 星期几
  * @returns 格式化时间字符串
  */
-export function parseTime(time: any, pattern?: string):string {
-
+export function parseTime(time: any, pattern?: string): string {
   if (arguments.length === 0 || !time) {
-    return "";
+    return '';
   }
   const format = pattern || '{y}-{m}-{d} {h}:{i}:{s}';
   let date;
@@ -66,9 +65,9 @@ export function parseTime(time: any, pattern?: string):string {
       time = parseInt(time);
     } else if (typeof time === 'string') {
       time = time
-          .replace(new RegExp(/-/gm), '/')
-          .replace('T', ' ')
-          .replace(new RegExp(/\.[\d]{3}/gm), '');
+        .replace(new RegExp(/-/gm), '/')
+        .replace('T', ' ')
+        .replace(new RegExp(/\.[\d]{3}/gm), '');
     }
     if (typeof time === 'number' && time.toString().length === 10) {
       time = time * 1000;
@@ -82,7 +81,7 @@ export function parseTime(time: any, pattern?: string):string {
     h: date.getHours(),
     i: date.getMinutes(),
     s: date.getSeconds(),
-    a: date.getDay()
+    a: date.getDay(),
   };
   return format.replace(/(yyyy|MM|dd|HH|mm|ss|a)/g, (result, key) => {
     let value = formatObj[key.charAt(0).toLowerCase()];

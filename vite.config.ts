@@ -7,6 +7,8 @@ import { buildConfig } from './src/utils/build';
 import { lazyImport, VxeResolver } from 'vite-plugin-lazy-import'
 import WindiCSS from 'vite-plugin-windicss'
 import AutoImport from 'unplugin-auto-import/vite'
+import Components from 'unplugin-vue-components/vite'
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 
 //处理相对路径（./ , ../），生成一个规范化的绝对路径
 const pathResolve = (dir: string) => {
@@ -45,7 +47,12 @@ const viteConfig: UserConfigFnObject = defineConfig((mode: ConfigEnv) => {
                     'vue',
                     'vue-router',
                 ],
+                resolvers: [ElementPlusResolver()],
                 dts: resolve('./auto-imports.d.ts')
+            }),
+            Components({
+                resolvers: [ElementPlusResolver()],
+                dts: resolve('./components.d.ts')
             }),
         ],
         root: process.cwd(),

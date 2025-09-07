@@ -41,7 +41,6 @@
           v-model="state.ruleForm.code"
           clearable
           autocomplete="off"
-         
         >
           <template #prefix>
             <el-icon class="el-input__icon"><ele-Position /></el-icon>

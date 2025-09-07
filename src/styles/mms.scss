@@ -1,0 +1,807 @@
+@charset "utf-8";
+
+/* =============================================================================
+   📱 MMS-UI 工具类样式库 - 见名知意版本
+   
+   🎯 设计理念：
+   - 与 WindiCSS 协同工作，避免命名冲突
+   - WindiCSS 处理：基础工具类（p-*, m-*, text-*, bg-*等）
+   - MMS.scss 处理：业务特定样式（lay-*, sp-*, interact-*, anim-*等）
+   
+   📐 统一数值体系：4px 递增（1=4px, 2=8px, 3=12px...）
+   🎨 统一色彩体系：与 WindiCSS 共享 primary、success、warning、danger
+   📱 统一断点体系：mobile(<640px), tablet(640-1023px), desktop(>=1024px)
+   
+   命名规范：[功能][细节][状态]
+   - lay-* : 布局相关（MMS专属）
+   - sp-*  : 间距相关（MMS专属，4px递增体系）
+   - font-*: 字体相关（语义化命名，与WindiCSS配合）
+   - color-*: 颜色相关（MMS专属，业务色彩）
+   - text-*: 文本相关（与WindiCSS配合）
+   - border-*: 边框相关（MMS专属扩展）
+   - bg-*: 背景相关（MMS专属扩展）
+   - d-*: 显示相关（MMS专属）
+   - interact-*: 交互效果（MMS专属）
+   - anim-*: 动画效果（MMS专属）
+   - resp-*: 响应式布局（MMS专属）
+   - util-*: 工具类（MMS专属）
+============================================================================= */
+
+/* 🎯 布局系统 (Layout) - lay-*
+========================================= */
+.lay-flex-row { display: flex !important; flex-direction: row; }
+.lay-flex-col { display: flex !important; flex-direction: column; }
+.lay-flex-wrap { flex-wrap: wrap; }
+.lay-flex-nowrap { flex-wrap: nowrap; }
+
+/* 弹性比例 */
+.lay-flex-0 { flex: 0; }
+.lay-flex-1 { flex: 1; }
+.lay-flex-2 { flex: 2; }
+.lay-flex-3 { flex: 3; }
+.lay-flex-auto { flex: auto; }
+.lay-flex-none { flex: none; }
+
+/* 对齐方式 */
+.lay-items-start { align-items: flex-start; }
+.lay-items-center { align-items: center; }
+.lay-items-end { align-items: flex-end; }
+.lay-items-stretch { align-items: stretch; }
+
+.lay-justify-start { justify-content: flex-start; }
+.lay-justify-center { justify-content: center; }
+.lay-justify-end { justify-content: flex-end; }
+.lay-justify-between { justify-content: space-between; }
+.lay-justify-around { justify-content: space-around; }
+
+/* 浮动 & 定位 */
+.lay-float-left { float: left !important; }
+.lay-float-right { float: right !important; }
+.lay-float-none { float: none !important; }
+
+.lay-pos-relative { position: relative; }
+.lay-pos-absolute { position: absolute; }
+.lay-pos-fixed { position: fixed; }
+
+.lay-center-xy {
+  position: absolute; top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+/* 🎯 尺寸系统 (Size) - size-*
+========================================= */
+.size-w-10p { width: 10% !important; }
+.size-w-20p { width: 20% !important; }
+.size-w-25p { width: 25% !important; }
+.size-w-30p { width: 30% !important; }
+.size-w-33p { width: 33.333% !important; }
+.size-w-40p { width: 40% !important; }
+.size-w-50p { width: 50% !important; }
+.size-w-60p { width: 60% !important; }
+.size-w-66p { width: 66.666% !important; }
+.size-w-70p { width: 70% !important; }
+.size-w-75p { width: 75% !important; }
+.size-w-80p { width: 80% !important; }
+.size-w-90p { width: 90% !important; }
+.size-w-100p { width: 100% !important; }
+
+.size-w-auto { width: auto !important; }
+.size-w-full { width: 100% !important; }
+.size-h-auto { height: auto !important; }
+.size-h-full { height: 100% !important; }
+.size-h-screen { height: 100vh !important; }
+
+/* 🎯 间距系统 (Space) - sp-*
+========================================= */
+/* 内边距 */
+.sp-p-0 { padding: 0 !important; }
+.sp-p-1 { padding: 4px !important; }
+.sp-p-2 { padding: 8px !important; }
+.sp-p-3 { padding: 12px !important; }
+.sp-p-4 { padding: 16px !important; }
+.sp-p-5 { padding: 20px !important; }
+.sp-p-6 { padding: 24px !important; }
+
+.sp-pt-0 { padding-top: 0 !important; }
+.sp-pt-2 { padding-top: 8px !important; }
+.sp-pt-4 { padding-top: 16px !important; }
+.sp-pt-6 { padding-top: 24px !important; }
+
+.sp-pb-0 { padding-bottom: 0 !important; }
+.sp-pb-2 { padding-bottom: 8px !important; }
+.sp-pb-4 { padding-bottom: 16px !important; }
+.sp-pb-6 { padding-bottom: 24px !important; }
+
+.sp-pl-0 { padding-left: 0 !important; }
+.sp-pl-2 { padding-left: 8px !important; }
+.sp-pl-4 { padding-left: 16px !important; }
+.sp-pl-6 { padding-left: 24px !important; }
+
+.sp-pr-0 { padding-right: 0 !important; }
+.sp-pr-2 { padding-right: 8px !important; }
+.sp-pr-4 { padding-right: 16px !important; }
+.sp-pr-6 { padding-right: 24px !important; }
+
+/* 外边距 */
+.sp-m-0 { margin: 0 !important; }
+.sp-m-1 { margin: 4px !important; }
+.sp-m-2 { margin: 8px !important; }
+.sp-m-3 { margin: 12px !important; }
+.sp-m-4 { margin: 16px !important; }
+.sp-m-5 { margin: 20px !important; }
+.sp-m-auto { margin: auto !important; }
+
+.sp-mt-0 { margin-top: 0 !important; }
+.sp-mt-2 { margin-top: 8px !important; }
+.sp-mt-4 { margin-top: 16px !important; }
+.sp-mt-6 { margin-top: 24px !important; }
+
+.sp-mb-0 { margin-bottom: 0 !important; }
+.sp-mb-2 { margin-bottom: 8px !important; }
+.sp-mb-4 { margin-bottom: 16px !important; }
+.sp-mb-6 { margin-bottom: 24px !important; }
+
+.sp-ml-0 { margin-left: 0 !important; }
+.sp-ml-2 { margin-left: 8px !important; }
+.sp-ml-4 { margin-left: 16px !important; }
+.sp-ml-6 { margin-left: 24px !important; }
+
+.sp-mr-0 { margin-right: 0 !important; }
+.sp-mr-2 { margin-right: 8px !important; }
+.sp-mr-4 { margin-right: 16px !important; }
+.sp-mr-6 { margin-right: 24px !important; }
+
+/* 🎯 字体系统 (Font) - font-*
+========================================= */
+/* 字体大小 */
+.font-xs { font-size: 10px !important; }
+.font-sm { font-size: 12px !important; }
+.font-base { font-size: 14px !important; }
+.font-md { font-size: 16px !important; }
+.font-lg { font-size: 18px !important; }
+.font-xl { font-size: 20px !important; }
+.font-2xl { font-size: 24px !important; }
+.font-3xl { font-size: 30px !important; }
+
+/* 字体粗细 */
+.font-thin { font-weight: 100 !important; }
+.font-light { font-weight: 300 !important; }
+.font-normal { font-weight: 400 !important; }
+.font-medium { font-weight: 500 !important; }
+.font-semibold { font-weight: 600 !important; }
+.font-bold { font-weight: 700 !important; }
+
+/* 🎯 颜色系统 (Color) - color-* & bg-*
+========================================= */
+/* 文字颜色 */
+.color-primary { color: #1e97f8 !important; }
+.color-success { color: #2dac34 !important; }
+.color-warning { color: #fe6701 !important; }
+.color-danger { color: #f56c6c !important; }
+.color-info { color: #909399 !important; }
+
+.color-black { color: #000000 !important; }
+.color-white { color: #ffffff !important; }
+.color-gray-dark { color: #333333 !important; }
+.color-gray { color: #666666 !important; }
+.color-gray-light { color: #999999 !important; }
+
+/* 背景颜色 */
+.bg-primary { background-color: #1e97f8 !important; }
+.bg-success { background-color: #2dac34 !important; }
+.bg-warning { background-color: #fe6701 !important; }
+.bg-danger { background-color: #f56c6c !important; }
+.bg-white { background-color: #ffffff !important; }
+.bg-gray { background-color: #f5f5f5 !important; }
+.bg-transparent { background-color: transparent !important; }
+
+/* 🎯 文本系统 (Text) - text-*
+========================================= */
+.text-left { text-align: left !important; }
+.text-center { text-align: center !important; }
+.text-right { text-align: right !important; }
+.text-nowrap { white-space: nowrap !important; }
+.text-break { word-break: break-all !important; }
+
+.text-underline { text-decoration: underline !important; }
+.text-line-through { text-decoration: line-through !important; }
+.text-no-decoration { text-decoration: none !important; }
+
+/* 文本溢出省略 */
+.text-ellipsis {
+  overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+}
+
+.text-ellipsis-2 {
+  display: -webkit-box; -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* 🎯 边框系统 (Border) - border-*
+========================================= */
+.border-0 { border: none !important; }
+.border-1 { border: 1px solid #e5e7eb !important; }
+.border-t { border-top: 1px solid #e5e7eb !important; }
+.border-b { border-bottom: 1px solid #e5e7eb !important; }
+.border-l { border-left: 1px solid #e5e7eb !important; }
+.border-r { border-right: 1px solid #e5e7eb !important; }
+
+/* 圆角 */
+.rounded-none { border-radius: 0 !important; }
+.rounded-sm { border-radius: 2px !important; }
+.rounded { border-radius: 4px !important; }
+.rounded-md { border-radius: 6px !important; }
+.rounded-lg { border-radius: 8px !important; }
+.rounded-full { border-radius: 50% !important; }
+
+/* 🎯 阴影系统 (Shadow) - shadow-*
+========================================= */
+.shadow-none { box-shadow: none !important; }
+.shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important; }
+.shadow { box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important; }
+.shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important; }
+.shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important; }
+
+/* 🎯 显示系统 (Display) - d-*
+========================================= */
+.d-none { display: none !important; }
+.d-block { display: block !important; }
+.d-inline { display: inline !important; }
+.d-inline-block { display: inline-block !important; }
+.d-flex { display: flex !important; }
+
+/* 🎯 工具类 (Utilities) - util-*
+========================================= */
+.util-clearfix::after { content: ""; display: table; clear: both; }
+.util-img-cover { object-fit: cover !important; }
+.util-img-contain { object-fit: contain !important; }
+.util-img-grayscale { filter: grayscale(100%) !important; }
+
+.util-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); z-index: 9999;
+}
+
+.cursor-pointer { cursor: pointer !important; }
+.cursor-not-allowed { cursor: not-allowed !important; }
+
+/* 🎯 动画系统 - anim-*
+========================================= */
+.anim-fade-in { animation: fadeIn 0.3s ease-in-out; }
+.transition-all { transition: all 0.3s ease !important; }
+
+/* 🎯 动画关键帧定义 (Keyframes)
+========================================= */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0;
+    transform: translateY(30px); 
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0); 
+  }
+}
+
+@keyframes slideDown {
+  from { 
+    opacity: 0;
+    transform: translateY(-30px); 
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0); 
+  }
+}
+
+@keyframes slideLeft {
+  from { 
+    opacity: 0;
+    transform: translateX(30px); 
+  }
+  to { 
+    opacity: 1;
+    transform: translateX(0); 
+  }
+}
+
+@keyframes slideRight {
+  from { 
+    opacity: 0;
+    transform: translateX(-30px); 
+  }
+  to { 
+    opacity: 1;
+    transform: translateX(0); 
+  }
+}
+
+@keyframes zoomIn {
+  from { 
+    opacity: 0;
+    transform: scale(0.9); 
+  }
+  to { 
+    opacity: 1;
+    transform: scale(1); 
+  }
+}
+
+@keyframes zoomOut {
+  from { 
+    opacity: 1;
+    transform: scale(1); 
+  }
+  to { 
+    opacity: 0;
+    transform: scale(0.9); 
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 53%, 80%, 100% {
+    animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+    transform: translate3d(0,0,0);
+  }
+  40%, 43% {
+    animation-timing-function: cubic-bezier(0.755, 0.050, 0.855, 0.060);
+    transform: translate3d(0, -30px, 0);
+  }
+  70% {
+    animation-timing-function: cubic-bezier(0.755, 0.050, 0.855, 0.060);
+    transform: translate3d(0, -15px, 0);
+  }
+  90% {
+    transform: translate3d(0,-4px,0);
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+  20%, 40%, 60%, 80% { transform: translateX(10px); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes ping {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes pulseRing {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0;
+  }
+}
+
+@keyframes skeleton {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes dots {
+  0% { content: '.'; }
+  33% { content: '..'; }
+  66% { content: '...'; }
+  100% { content: '....'; }
+}
+
+@keyframes typewriter {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@keyframes blink {
+  from, to { border-color: transparent; }
+  50% { border-color: #1e97f8; }
+}
+
+/* 🎯 响应式断点系统 (Responsive Breakpoints)
+========================================= */
+
+/* 移动设备 (Mobile) - 小于 640px */
+@media (max-width: 639px) {
+  .sm-hidden { display: none !important; }
+  .sm-block { display: block !important; }
+  .sm-flex { display: flex !important; }
+  .sm-flex-col { flex-direction: column !important; }
+  .sm-text-center { text-align: center !important; }
+  .sm-text-sm { font-size: 12px !important; }
+  .sm-p-2 { padding: 8px !important; }
+  .sm-m-2 { margin: 8px !important; }
+  
+  .resp-show-mobile { display: block !important; }
+  .resp-show-tablet { display: none !important; }
+  .resp-show-desktop { display: none !important; }
+  
+  .resp-grid-2 { grid-template-columns: 1fr !important; }
+  .resp-grid-3 { grid-template-columns: 1fr !important; }
+  .resp-grid-4 { grid-template-columns: repeat(2, 1fr) !important; }
+}
+
+/* 平板设备 (Tablet) - 640px 到 1024px */
+@media (min-width: 640px) and (max-width: 1023px) {
+  .md-hidden { display: none !important; }
+  .md-block { display: block !important; }
+  .md-flex { display: flex !important; }
+  .md-text-center { text-align: center !important; }
+  
+  .resp-show-mobile { display: none !important; }
+  .resp-show-tablet { display: block !important; }
+  .resp-show-desktop { display: none !important; }
+  
+  .resp-grid-4 { grid-template-columns: repeat(3, 1fr) !important; }
+  .resp-grid-6 { grid-template-columns: repeat(4, 1fr) !important; }
+}
+
+/* 桌面设备 (Desktop) - 1024px 及以上 */
+@media (min-width: 1024px) {
+  .lg-hidden { display: none !important; }
+  .lg-block { display: block !important; }
+  .lg-flex { display: flex !important; }
+  
+  .resp-show-mobile { display: none !important; }
+  .resp-show-tablet { display: none !important; }
+  .resp-show-desktop { display: block !important; }
+}
+
+/* 🎯 响应式布局系统 (Responsive) - resp-*
+========================================= */
+
+/* Grid 网格系统 */
+.resp-grid { display: grid !important; }
+.resp-grid-1 { grid-template-columns: 1fr !important; }
+.resp-grid-2 { grid-template-columns: repeat(2, 1fr) !important; }
+.resp-grid-3 { grid-template-columns: repeat(3, 1fr) !important; }
+.resp-grid-4 { grid-template-columns: repeat(4, 1fr) !important; }
+.resp-grid-5 { grid-template-columns: repeat(5, 1fr) !important; }
+.resp-grid-6 { grid-template-columns: repeat(6, 1fr) !important; }
+
+/* Grid 间距 */
+.resp-gap-1 { gap: 4px !important; }
+.resp-gap-2 { gap: 8px !important; }
+.resp-gap-3 { gap: 12px !important; }
+.resp-gap-4 { gap: 16px !important; }
+.resp-gap-5 { gap: 20px !important; }
+.resp-gap-6 { gap: 24px !important; }
+
+/* 自适应容器 */
+.resp-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.resp-container-sm {
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+.resp-container-lg {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 16px;
+}
+
+/* 响应式隐藏显示 */
+.resp-show-mobile { display: none !important; }
+.resp-show-tablet { display: none !important; }
+.resp-show-desktop { display: block !important; }
+
+/* 🎯 交互效果系统 (Interactive) - interact-*
+========================================= */
+
+/* 悬停效果 */
+.interact-hover-lift {
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+}
+
+.interact-hover-lift:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+}
+
+.interact-hover-scale {
+  transition: transform 0.2s ease !important;
+}
+
+.interact-hover-scale:hover {
+  transform: scale(1.05) !important;
+}
+
+.interact-hover-glow {
+  transition: box-shadow 0.3s ease !important;
+}
+
+.interact-hover-glow:hover {
+  box-shadow: 0 0 20px rgba(30, 151, 248, 0.5) !important;
+}
+
+.interact-hover-darken {
+  transition: filter 0.2s ease !important;
+}
+
+.interact-hover-darken:hover {
+  filter: brightness(0.9) !important;
+}
+
+.interact-hover-brighten {
+  transition: filter 0.2s ease !important;
+}
+
+.interact-hover-brighten:hover {
+  filter: brightness(1.1) !important;
+}
+
+/* 按钮悬停效果 */
+.interact-btn-primary {
+  background-color: #1e97f8;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  transform: translateY(0);
+}
+
+.interact-btn-primary:hover {
+  background-color: #1976d2;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(30, 151, 248, 0.4);
+}
+
+.interact-btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(30, 151, 248, 0.4);
+}
+
+/* 卡片悬停效果 */
+.interact-card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  cursor: pointer;
+}
+
+.interact-card-hover:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* 🎯 动画效果系统 (Animation) - anim-*
+========================================= */
+
+/* 基础动画类 */
+.anim-fade-in { animation: fadeIn 0.3s ease-in-out; }
+.anim-fade-out { animation: fadeOut 0.3s ease-in-out; }
+.anim-slide-up { animation: slideUp 0.4s ease-out; }
+.anim-slide-down { animation: slideDown 0.4s ease-out; }
+.anim-slide-left { animation: slideLeft 0.4s ease-out; }
+.anim-slide-right { animation: slideRight 0.4s ease-out; }
+.anim-zoom-in { animation: zoomIn 0.3s ease-out; }
+.anim-zoom-out { animation: zoomOut 0.3s ease-out; }
+.anim-bounce { animation: bounce 0.6s ease-in-out; }
+.anim-shake { animation: shake 0.6s ease-in-out; }
+.anim-pulse { animation: pulse 2s infinite; }
+.anim-spin { animation: spin 1s linear infinite; }
+.anim-ping { animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite; }
+
+/* 延迟动画 */
+.anim-delay-100 { animation-delay: 0.1s !important; }
+.anim-delay-200 { animation-delay: 0.2s !important; }
+.anim-delay-300 { animation-delay: 0.3s !important; }
+.anim-delay-500 { animation-delay: 0.5s !important; }
+
+/* 持续时间 */
+.anim-duration-fast { animation-duration: 0.15s !important; }
+.anim-duration-normal { animation-duration: 0.3s !important; }
+.anim-duration-slow { animation-duration: 0.5s !important; }
+
+/* 过渡效果 */
+.transition-none { transition: none !important; }
+.transition-all { transition: all 0.3s ease !important; }
+.transition-colors { transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease !important; }
+.transition-transform { transition: transform 0.3s ease !important; }
+.transition-opacity { transition: opacity 0.3s ease !important; }
+.transition-shadow { transition: box-shadow 0.3s ease !important; }
+
+/* 缓动函数 */
+.ease-linear { transition-timing-function: linear !important; }
+.ease-in { transition-timing-function: ease-in !important; }
+.ease-out { transition-timing-function: ease-out !important; }
+.ease-in-out { transition-timing-function: ease-in-out !important; }
+
+/* 🎯 加载状态系统 (Loading) - loading-*
+========================================= */
+
+.loading-spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid #1e97f8;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loading-dots {
+  display: inline-block;
+}
+
+.loading-dots::after {
+  content: '.';
+  animation: dots 2s steps(4, end) infinite;
+}
+
+.loading-skeleton {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton 2s infinite;
+}
+
+/* 🎯 状态指示系统 (Status) - status-*
+========================================= */
+
+.status-success {
+  color: #2dac34 !important;
+  background-color: #f0f9f0 !important;
+  border: 1px solid #b3d9b3 !important;
+}
+
+.status-warning {
+  color: #fe6701 !important;
+  background-color: #fff8f0 !important;
+  border: 1px solid #fdb566 !important;
+}
+
+.status-error {
+  color: #f56c6c !important;
+  background-color: #fef0f0 !important;
+  border: 1px solid #f5b2b2 !important;
+}
+
+.status-info {
+  color: #1e97f8 !important;
+  background-color: #f0f8ff !important;
+  border: 1px solid #b3d9f8 !important;
+}
+
+/* 🎯 特效系统 (Effects) - effect-*
+========================================= */
+
+/* 毛玻璃效果 */
+.effect-glass {
+  backdrop-filter: blur(10px) !important;
+  background-color: rgba(255, 255, 255, 0.25) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+}
+
+/* 渐变文字 */
+.effect-gradient-text {
+  background: linear-gradient(135deg, #1e97f8, #fe6701) !important;
+  background-clip: text !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+/* 发光边框 */
+.effect-glow-border {
+  border: 2px solid #1e97f8 !important;
+  box-shadow: 0 0 10px rgba(30, 151, 248, 0.5) !important;
+}
+
+/* 脉冲动画 */
+.effect-pulse-ring {
+  position: relative;
+}
+
+.effect-pulse-ring::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  border: 2px solid #1e97f8;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: pulseRing 2s infinite;
+}
+
+/* 🎯 工具动画类 (Utility Animations) - util-anim-*
+========================================= */
+
+/* 点击波纹效果 */
+.util-anim-ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.util-anim-ripple::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.util-anim-ripple:active::before {
+  width: 300px;
+  height: 300px;
+}
+
+/* 打字机效果 */
+.util-anim-typewriter {
+  overflow: hidden;
+  border-right: 2px solid #1e97f8;
+  white-space: nowrap;
+  animation: typewriter 3s steps(40, end), blink 0.75s step-end infinite;
+}
+
+/* 浮动标签 */
+.util-anim-float-label {
+  position: relative;
+}
+
+.util-anim-float-label input:focus + label,
+.util-anim-float-label input:not(:placeholder-shown) + label {
+  transform: translateY(-20px) scale(0.8);
+  color: #1e97f8;
+}
+
+.util-anim-float-label label {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  transition: all 0.2s ease;
+  pointer-events: none;
+  color: #999;
+}
+
+/* 🔄 向后兼容的别名 - 保持项目兼容性
+   为了避免与WindiCSS冲突，这里提供了向后兼容的别名
+   建议新代码使用 WindiCSS 原生类名或 MMS 的语义化类名
+========================================= */
+.flex { display: flex !important; flex-direction: row; }
+.flex-col { display: flex !important; flex-direction: column; }
+.col-center { align-items: center; }
+.row-center { justify-content: center; }
+.w-50 { width: 50% !important; }
+.f-14 { font-size: 14px !important; }
+.p-10 { padding: 8px !important; }
+.m-10 { margin: 8px !important; }
