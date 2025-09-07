@@ -120,10 +120,6 @@ nvm ls
 #### 🚧 安装 yarn
 
 ```bash
-# 推荐安装 20.15.0
-nvm install 20
-# 切换 20.15.0
-nvm use 20
 # 安装yarn
 npm install -g yarn --registry=https://registry.npmmirror.com
 ```
