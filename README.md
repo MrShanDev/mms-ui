@@ -138,10 +138,14 @@ yarn dev
 yarn build
 
 # ===扩展代码===
-# 运行格式化
+# 1.删除依赖
+rm -rf node_modules package-lock.json
+# 2.运行格式化
 npm run format
-# 代码质量检查
+# 3.代码质量检查
 npm run lint
+# 4.清除 npm 缓存 
+npm cache clean --force
 ```
 
 ### 🍉 NPM方式 (保守方式)
@@ -156,10 +160,14 @@ npm run dev
 npm run build
 
 # ===扩展代码===
-# 运行格式化
+# 1.删除依赖
+rm -rf node_modules package-lock.json
+# 2.运行格式化
 npm run format
-# 代码质量检查
+# 3.代码质量检查
 npm run lint
+# 4.清除 npm 缓存 
+npm cache clean --force
 ```
 
 ### 🔧 启动命令
