@@ -41,7 +41,7 @@
           v-model="state.ruleForm.code"
           clearable
           autocomplete="off"
-          @focus="captchaIn(0)"
+         
         >
           <template #prefix>
             <el-icon class="el-input__icon"><ele-Position /></el-icon>

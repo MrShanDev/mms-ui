@@ -83,7 +83,7 @@ system），简称：MMS，是一款基于多应用模块用户、商品、支�
 
 [模块化管理系统](https://www.mmsadmin.cn/)
 
-#### 🏭 环境支持
+## 🏭 环境支持
 
 | Edge      | Firefox      | Chrome      | Safari      |
 | --------- | ------------ | ----------- | ----------- |
@@ -91,11 +91,32 @@ system），简称：MMS，是一款基于多应用模块用户、商品、支�
 
 > 由于 Vue3 不再支持 IE11，故而 ElementPlus 也不支持 IE11 及之前版本。
 
-#### ⚡ 使用说明
+## ⚡ 使用说明
 
 > Vite 不再支持 Node 12 / 13 / 15，因为上述版本已经进入了 EOL 阶段。现在你必须使用 Node 14.18+ / 16+ 版本。
 
-#### 💫 YARN方式 (推荐方式)
+## Node.js 版本 推荐
+
+- Node.js 20.19.5 (Latest LTS: Iron) 
+- Node.js	>=18.0.0
+- PM	>=8.0.0
+- Vite	^18.0.0 || ^20.0.0 || >=22.0.0
+- TypeScript	>=14.17
+
+
+## 😀 nvm管理工具管理Nodejs
+```bash
+# 推荐安装Node.js   20.19.5
+nvm install 20.19.5
+
+# 切换
+nvm use 20.19.5
+
+# 验证
+nvm ls
+```
+
+### 💫 YARN方式 (推荐方式)
 #### 🚧 安装 yarn
 
 ```bash
@@ -121,18 +142,7 @@ yarn dev
 yarn build
 ```
 
-#### 😀 nvm管理工具管理Nodejs
-```bash
-# 推荐安装 16.14.0
-nvm install 16.14.0
-
-# 切换
-nvm use 16.14.0
-
-# 验证
-nvm ls
-```
-#### 🍉 NPM方式 (保守方式)
+### 🍉 NPM方式 (保守方式)
 ```bash
 # 安装依赖
 npm install --registry=https://registry.npmmirror.com
@@ -149,6 +159,8 @@ npm run format
 # 代码质量检查
 npm run lint
 ```
+
+### 🔧 启动命令
 
 ```text 启动命令备注
 		"dev": "vite --mode development --open",           // 开发环境启动
@@ -169,7 +181,7 @@ npm run lint
 ```
 
 
-#### 💯 🐱 🙋‍♂️ 💫 📢 🔥常见问题
+### 💯 🐱 🙋‍♂️ 💫 📢 🔥常见问题
 1.  `vite build --mode production && vue-tsc --noEmit` 
 * `vue-tsc`：Vue 官方提供的命令，用于执行 TS 的类型检查。它在执行时会根据项目中的 tsconfig.json 文件配置进行类型检查.
 
