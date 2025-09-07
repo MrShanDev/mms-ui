@@ -136,6 +136,12 @@ yarn dev
 
 # 打包发布
 yarn build
+
+# ===扩展代码===
+# 运行格式化
+npm run format
+# 代码质量检查
+npm run lint
 ```
 
 ### 🍉 NPM方式 (保守方式)
