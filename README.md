@@ -134,7 +134,7 @@ npm run mirror:test
 
 ## 😀 项目启动
 
-### 🍉 方式一
+### 🍉 方式一(推荐) 
 ```bash
 # 安装依赖
 npm install
@@ -156,7 +156,7 @@ npm run lint
 npm cache clean --force
 ```
 
-### 🚧 方式二(推荐) 
+### 🚧 方式二
 
 ```bash
 # 安装yarn
