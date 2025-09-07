@@ -9,7 +9,7 @@ import { dynamicRoutes, notFoundAndNoPower } from '/@/router/route';
 import { formatTwoStageRoutes, formatFlatteningRoutes, router } from '/@/router/index';
 import { useRoutesList } from '/@/stores/routesList';
 import { useTagsViewRoutes } from '/@/stores/tagsViewRoutes';
-import { getMenu } from '/src/views/system/init';
+import { getMenu } from '/@/views/system/init';
 import { useAppStore } from '/@/stores/app';
 
 // 后端控制路由

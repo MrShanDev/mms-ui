@@ -77,7 +77,7 @@
   import logoMini from '/@/assets/image.svg';
   import loginMain from '/@/assets/login_main01.svg';
   import loginBg from '/@/assets/login-bg.svg';
-  import { startBase } from '/src/views/system/init';
+  import { startBase } from '/@/views/system/init';
 
   // 引入组件
   const Animate = defineAsyncComponent(() => import('/@/components/animate/index.vue'));

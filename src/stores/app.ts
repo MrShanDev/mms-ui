@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { listDictAll } from '/src/views/system/init';
+import { listDictAll } from '/@/views/system/init';
 
 export const useAppStore = defineStore('appStore', {
   state: () => ({

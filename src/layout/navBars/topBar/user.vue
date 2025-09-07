@@ -122,7 +122,7 @@
   import other from '/@/utils/other';
   import mittBus from '/@/utils/mitt';
   import { Session, Local } from '/@/utils/storage';
-  import { logout } from '/src/views/system/login';
+  import { logout } from '/@/views/system/login';
   import { isEmpty, tansParams } from '/@/utils/mms';
   // 引入 api 请求接口
 

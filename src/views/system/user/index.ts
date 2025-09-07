@@ -1,8 +1,8 @@
-import request from '/src/utils/request';
-import { getEnv } from '/src/utils/mms';
+import request from '/@/utils/request';
+import { getEnv } from '/@/utils/mms';
 import { AxiosPromise } from 'axios';
-import { SysEnum } from '/src/enums/SysEnum';
-import { EncryptTypeEnum } from '/src/enums/EncryptTypeEnum';
+import { SysEnum } from '/@/enums/SysEnum';
+import { EncryptTypeEnum } from '/@/enums/EncryptTypeEnum';
 
 /**
  * 系统用户

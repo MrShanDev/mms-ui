@@ -146,7 +146,7 @@
   import { reactive, ref, nextTick } from 'vue';
   import { ElMessage } from 'element-plus';
   import { CURDEnum } from '/@/enums/CURDEnum';
-  import { deptApi } from '/src/views/system/dept';
+  import { deptApi } from '/@/views/system/dept';
   import FastSelect from '/@/components/fast-select/src/fast-select.vue';
   import FastSwitch from '/@/components/fast-switch/src/fast-switch.vue';
   import { RowUserType } from '/@/views/system/user/type';

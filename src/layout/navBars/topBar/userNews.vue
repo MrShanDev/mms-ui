@@ -24,7 +24,7 @@
 
 <script setup lang="ts" name="layoutBreadcrumbUserNews">
   import { onMounted, reactive } from 'vue';
-  import { noticeApi } from '/src/views/system/notice';
+  import { noticeApi } from '/@/views/system/notice';
   import { ElMessage } from 'element-plus';
   const baseApi = noticeApi();
   // 定义变量内容
