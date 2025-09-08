@@ -243,8 +243,8 @@
         </el-form-item>
         <el-form-item label="项目图标" prop="configValue">
           <fast-img
-            v-model="state.eventDialog.ruleForm.configValue"
-            :fileUrl="state.eventDialog.ruleForm.configValue"
+            v-model="state.eventDialog.ruleForm.configValue as string"
+            :fileUrl="String(state.eventDialog.ruleForm.configValue)"
           />
         </el-form-item>
         <el-form-item label="跳转地址" prop="remark">
@@ -274,8 +274,21 @@
   const storesThemeConfig = useThemeConfig();
   const { themeConfig } = storeToRefs(storesThemeConfig);
   const { isTagsViewCurrenFull } = storeToRefs(storesTagsViewRoutes);
-  import { DocUserBo, DocUserVo } from '/@/views/docAdmin/docUser/type';
-  import { NoticeEntity, NoticeState } from '/@/views/system/notice/type';
+  import { FunctionType } from '/@/views/system/menu/type';
+  import { RowSysConfigType } from '/@/views/system/config/type';
+  
+  // 定义用户类型
+  interface DocUserVo {
+    nickname: string;
+    mtime: string;
+    type: string;
+  }
+  
+  // 定义公告类型
+  interface NoticeEntity {
+    title: string;
+  }
+  
   import { noticeApi } from '/@/views/system/notice';
   import { homeApi } from '/@/views/system/home';
   import { ElMessage } from 'element-plus';
@@ -530,8 +543,11 @@
     configKey: generateUUID(),
     configValue: '',
     configType: 3,
+    columnName: '',
     remark: '',
     status: 1,
+    sort: 0,
+    revision: 0,
   });
   const state = reactive({
     //MMS用户列表
@@ -551,7 +567,12 @@
       userTool: 0,
       newsTool: 0,
       task: '0/0',
-      systemInfo: {},
+      systemInfo: {
+        name: '',
+        version: '',
+        docUrl: '',
+        describe: '',
+      },
       fastList: [],
       eventList: [],
     } as {
@@ -560,7 +581,12 @@
       userTool: number;
       newsTool: number;
       task: string;
-      systemInfo: {};
+      systemInfo: {
+        name: string;
+        version: string;
+        docUrl: string;
+        describe: string;
+      };
       fastList: Array<FunctionType>;
       eventList: Array<any>;
     },
@@ -602,7 +628,7 @@
     state.docUserData.param.pageNum += 1;
     getUserList();
   };
-  const openWindow = (url) => {
+  const openWindow = (url: string) => {
     // 确保在客户端环境且 url 存在
     if (typeof window !== 'undefined' && url) {
       window.open(url, '_blank');

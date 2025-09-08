@@ -204,7 +204,6 @@ pnpm store prune
 
 | 脚本命令               | 功能说明        | 使用场景           |
 | ---------------------- | --------------- | ------------------ |
-|                        |                 |                    |
 | `npm run pnpm:install` | 快速安装依赖    | 首次安装或重新安装 |
 | `npm run pnpm:dev`     | PNPM 开发服务器 | 日常开发           |
 | `npm run pnpm:build`   | PNPM 项目构建   | 生产环境构建       |
