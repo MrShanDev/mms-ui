@@ -91,9 +91,6 @@
                 label="创建时间"
                 show-overflow-tooltip
               >
-                <template #default="scope">
-                  {{ $ut.parseTime(scope.row.createdTime, '{y}-{m}-{d} {h}:{i}:{s}') }}
-                </template>
               </el-table-column>
               <el-table-column fixed="right" width="100" label="操作">
                 <template #default="scope">

@@ -274,4 +274,8 @@
     getTableData();
   });
 </script>
-<style></style>
+<style>
+.el-table .cell.el-tooltip {
+  display: flex !important;
+}
+</style>

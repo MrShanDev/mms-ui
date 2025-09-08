@@ -13,21 +13,21 @@
           :key="!v.meta.tagsViewName ? v.meta.title : v.meta.tagsViewName"
         >
           <span v-if="k === state.breadcrumbList.length - 1" class="layout-navbars-breadcrumb-span">
-            <SvgIcon
-              :name="v.meta.icon"
+            <i
+              :class="v.meta.icon"
               class="layout-navbars-breadcrumb-iconfont"
               v-if="themeConfig.isBreadcrumbIcon"
             />
-            <div v-if="!v.meta.tagsViewName">{{ $t(v.meta.title) }}</div>
+            <div v-if="!v.meta.tagsViewName">{{ t(v.meta.title) }}</div>
             <div v-else>{{ v.meta.tagsViewName }}</div>
           </span>
           <a v-else @click.prevent="onBreadcrumbClick(v)">
-            <SvgIcon
-              :name="v.meta.icon"
+            <i
+              :class="v.meta.icon"
               class="layout-navbars-breadcrumb-iconfont"
               v-if="themeConfig.isBreadcrumbIcon"
             />
-            {{ $t(v.meta.title) }}
+            {{ t(v.meta.title) }}
           </a>
         </el-breadcrumb-item>
       </transition-group>
@@ -36,15 +36,18 @@
 </template>
 
 <script setup lang="ts" name="layoutBreadcrumb">
-  import { reactive, computed, onMounted } from 'vue';
+  import { reactive, computed, onMounted, watch } from 'vue';
   import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
+  import { useI18n } from 'vue-i18n';
   import { Local } from '/@/utils/storage';
   import other from '/@/utils/other';
   import { storeToRefs } from 'pinia';
   import { useThemeConfig } from '/@/stores/themeConfig';
   import { useRoutesList } from '/@/stores/routesList';
+  import type { RouteItem, RouteItems, RouteToFrom } from '/@/types/global';
 
   // 定义变量内容
+  const { t } = useI18n();
   const stores = useRoutesList();
   const storesThemeConfig = useThemeConfig();
   const { themeConfig } = storeToRefs(storesThemeConfig);
@@ -60,7 +63,6 @@
 
   // 动态设置经典、横向布局不显示
   const isShowBreadcrumb = computed(() => {
-    initRouteSplit(route.path);
     const { layout, isBreadcrumb } = themeConfig.value;
     if (layout === 'classic' || layout === 'transverse') return false;
     else return isBreadcrumb ? true : false;
@@ -113,6 +115,12 @@
   onMounted(() => {
     initRouteSplit(route.path);
   });
+  
+  // 监听路由变化
+  watch(() => route.path, (newPath) => {
+    initRouteSplit(newPath);
+  }, { immediate: true });
+  
   // 路由更新时
   onBeforeRouteUpdate((to) => {
     initRouteSplit(to.path);

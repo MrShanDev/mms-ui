@@ -25,7 +25,12 @@
   });
 
   // https://www.iconfont.cn 图标库需使用前缀 icon- 才能匹配
-  const iconName = computed(() => `#icon-${props.icon.replace('icon-', '')}`);
+  const iconName = computed(() => {
+    if (!props.icon || typeof props.icon !== 'string') {
+      return '#icon-';
+    }
+    return `#icon-${props.icon.replace('icon-', '')}`;
+  });
 </script>
 
 <style scoped>
