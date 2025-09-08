@@ -24,8 +24,8 @@
             class="iconfont icon-webicon318 layout-navbars-tagsview-ul-li-iconfont"
             v-if="isActive(v)"
           ></i>
-          <SvgIcon
-            :name="v.meta.icon"
+          <i
+            :class="v.meta.icon"
             v-if="!isActive(v) && getThemeConfig.isTagsviewIcon"
             class="pr5"
           />

@@ -14,8 +14,6 @@ import { i18n } from '/@/i18n';
 import ElementPlus from 'element-plus';
 // 栅格布局（Vue3版本）
 import { GridLayout, GridItem } from 'vue-grid-layout';
-// 图标系统
-import SvgIcon from '/@/components/svg-icon';
 import '/@/styles/mms.scss';
 // 图表
 import { VueUiRadar } from 'vue-data-ui';
@@ -61,5 +59,4 @@ app
   .use(ElementPlus)
   .use(VxeUI)
   .use(VxeTable)
-  .use(SvgIcon)
   .mount('#app');
