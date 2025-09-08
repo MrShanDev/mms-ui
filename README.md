@@ -39,6 +39,11 @@ npm mirror:setup
 | 基础版-前端 |  mms-ui  |  -[Gitee](https://gitee.com/mmsAdmin/mms-ui)  | 🙋‍♂️适配：基础版后端系统                                                                        |
 | MMS商城版   | mms-mall | -[Gitee](https://gitee.com/mmsAdmin/mms-mall) | 🙋‍♂️若遇到问题请联系我们（备注：mms）<br>📢微信号：qq942879858<br>📢Q&nbsp;&nbsp;Q号：942879858 |
 
+## **官方文档**
+
+
+[🍃 模块化管理系统 🍃](https://www.mmsadmin.cn)
+
 ## 开发语言
 
 <div style="text-align: center;float: left;width: 100%">
@@ -59,14 +64,8 @@ npm mirror:setup
 
 ## 部署方式
 
-<br/>
 <img src="https://img.shields.io/docker/automated/tsund/tianchi_docker_practice.svg" alt=""/>
 
-## **官方文档**
-
-<br/>
-
-[模块化管理系统](https://www.mmsadmin.cn)
 
 ## 模块介绍
 
