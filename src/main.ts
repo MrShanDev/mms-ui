@@ -16,7 +16,7 @@ import ElementPlus from 'element-plus';
 import { GridLayout, GridItem } from 'vue-grid-layout';
 // 图标系统
 import SvgIcon from '/@/components/svg-icon';
-import '/@/styles/myStyle.scss';
+import '/@/styles/mms.scss';
 // 图表
 import { VueUiRadar } from 'vue-data-ui';
 // 样式
