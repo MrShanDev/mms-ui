@@ -378,15 +378,170 @@ project_info_menu() {
 
 # 实现功能函数 (部分示例)
 
-# 安装 NVM
+# 安装 NVM (增强版)
 install_nvm() {
     echo -e "${BLUE}📥 安装 NVM...${NC}"
-    if command_exists nvm; then
-        echo -e "${YELLOW}⚠️  NVM 已安装${NC}"
-    else
-        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.0/install.sh | bash
-        echo -e "${GREEN}✅ NVM 安装完成，请重新打开终端或运行: source ~/.bashrc${NC}"
+    echo -e "${GRAY}─────────────────────────────────────────────────────────────${NC}"
+    
+    # 检查是否已经安装
+    if command_exists nvm || [[ -s "$NVM_DIR/nvm.sh" ]]; then
+        # 尝试加载 NVM
+        [[ -s "$NVM_DIR/nvm.sh" ]] && source "$NVM_DIR/nvm.sh"
+        
+        if command_exists nvm; then
+            CURRENT_VERSION=$(nvm --version 2>/dev/null || echo "unknown")
+            echo -e "  ${YELLOW}⚠️  NVM 已安装: v${CURRENT_VERSION}${NC}"
+            echo ""
+            read -p "是否要重新安装最新版本? (y/n): " reinstall_choice
+            if [[ "$reinstall_choice" != "y" && "$reinstall_choice" != "Y" ]]; then
+                echo -e "${CYAN}💡 保持当前安装 v${CURRENT_VERSION}${NC}"
+                read -p "按任意键继续..." -n1 -s
+                return
+            fi
+        fi
     fi
+    
+    echo -e "${CYAN}📋 NVM 安装方式选择:${NC}"
+    echo "  1) 使用 curl 安装脚本 (推荐)"
+    echo "  2) 使用 wget 安装脚本"
+    echo "  3) 使用 Homebrew 安装 (仅 macOS)"
+    echo "  4) 手动下载安装"
+    echo ""
+    read -p "请选择安装方式 (1-4): " install_choice
+    
+    # 获取最新版本
+    echo -e "${BLUE}🔍 获取 NVM 最新版本信息...${NC}"
+    LATEST_VERSION=$(curl -s https://api.github.com/repos/nvm-sh/nvm/releases/latest | grep '"tag_name"' | cut -d'"' -f4 2>/dev/null || echo "v0.40.3")
+    echo -e "${CYAN}最新版本: ${LATEST_VERSION}${NC}"
+    echo ""
+    
+    case $install_choice in
+        1)
+            echo -e "${BLUE}📥 使用 curl 安装 NVM ${LATEST_VERSION}...${NC}"
+            if command_exists curl; then
+                # 备份现有配置
+                [[ -f ~/.bashrc ]] && cp ~/.bashrc ~/.bashrc.bak.$(date +%Y%m%d_%H%M%S) 2>/dev/null
+                [[ -f ~/.zshrc ]] && cp ~/.zshrc ~/.zshrc.bak.$(date +%Y%m%d_%H%M%S) 2>/dev/null
+                
+                # 下载并安装
+                curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/${LATEST_VERSION}/install.sh | bash
+                
+                if [ $? -eq 0 ]; then
+                    echo -e "${GREEN}✅ NVM 安装成功${NC}"
+                else
+                    echo -e "${RED}❌ NVM 安装失败${NC}"
+                fi
+            else
+                echo -e "${RED}❌ curl 未安装，请先安装 curl${NC}"
+            fi
+            ;;
+        2)
+            echo -e "${BLUE}📥 使用 wget 安装 NVM ${LATEST_VERSION}...${NC}"
+            if command_exists wget; then
+                # 备份现有配置
+                [[ -f ~/.bashrc ]] && cp ~/.bashrc ~/.bashrc.bak.$(date +%Y%m%d_%H%M%S) 2>/dev/null
+                [[ -f ~/.zshrc ]] && cp ~/.zshrc ~/.zshrc.bak.$(date +%Y%m%d_%H%M%S) 2>/dev/null
+                
+                # 下载并安装
+                wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/${LATEST_VERSION}/install.sh | bash
+                
+                if [ $? -eq 0 ]; then
+                    echo -e "${GREEN}✅ NVM 安装成功${NC}"
+                else
+                    echo -e "${RED}❌ NVM 安装失败${NC}"
+                fi
+            else
+                echo -e "${RED}❌ wget 未安装，请先安装 wget${NC}"
+            fi
+            ;;
+        3)
+            echo -e "${BLUE}📥 使用 Homebrew 安装 NVM...${NC}"
+            if command_exists brew; then
+                brew install nvm
+                if [ $? -eq 0 ]; then
+                    echo -e "${GREEN}✅ NVM 安装成功${NC}"
+                    echo -e "${CYAN}🔧 配置环境变量...${NC}"
+                    
+                    # 为 Homebrew 安装的 NVM 配置环境
+                    NVM_HOMEBREW_PREFIX="$(brew --prefix nvm)"
+                    if [[ -n "$NVM_HOMEBREW_PREFIX" ]]; then
+                        echo "export NVM_DIR=\"$HOME/.nvm\"" >> ~/.zshrc
+                        echo "[ -s \"$NVM_HOMEBREW_PREFIX/nvm.sh\" ] && . \"$NVM_HOMEBREW_PREFIX/nvm.sh\"" >> ~/.zshrc
+                        echo "[ -s \"$NVM_HOMEBREW_PREFIX/etc/bash_completion.d/nvm\" ] && . \"$NVM_HOMEBREW_PREFIX/etc/bash_completion.d/nvm\"" >> ~/.zshrc
+                        echo -e "${GREEN}✅ 环境配置完成${NC}"
+                    fi
+                else
+                    echo -e "${RED}❌ NVM 安装失败${NC}"
+                fi
+            else
+                echo -e "${RED}❌ Homebrew 未安装，请先安装 Homebrew${NC}"
+                echo -e "${CYAN}💡 Homebrew 安装命令: /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"${NC}"
+            fi
+            ;;
+        4)
+            echo -e "${BLUE}📁 手动下载安装指引:${NC}"
+            echo -e "${CYAN}1. 访问 NVM GitHub 页面: https://github.com/nvm-sh/nvm${NC}"
+            echo -e "${CYAN}2. 下载最新版本: ${LATEST_VERSION}${NC}"
+            echo -e "${CYAN}3. 按照官方文档进行安装${NC}"
+            echo -e "${CYAN}4. 或者使用以下命令:${NC}"
+            echo "   curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/${LATEST_VERSION}/install.sh | bash"
+            ;;
+        *)
+            echo -e "${RED}❌ 无效选择${NC}"
+            read -p "按任意键继续..." -n1 -s
+            return
+            ;;
+    esac
+    
+    echo ""
+    echo -e "${CYAN}🔧 环境配置:${NC}"
+    
+    # 检查并配置 shell 环境
+    SHELL_RC=""
+    if [[ "$SHELL" == *"zsh"* ]]; then
+        SHELL_RC="~/.zshrc"
+    elif [[ "$SHELL" == *"bash"* ]]; then
+        SHELL_RC="~/.bashrc"
+    fi
+    
+    echo -e "${CYAN}当前 Shell: $SHELL${NC}"
+    echo -e "${CYAN}配置文件: $SHELL_RC${NC}"
+    
+    # 重新加载环境
+    export NVM_DIR="$HOME/.nvm"
+    [[ -s "$NVM_DIR/nvm.sh" ]] && source "$NVM_DIR/nvm.sh"
+    [[ -s "$NVM_DIR/bash_completion" ]] && source "$NVM_DIR/bash_completion"
+    
+    echo ""
+    echo -e "${CYAN}📋 NVM 验证:${NC}"
+    
+    if command_exists nvm; then
+        NVM_VERSION=$(nvm --version 2>/dev/null || echo "unknown")
+        echo -e "  ${GREEN}✅ NVM 版本: v${NVM_VERSION}${NC}"
+        echo -e "  ${GREEN}✅ NVM 目录: $NVM_DIR${NC}"
+        
+        # 显示可用的 Node.js 版本
+        echo -e "  ${GREEN}✅ 正在检查可用的 Node.js 版本...${NC}"
+        nvm list-remote --lts 2>/dev/null | tail -5 || echo "    无法获取远程版本列表"
+        
+        echo ""
+        echo -e "${CYAN}💡 常用 NVM 命令:${NC}"
+        echo "  nvm install node       - 安装最新版本 Node.js"
+        echo "  nvm install --lts      - 安装最新 LTS 版本"
+        echo "  nvm use node           - 使用最新版本"
+        echo "  nvm list               - 查看已安装版本"
+        echo "  nvm alias default node - 设置默认版本"
+        
+        echo ""
+        echo -e "${GREEN}✅ NVM 安装完成！${NC}"
+        echo -e "${YELLOW}⚠️  请重新打开终端或运行以下命令加载 NVM:${NC}"
+        echo -e "${CYAN}source $SHELL_RC${NC}"
+    else
+        echo -e "  ${RED}❌ NVM 验证失败${NC}"
+        echo -e "  ${YELLOW}⚠️  可能需要手动配置环境变量${NC}"
+        echo -e "  ${CYAN}请检查 $SHELL_RC 文件中的 NVM 配置${NC}"
+    fi
+    
     read -p "按任意键继续..." -n1 -s
 }
 
@@ -435,13 +590,120 @@ pnpm_install_fast() {
     read -p "按任意键继续..." -n1 -s
 }
 
+# 安装 PNPM (增强版)
+install_pnpm() {
+    echo -e "${BLUE}📥 安装 PNPM...${NC}"
+    echo -e "${GRAY}─────────────────────────────────────────────────────────────${NC}"
+    
+    # 检查是否已经安装
+    if command_exists pnpm; then
+        CURRENT_VERSION=$(pnpm --version)
+        echo -e "  ${YELLOW}⚠️  PNPM 已安装: v${CURRENT_VERSION}${NC}"
+        echo ""
+        read -p "是否要升级到最新版本? (y/n): " upgrade_choice
+        if [[ "$upgrade_choice" == "y" || "$upgrade_choice" == "Y" ]]; then
+            echo -e "${BLUE}🔄 升级 PNPM 到最新版本...${NC}"
+            npm install -g pnpm@latest
+            if [ $? -eq 0 ]; then
+                NEW_VERSION=$(pnpm --version)
+                echo -e "${GREEN}✅ PNPM 升级成功: v${CURRENT_VERSION} → v${NEW_VERSION}${NC}"
+            else
+                echo -e "${RED}❌ PNPM 升级失败${NC}"
+            fi
+        else
+            echo -e "${CYAN}💡 保持当前版本 v${CURRENT_VERSION}${NC}"
+        fi
+    else
+        echo -e "${CYAN}📋 PNPM 安装方式选择:${NC}"
+        echo "  1) 使用 npm 安装 (推荐)"
+        echo "  2) 使用 curl 安装脚本"
+        echo "  3) 使用 Homebrew 安装 (仅 macOS)"
+        echo ""
+        read -p "请选择安装方式 (1-3): " install_choice
+        
+        case $install_choice in
+            1)
+                echo -e "${BLUE}📥 使用 npm 安装 PNPM...${NC}"
+                npm install -g pnpm
+                if [ $? -eq 0 ]; then
+                    INSTALLED_VERSION=$(pnpm --version)
+                    echo -e "${GREEN}✅ PNPM 安装成功: v${INSTALLED_VERSION}${NC}"
+                    echo -e "${CYAN}🔧 自动配置镜像源...${NC}"
+                    pnpm config set registry https://registry.npmmirror.com
+                    echo -e "${GREEN}✅ 镜像源配置完成${NC}"
+                else
+                    echo -e "${RED}❌ PNPM 安装失败${NC}"
+                fi
+                ;;
+            2)
+                echo -e "${BLUE}📥 使用安装脚本安装 PNPM...${NC}"
+                if command_exists curl; then
+                    curl -fsSL https://get.pnpm.io/install.sh | sh -
+                    # 重新加载 shell 环境
+                    source ~/.bashrc 2>/dev/null || source ~/.zshrc 2>/dev/null || true
+                    if command_exists pnpm; then
+                        INSTALLED_VERSION=$(pnpm --version)
+                        echo -e "${GREEN}✅ PNPM 安装成功: v${INSTALLED_VERSION}${NC}"
+                        echo -e "${CYAN}🔧 自动配置镜像源...${NC}"
+                        pnpm config set registry https://registry.npmmirror.com
+                        echo -e "${GREEN}✅ 镜像源配置完成${NC}"
+                    else
+                        echo -e "${RED}❌ PNPM 安装失败，请重新打开终端或手动配置环境变量${NC}"
+                    fi
+                else
+                    echo -e "${RED}❌ curl 未安装，请先安装 curl${NC}"
+                fi
+                ;;
+            3)
+                echo -e "${BLUE}📥 使用 Homebrew 安装 PNPM...${NC}"
+                if command_exists brew; then
+                    brew install pnpm
+                    if [ $? -eq 0 ]; then
+                        INSTALLED_VERSION=$(pnpm --version)
+                        echo -e "${GREEN}✅ PNPM 安装成功: v${INSTALLED_VERSION}${NC}"
+                        echo -e "${CYAN}🔧 自动配置镜像源...${NC}"
+                        pnpm config set registry https://registry.npmmirror.com
+                        echo -e "${GREEN}✅ 镜像源配置完成${NC}"
+                    else
+                        echo -e "${RED}❌ PNPM 安装失败${NC}"
+                    fi
+                else
+                    echo -e "${RED}❌ Homebrew 未安装，请先安装 Homebrew${NC}"
+                    echo -e "${CYAN}💡 Homebrew 安装命令: /bin/bash -c \"\$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)\"${NC}"
+                fi
+                ;;
+            *)
+                echo -e "${RED}❌ 无效选择${NC}"
+                ;;
+        esac
+    fi
+    
+    echo ""
+    echo -e "${CYAN}📋 PNPM 验证:${NC}"
+    if command_exists pnpm; then
+        echo -e "  ${GREEN}✅ PNPM 版本: $(pnpm --version)${NC}"
+        echo -e "  ${GREEN}✅ 安装路径: $(which pnpm)${NC}"
+        echo -e "  ${GREEN}✅ 镜像源: $(pnpm config get registry)${NC}"
+        echo ""
+        echo -e "${CYAN}💡 常用 PNPM 命令:${NC}"
+        echo "  pnpm install          - 安装依赖"
+        echo "  pnpm add <package>     - 添加依赖"
+        echo "  pnpm run dev           - 运行开发服务器"
+        echo "  pnpm store prune       - 清理存储"
+    else
+        echo -e "  ${RED}❌ PNPM 验证失败${NC}"
+    fi
+    
+    read -p "按任意键继续..." -n1 -s
+}
+
 # 一键启动脚本
 start_with_script() {
     echo -e "${BLUE}🚀 启动一键启动脚本...${NC}"
-    if [[ -f "start-pnpm.sh" ]]; then
-        ./start-pnpm.sh
+    if [[ -f "scripts/start-pnpm.sh" ]]; then
+        ./scripts/start-pnpm.sh
     else
-        echo -e "${RED}❌ start-pnpm.sh 脚本不存在${NC}"
+        echo -e "${RED}❌ scripts/start-pnpm.sh 脚本不存在${NC}"
     fi
     read -p "按任意键继续..." -n1 -s
 }
@@ -456,8 +718,287 @@ run_eslint() {
 # 清理 npm 缓存
 clean_npm_cache() {
     echo -e "${BLUE}🗑️ 清理 npm 缓存...${NC}"
-    npm cache clean --force
-    echo -e "${GREEN}✅ npm 缓存清理完成${NC}"
+    echo -e "${GRAY}─────────────────────────────────────────────────────────────${NC}"
+    
+    if command_exists npm; then
+        echo -e "${CYAN}正在清理 npm 缓存...${NC}"
+        npm cache clean --force
+        
+        # 获取缓存大小信息
+        if command_exists du; then
+            CACHE_DIR=$(npm config get cache)
+            if [[ -d "$CACHE_DIR" ]]; then
+                CACHE_SIZE=$(du -sh "$CACHE_DIR" 2>/dev/null | cut -f1 || echo "未知")
+                echo -e "${CYAN}缓存目录: $CACHE_DIR${NC}"
+                echo -e "${CYAN}剩余大小: $CACHE_SIZE${NC}"
+            fi
+        fi
+        
+        echo -e "${GREEN}✅ npm 缓存清理完成${NC}"
+    else
+        echo -e "${RED}❌ npm 未安装${NC}"
+    fi
+    
+    echo ""
+    read -p "按任意键继续..." -n1 -s
+}
+
+# 清理 pnpm 缓存
+clean_pnpm_cache() {
+    echo -e "${BLUE}🗑️ 清理 pnpm 缓存...${NC}"
+    echo -e "${GRAY}─────────────────────────────────────────────────────────────${NC}"
+    
+    if command_exists pnpm; then
+        echo -e "${CYAN}正在清理 pnpm 存储...${NC}"
+        pnpm store prune
+        
+        echo -e "${CYAN}正在清理 pnpm 缓存...${NC}"
+        pnpm cache dir 2>/dev/null && pnpm cache clear 2>/dev/null
+        
+        # 获取存储信息
+        echo -e "${CYAN}存储状态:${NC}"
+        pnpm store status 2>/dev/null || echo "无法获取存储状态"
+        
+        echo -e "${GREEN}✅ pnpm 缓存清理完成${NC}"
+    else
+        echo -e "${RED}❌ pnpm 未安装${NC}"
+    fi
+    
+    echo ""
+    read -p "按任意键继续..." -n1 -s
+}
+
+# 清理 node_modules
+clean_node_modules() {
+    echo -e "${BLUE}🗑️ 清理 node_modules...${NC}"
+    echo -e "${GRAY}─────────────────────────────────────────────────────────────${NC}"
+    
+    if [[ -d "node_modules" ]]; then
+        # 获取大小信息
+        if command_exists du; then
+            NODE_MODULES_SIZE=$(du -sh node_modules 2>/dev/null | cut -f1 || echo "未知")
+            echo -e "${CYAN}当前 node_modules 大小: $NODE_MODULES_SIZE${NC}"
+        fi
+        
+        echo -e "${YELLOW}⚠️  即将删除 node_modules 目录${NC}"
+        read -p "确认删除? (y/n): " confirm
+        
+        if [[ "$confirm" == "y" || "$confirm" == "Y" ]]; then
+            echo -e "${CYAN}正在删除 node_modules...${NC}"
+            rm -rf node_modules
+            echo -e "${GREEN}✅ node_modules 清理完成${NC}"
+            
+            echo -e "${CYAN}💡 提示: 可以运行以下命令重新安装依赖:${NC}"
+            echo -e "   npm install 或 pnpm install"
+        else
+            echo -e "${YELLOW}❌ 已取消删除${NC}"
+        fi
+    else
+        echo -e "${YELLOW}⚠️  node_modules 目录不存在${NC}"
+    fi
+    
+    echo ""
+    read -p "按任意键继续..." -n1 -s
+}
+
+# 清理构建缓存
+clean_build_cache() {
+    echo -e "${BLUE}🗑️ 清理构建缓存...${NC}"
+    echo -e "${GRAY}─────────────────────────────────────────────────────────────${NC}"
+    
+    # 清理常见的构建缓存目录和文件
+    CACHE_DIRS=("dist" "build" ".vite" "node_modules/.vite" "node_modules/.cache")
+    CLEANED_COUNT=0
+    
+    for dir in "${CACHE_DIRS[@]}"; do
+        if [[ -d "$dir" ]]; then
+            if command_exists du; then
+                DIR_SIZE=$(du -sh "$dir" 2>/dev/null | cut -f1 || echo "未知")
+                echo -e "${CYAN}正在清理 $dir (大小: $DIR_SIZE)...${NC}"
+            else
+                echo -e "${CYAN}正在清理 $dir...${NC}"
+            fi
+            rm -rf "$dir"
+            CLEANED_COUNT=$((CLEANED_COUNT + 1))
+        fi
+    done
+    
+    # 清理临时文件
+    TEMP_FILES=("*.log" "*.tmp" ".DS_Store")
+    for pattern in "${TEMP_FILES[@]}"; do
+        if ls $pattern 1> /dev/null 2>&1; then
+            echo -e "${CYAN}正在清理 $pattern 文件...${NC}"
+            rm -f $pattern
+            CLEANED_COUNT=$((CLEANED_COUNT + 1))
+        fi
+    done
+    
+    if [ $CLEANED_COUNT -gt 0 ]; then
+        echo -e "${GREEN}✅ 构建缓存清理完成 (清理了 $CLEANED_COUNT 项)${NC}"
+    else
+        echo -e "${YELLOW}⚠️  没有发现需要清理的构建缓存${NC}"
+    fi
+    
+    echo ""
+    read -p "按任意键继续..." -n1 -s
+}
+
+# 清理 lock 文件
+clean_lock_files() {
+    echo -e "${BLUE}🗑️ 清理 lock 文件...${NC}"
+    echo -e "${GRAY}─────────────────────────────────────────────────────────────${NC}"
+    
+    LOCK_FILES=("package-lock.json" "pnpm-lock.yaml" "yarn.lock")
+    CLEANED_COUNT=0
+    
+    echo -e "${YELLOW}⚠️  即将删除以下 lock 文件:${NC}"
+    for file in "${LOCK_FILES[@]}"; do
+        if [[ -f "$file" ]]; then
+            echo -e "   - $file"
+        fi
+    done
+    
+    echo ""
+    read -p "确认删除? (y/n): " confirm
+    
+    if [[ "$confirm" == "y" || "$confirm" == "Y" ]]; then
+        for file in "${LOCK_FILES[@]}"; do
+            if [[ -f "$file" ]]; then
+                echo -e "${CYAN}正在删除 $file...${NC}"
+                rm -f "$file"
+                CLEANED_COUNT=$((CLEANED_COUNT + 1))
+            fi
+        done
+        
+        if [ $CLEANED_COUNT -gt 0 ]; then
+            echo -e "${GREEN}✅ lock 文件清理完成 (删除了 $CLEANED_COUNT 个文件)${NC}"
+            echo -e "${CYAN}💡 提示: 下次安装依赖时会重新生成 lock 文件${NC}"
+        else
+            echo -e "${YELLOW}⚠️  没有发现 lock 文件${NC}"
+        fi
+    else
+        echo -e "${YELLOW}❌ 已取消删除${NC}"
+    fi
+    
+    echo ""
+    read -p "按任意键继续..." -n1 -s
+}
+
+# 完全重置项目
+full_project_reset() {
+    echo -e "${RED}🚨 完全重置项目${NC}"
+    echo -e "${GRAY}─────────────────────────────────────────────────────────────${NC}"
+    
+    echo -e "${YELLOW}⚠️  此操作将删除以下内容:${NC}"
+    echo -e "   - node_modules 目录"
+    echo -e "   - 所有 lock 文件"
+    echo -e "   - 构建缓存目录"
+    echo -e "   - npm/pnpm 缓存"
+    echo -e "   - 临时文件"
+    echo ""
+    echo -e "${RED}⚠️  这是一个不可逆操作！${NC}"
+    echo ""
+    read -p "确认完全重置项目? (输入 'RESET' 确认): " confirm
+    
+    if [[ "$confirm" == "RESET" ]]; then
+        echo -e "${CYAN}🔄 开始完全重置项目...${NC}"
+        echo ""
+        
+        # 清理 node_modules
+        if [[ -d "node_modules" ]]; then
+            echo -e "${CYAN}1. 删除 node_modules...${NC}"
+            rm -rf node_modules
+        fi
+        
+        # 清理 lock 文件
+        LOCK_FILES=("package-lock.json" "pnpm-lock.yaml" "yarn.lock")
+        echo -e "${CYAN}2. 删除 lock 文件...${NC}"
+        for file in "${LOCK_FILES[@]}"; do
+            [[ -f "$file" ]] && rm -f "$file" && echo -e "   删除 $file"
+        done
+        
+        # 清理构建缓存
+        echo -e "${CYAN}3. 清理构建缓存...${NC}"
+        CACHE_DIRS=("dist" "build" ".vite" "node_modules/.vite" "node_modules/.cache")
+        for dir in "${CACHE_DIRS[@]}"; do
+            [[ -d "$dir" ]] && rm -rf "$dir" && echo -e "   删除 $dir"
+        done
+        
+        # 清理包管理器缓存
+        echo -e "${CYAN}4. 清理包管理器缓存...${NC}"
+        command_exists npm && npm cache clean --force
+        command_exists pnpm && pnpm store prune
+        
+        # 清理临时文件
+        echo -e "${CYAN}5. 清理临时文件...${NC}"
+        rm -f *.log *.tmp .DS_Store
+        
+        echo ""
+        echo -e "${GREEN}✅ 项目重置完成！${NC}"
+        echo -e "${CYAN}💡 下一步操作建议:${NC}"
+        echo -e "   1. npm install 或 pnpm install (重新安装依赖)"
+        echo -e "   2. npm run dev 或 pnpm dev (启动开发服务器)"
+    else
+        echo -e "${YELLOW}❌ 已取消重置操作${NC}"
+    fi
+    
+    echo ""
+    read -p "按任意键继续..." -n1 -s
+}
+
+# 清理系统临时文件
+clean_system_temp() {
+    echo -e "${BLUE}🗑️ 清理系统临时文件...${NC}"
+    echo -e "${GRAY}─────────────────────────────────────────────────────────────${NC}"
+    
+    CLEANED_COUNT=0
+    
+    # macOS 特有的文件
+    if [[ "$(uname)" == "Darwin" ]]; then
+        echo -e "${CYAN}检测到 macOS 系统，清理 macOS 特有临时文件...${NC}"
+        
+        # 清理 .DS_Store 文件
+        if find . -name ".DS_Store" -type f 2>/dev/null | head -1 | grep -q "."; then
+            echo -e "${CYAN}正在清理 .DS_Store 文件...${NC}"
+            find . -name ".DS_Store" -type f -delete 2>/dev/null
+            CLEANED_COUNT=$((CLEANED_COUNT + 1))
+        fi
+        
+        # 清理 Thumb.db (如果存在)
+        if find . -name "Thumbs.db" -type f 2>/dev/null | head -1 | grep -q "."; then
+            echo -e "${CYAN}正在清理 Thumbs.db 文件...${NC}"
+            find . -name "Thumbs.db" -type f -delete 2>/dev/null
+            CLEANED_COUNT=$((CLEANED_COUNT + 1))
+        fi
+    fi
+    
+    # 通用临时文件
+    TEMP_PATTERNS=("*.tmp" "*.log" "*.swp" "*.swo" "*~")
+    for pattern in "${TEMP_PATTERNS[@]}"; do
+        if find . -name "$pattern" -type f 2>/dev/null | head -1 | grep -q "."; then
+            echo -e "${CYAN}正在清理 $pattern 文件...${NC}"
+            find . -name "$pattern" -type f -delete 2>/dev/null
+            CLEANED_COUNT=$((CLEANED_COUNT + 1))
+        fi
+    done
+    
+    # 编辑器临时文件
+    EDITOR_TEMP=(".vscode/.history" ".idea" "*.orig")
+    for pattern in "${EDITOR_TEMP[@]}"; do
+        if [[ -d "$pattern" ]] || find . -name "$pattern" -type f 2>/dev/null | head -1 | grep -q "."; then
+            echo -e "${CYAN}正在清理编辑器临时文件 $pattern...${NC}"
+            rm -rf $pattern 2>/dev/null
+            CLEANED_COUNT=$((CLEANED_COUNT + 1))
+        fi
+    done
+    
+    if [ $CLEANED_COUNT -gt 0 ]; then
+        echo -e "${GREEN}✅ 系统临时文件清理完成 (清理了 $CLEANED_COUNT 类文件)${NC}"
+    else
+        echo -e "${YELLOW}⚠️  没有发现需要清理的系统临时文件${NC}"
+    fi
+    
+    echo ""
     read -p "按任意键继续..." -n1 -s
 }
 

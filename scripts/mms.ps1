@@ -228,15 +228,190 @@ function Show-DependencyManagementMenu {
 
 # 实现功能函数 (部分示例)
 
-# 安装 NVM for Windows
+# 安装 NVM for Windows (增强版)
 function Install-NVM {
     Write-ColorText "📥 安装 NVM for Windows..." "Blue"
+    Write-ColorText "─────────────────────────────────────────────────────────────" "Gray"
+    
+    # 检查是否已经安装
     if (Test-Command "nvm") {
-        Write-ColorText "⚠️  NVM 已安装" "Yellow"
-    } else {
-        Write-ColorText "请访问 https://github.com/coreybutler/nvm-windows/releases 下载安装" "Cyan"
-        Write-ColorText "或者使用 Chocolatey: choco install nvm" "Cyan"
+        try {
+            $currentVersion = nvm version
+            Write-ColorText "  ⚠️  NVM 已安装: $currentVersion" "Yellow"
+            Write-Host ""
+            $reinstallChoice = Read-Host "是否要重新安装最新版本? (y/n)"
+            if ($reinstallChoice -ne "y" -and $reinstallChoice -ne "Y") {
+                Write-ColorText "💡 保持当前安装 $currentVersion" "Cyan"
+                Read-Host "按任意键继续..."
+                return
+            }
+        } catch {
+            Write-ColorText "  ⚠️  NVM 存在但未正确配置" "Yellow"
+        }
     }
+    
+    Write-ColorText "📋 NVM for Windows 安装方式选择:" "Cyan"
+    Write-Host "  1) 使用 Chocolatey 安装 (推荐)"
+    Write-Host "  2) 使用 Scoop 安装"
+    Write-Host "  3) 手动下载安装包"
+    Write-Host "  4) 使用 winget 安装"
+    Write-Host ""
+    $installChoice = Read-Host "请选择安装方式 (1-4)"
+    
+    # 获取最新版本
+    Write-ColorText "🔍 获取 NVM for Windows 最新版本信息..." "Blue"
+    try {
+        $apiResponse = Invoke-WebRequest -Uri "https://api.github.com/repos/coreybutler/nvm-windows/releases/latest" -UseBasicParsing
+        $releaseInfo = $apiResponse.Content | ConvertFrom-Json
+        $latestVersion = $releaseInfo.tag_name
+        Write-ColorText "最新版本: $latestVersion" "Cyan"
+    } catch {
+        $latestVersion = "v1.1.12"
+        Write-ColorText "无法获取最新版本，使用默认版本: $latestVersion" "Yellow"
+    }
+    Write-Host ""
+    
+    switch ($installChoice) {
+        "1" {
+            Write-ColorText "📥 使用 Chocolatey 安装 NVM for Windows..." "Blue"
+            if (Test-Command "choco") {
+                # 卸载旧版本
+                if (Test-Command "nvm") {
+                    Write-ColorText "🗑️ 卸载旧版本..." "Yellow"
+                    choco uninstall nvm -y 2>$null
+                }
+                
+                # 安装新版本
+                choco install nvm -y
+                if ($LASTEXITCODE -eq 0) {
+                    Write-ColorText "✅ NVM for Windows 安装成功" "Green"
+                    # 刷新环境变量
+                    $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
+                } else {
+                    Write-ColorText "❌ NVM for Windows 安装失败" "Red"
+                }
+            } else {
+                Write-ColorText "❌ Chocolatey 未安装，请先安装 Chocolatey" "Red"
+                Write-ColorText "💡 Chocolatey 安装命令:" "Cyan"
+                Write-Host "Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))"
+            }
+        }
+        "2" {
+            Write-ColorText "📥 使用 Scoop 安装 NVM for Windows..." "Blue"
+            if (Test-Command "scoop") {
+                # 卸载旧版本
+                if (Test-Command "nvm") {
+                    Write-ColorText "🗑️ 卸载旧版本..." "Yellow"
+                    scoop uninstall nvm 2>$null
+                }
+                
+                # 添加 extras bucket 如果未添加
+                scoop bucket add extras 2>$null
+                
+                # 安装新版本
+                scoop install nvm
+                if ($LASTEXITCODE -eq 0) {
+                    Write-ColorText "✅ NVM for Windows 安装成功" "Green"
+                } else {
+                    Write-ColorText "❌ NVM for Windows 安装失败" "Red"
+                }
+            } else {
+                Write-ColorText "❌ Scoop 未安装，请先安装 Scoop" "Red"
+                Write-ColorText "💡 Scoop 安装命令:" "Cyan"
+                Write-Host "Set-ExecutionPolicy RemoteSigned -Scope CurrentUser; irm get.scoop.sh | iex"
+            }
+        }
+        "3" {
+            Write-ColorText "📁 手动下载安装指引:" "Blue"
+            Write-ColorText "1. 访问 NVM for Windows GitHub 页面:" "Cyan"
+            Write-Host "   https://github.com/coreybutler/nvm-windows/releases"
+            Write-ColorText "2. 下载最新版本: $latestVersion" "Cyan"
+            Write-ColorText "3. 选择 nvm-setup.zip 或 nvm-setup.exe" "Cyan"
+            Write-ColorText "4. 解压并运行安装程序" "Cyan"
+            Write-ColorText "5. 按照安装向导完成安装" "Cyan"
+            
+            # 提供直接下载链接
+            if ($releaseInfo) {
+                $setupAsset = $releaseInfo.assets | Where-Object { $_.name -like "*setup*" } | Select-Object -First 1
+                if ($setupAsset) {
+                    Write-ColorText "🔗 直接下载链接:" "Cyan"
+                    Write-Host "   $($setupAsset.browser_download_url)"
+                }
+            }
+        }
+        "4" {
+            Write-ColorText "📥 使用 winget 安装 NVM for Windows..." "Blue"
+            if (Test-Command "winget") {
+                winget install CoreyButler.NVMforWindows
+                if ($LASTEXITCODE -eq 0) {
+                    Write-ColorText "✅ NVM for Windows 安装成功" "Green"
+                    # 刷新环境变量
+                    $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
+                } else {
+                    Write-ColorText "❌ NVM for Windows 安装失败" "Red"
+                }
+            } else {
+                Write-ColorText "❌ winget 未安装或不可用" "Red"
+                Write-ColorText "💡 winget 是 Windows 10/11 的包管理器，请确保系统已更新" "Cyan"
+            }
+        }
+        default {
+            Write-ColorText "❌ 无效选择" "Red"
+            Read-Host "按任意键继续..."
+            return
+        }
+    }
+    
+    Write-Host ""
+    Write-ColorText "📋 NVM for Windows 验证:" "Cyan"
+    
+    # 刷新环境变量
+    $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
+    
+    if (Test-Command "nvm") {
+        try {
+            $nvmVersion = nvm version
+            Write-ColorText "  ✅ NVM 版本: $nvmVersion" "Green"
+            
+            # 检查安装路径
+            $nvmPath = Get-Command nvm -ErrorAction SilentlyContinue
+            if ($nvmPath) {
+                Write-ColorText "  ✅ 安装路径: $($nvmPath.Path)" "Green"
+            }
+            
+            # 显示可用的 Node.js 版本
+            Write-ColorText "  ✅ 正在检查可用的 Node.js 版本..." "Green"
+            try {
+                $nodeVersions = nvm list available 2>$null | Select-Object -First 10
+                if ($nodeVersions) {
+                    $nodeVersions | ForEach-Object { Write-Host "    $_" }
+                } else {
+                    Write-Host "    无法获取远程版本列表"
+                }
+            } catch {
+                Write-Host "    无法获取远程版本列表"
+            }
+            
+            Write-Host ""
+            Write-ColorText "💡 常用 NVM 命令:" "Cyan"
+            Write-Host "  nvm install latest      - 安装最新版本 Node.js"
+            Write-Host "  nvm install lts          - 安装最新 LTS 版本"
+            Write-Host "  nvm use <version>        - 使用指定版本"
+            Write-Host "  nvm list                 - 查看已安装版本"
+            Write-Host "  nvm list available       - 查看可用版本"
+            
+            Write-Host ""
+            Write-ColorText "✅ NVM for Windows 安装完成！" "Green"
+            Write-ColorText "⚠️  请重新打开 PowerShell 终端以加载 NVM" "Yellow"
+        } catch {
+            Write-ColorText "  ❌ NVM 验证失败" "Red"
+            Write-ColorText "  ⚠️  可能需要重启终端或重新登录" "Yellow"
+        }
+    } else {
+        Write-ColorText "  ❌ NVM 验证失败" "Red"
+        Write-ColorText "  ⚠️  请检查安装是否成功，可能需要重启系统" "Yellow"
+    }
+    
     Read-Host "按任意键继续..."
 }
 
@@ -280,6 +455,134 @@ function Install-PnpmFast {
     } else {
         Write-ColorText "❌ 请先安装 PNPM" "Red"
     }
+    Read-Host "按任意键继续..."
+}
+
+# 安装 PNPM (增强版)
+function Install-Pnpm {
+    Write-ColorText "📥 安装 PNPM..." "Blue"
+    Write-ColorText "─────────────────────────────────────────────────────────────" "Gray"
+    
+    # 检查是否已经安装
+    if (Test-Command "pnpm") {
+        $currentVersion = pnpm --version
+        Write-ColorText "  ⚠️  PNPM 已安装: v$currentVersion" "Yellow"
+        Write-Host ""
+        $upgradeChoice = Read-Host "是否要升级到最新版本? (y/n)"
+        if ($upgradeChoice -eq "y" -or $upgradeChoice -eq "Y") {
+            Write-ColorText "🔄 升级 PNPM 到最新版本..." "Blue"
+            npm install -g pnpm@latest
+            if ($LASTEXITCODE -eq 0) {
+                $newVersion = pnpm --version
+                Write-ColorText "✅ PNPM 升级成功: v$currentVersion → v$newVersion" "Green"
+            } else {
+                Write-ColorText "❌ PNPM 升级失败" "Red"
+            }
+        } else {
+            Write-ColorText "💡 保持当前版本 v$currentVersion" "Cyan"
+        }
+    } else {
+        Write-ColorText "📋 PNPM 安装方式选择:" "Cyan"
+        Write-Host "  1) 使用 npm 安装 (推荐)"
+        Write-Host "  2) 使用 PowerShell 安装脚本"
+        Write-Host "  3) 使用 Chocolatey 安装"
+        Write-Host "  4) 使用 Scoop 安装"
+        Write-Host ""
+        $installChoice = Read-Host "请选择安装方式 (1-4)"
+        
+        switch ($installChoice) {
+            "1" {
+                Write-ColorText "📥 使用 npm 安装 PNPM..." "Blue"
+                npm install -g pnpm
+                if ($LASTEXITCODE -eq 0) {
+                    $installedVersion = pnpm --version
+                    Write-ColorText "✅ PNPM 安装成功: v$installedVersion" "Green"
+                    Write-ColorText "🔧 自动配置镜像源..." "Cyan"
+                    pnpm config set registry https://registry.npmmirror.com
+                    Write-ColorText "✅ 镜像源配置完成" "Green"
+                } else {
+                    Write-ColorText "❌ PNPM 安装失败" "Red"
+                }
+            }
+            "2" {
+                Write-ColorText "📥 使用安装脚本安装 PNPM..." "Blue"
+                try {
+                    Invoke-WebRequest https://get.pnpm.io/install.ps1 -OutFile install-pnpm.ps1
+                    PowerShell -ExecutionPolicy Bypass -File install-pnpm.ps1
+                    Remove-Item install-pnpm.ps1 -Force
+                    # 刷新环境变量
+                    $env:Path = [System.Environment]::GetEnvironmentVariable("Path", "Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path", "User")
+                    if (Test-Command "pnpm") {
+                        $installedVersion = pnpm --version
+                        Write-ColorText "✅ PNPM 安装成功: v$installedVersion" "Green"
+                        Write-ColorText "🔧 自动配置镜像源..." "Cyan"
+                        pnpm config set registry https://registry.npmmirror.com
+                        Write-ColorText "✅ 镜像源配置完成" "Green"
+                    } else {
+                        Write-ColorText "❌ PNPM 安装失败，请重启终端或手动配置环境变量" "Red"
+                    }
+                } catch {
+                    Write-ColorText "❌ 下载安装脚本失败" "Red"
+                }
+            }
+            "3" {
+                Write-ColorText "📥 使用 Chocolatey 安装 PNPM..." "Blue"
+                if (Test-Command "choco") {
+                    choco install pnpm -y
+                    if ($LASTEXITCODE -eq 0) {
+                        $installedVersion = pnpm --version
+                        Write-ColorText "✅ PNPM 安装成功: v$installedVersion" "Green"
+                        Write-ColorText "🔧 自动配置镜像源..." "Cyan"
+                        pnpm config set registry https://registry.npmmirror.com
+                        Write-ColorText "✅ 镜像源配置完成" "Green"
+                    } else {
+                        Write-ColorText "❌ PNPM 安装失败" "Red"
+                    }
+                } else {
+                    Write-ColorText "❌ Chocolatey 未安装，请先安装 Chocolatey" "Red"
+                    Write-ColorText "💡 Chocolatey 安装命令: Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))" "Cyan"
+                }
+            }
+            "4" {
+                Write-ColorText "📥 使用 Scoop 安装 PNPM..." "Blue"
+                if (Test-Command "scoop") {
+                    scoop install pnpm
+                    if ($LASTEXITCODE -eq 0) {
+                        $installedVersion = pnpm --version
+                        Write-ColorText "✅ PNPM 安装成功: v$installedVersion" "Green"
+                        Write-ColorText "🔧 自动配置镜像源..." "Cyan"
+                        pnpm config set registry https://registry.npmmirror.com
+                        Write-ColorText "✅ 镜像源配置完成" "Green"
+                    } else {
+                        Write-ColorText "❌ PNPM 安装失败" "Red"
+                    }
+                } else {
+                    Write-ColorText "❌ Scoop 未安装，请先安装 Scoop" "Red"
+                    Write-ColorText "💡 Scoop 安装命令: Set-ExecutionPolicy RemoteSigned -Scope CurrentUser; irm get.scoop.sh | iex" "Cyan"
+                }
+            }
+            default {
+                Write-ColorText "❌ 无效选择" "Red"
+            }
+        }
+    }
+    
+    Write-Host ""
+    Write-ColorText "📋 PNPM 验证:" "Cyan"
+    if (Test-Command "pnpm") {
+        Write-ColorText "  ✅ PNPM 版本: $(pnpm --version)" "Green"
+        Write-ColorText "  ✅ 安装路径: $(Get-Command pnpm | Select-Object -ExpandProperty Path)" "Green"
+        Write-ColorText "  ✅ 镜像源: $(pnpm config get registry)" "Green"
+        Write-Host ""
+        Write-ColorText "💡 常用 PNPM 命令:" "Cyan"
+        Write-Host "  pnpm install          - 安装依赖"
+        Write-Host "  pnpm add <package>     - 添加依赖"
+        Write-Host "  pnpm run dev           - 运行开发服务器"
+        Write-Host "  pnpm store prune       - 清理存储"
+    } else {
+        Write-ColorText "  ❌ PNPM 验证失败" "Red"
+    }
+    
     Read-Host "按任意键继续..."
 }
 

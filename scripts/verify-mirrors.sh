@@ -24,24 +24,6 @@ fi
 
 echo ""
 
-# 验证 Yarn 配置
-echo "🧶 Yarn 配置验证:"
-if command -v yarn &> /dev/null; then
-    YARN_REGISTRY=$(yarn config get registry 2>/dev/null)
-    echo "  当前镜像源: $YARN_REGISTRY"
-    
-    if [[ "$YARN_REGISTRY" == *"npmmirror.com"* ]]; then
-        echo "  ✅ Yarn 镜像配置正确"
-    else
-        echo "  ⚠️  Yarn 镜像未配置或配置错误"
-        echo "     建议运行: yarn config set registry https://registry.npmmirror.com"
-    fi
-else
-    echo "  ❌ Yarn 未安装"
-fi
-
-echo ""
-
 # 验证 PNPM 配置
 echo "📎 PNPM 配置验证:"
 if command -v pnpm &> /dev/null; then
@@ -62,7 +44,7 @@ echo ""
 
 # 验证配置文件是否存在
 echo "📄 配置文件验证:"
-CONFIG_FILES=(".npmrc" ".yarnrc" ".pnpmrc")
+CONFIG_FILES=(".npmrc" ".pnpmrc")
 
 for file in "${CONFIG_FILES[@]}"; do
     if [[ -f "$file" ]]; then
@@ -107,18 +89,13 @@ echo "════════════════════════�
 
 # 检查是否所有配置都正确
 NPM_OK=$(npm config get registry | grep -c "npmmirror.com" || echo "0")
-YARN_OK=0
 PNPM_OK=0
-
-if command -v yarn &> /dev/null; then
-    YARN_OK=$(yarn config get registry 2>/dev/null | grep -c "npmmirror.com" || echo "0")
-fi
 
 if command -v pnpm &> /dev/null; then
     PNPM_OK=$(pnpm config get registry 2>/dev/null | grep -c "npmmirror.com" || echo "0")
 fi
 
-TOTAL_OK=$((NPM_OK + YARN_OK + PNPM_OK))
+TOTAL_OK=$((NPM_OK + PNPM_OK))
 
 if [ $TOTAL_OK -eq 0 ]; then
     echo "❌ 建议运行 npm run mirror:setup 配置镜像加速"

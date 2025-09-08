@@ -24,8 +24,10 @@
 		"mirror:test": "npm config get registry && npm view vue version",
 		"install:fast": "npm install --registry=https://registry.npmmirror.com",
 		"pnpm:install": "pnpm install --registry=https://registry.npmmirror.com",
+		"pnpm:setup": "npm install -g pnpm && pnpm config set registry https://registry.npmmirror.com",
 		"pnpm:clean": "pnpm store prune && rm -rf node_modules",
-		"start:pnpm": "./start-pnpm.sh",
+		"start:pnpm": "./scripts/start-pnpm.sh",
+		"start:pnpm:win": "powershell -ExecutionPolicy Bypass -File ./scripts/start-pnpm.ps1",
 		"mms": "./scripts/mms.sh",
 		"mms:win": "powershell -ExecutionPolicy Bypass -File ./scripts/mms.ps1"
 	},
