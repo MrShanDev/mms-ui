@@ -6,7 +6,6 @@
 	"license": "MIT",
 	"scripts": {
 		"dev": "vite --mode development --open",
-		"preview": "vite --mode preview --open",
 		"build": "vite build --mode production",
 		"lint": "eslint --ext .js,.jsx,.ts,.tsx,.vue src/",
 		"lint:fix": "eslint --ext .js,.jsx,.ts,.tsx,.vue src/ --fix",
@@ -18,7 +17,7 @@
 		"build:dev": "vite build --mode development",
 		"clean": "rm -rf dist node_modules/.vite",
 		"clean:cache": "rm -rf node_modules/.vite node_modules/.cache",
-		"clean:deps": "rm -rf node_modules/.vite && npm run dev",
+		"clean:deps": "rm -rf node_modules pnpm-lock.yaml && pnpm install",
 		"dev:fresh": "rm -rf node_modules/.vite && vite --mode development --open",
 		"mirror:setup": "bash scripts/setup-npm-mirrors.sh",
 		"mirror:verify": "bash scripts/verify-mirrors.sh",
