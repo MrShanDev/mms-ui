@@ -14,13 +14,14 @@ import { i18n } from '/@/i18n';
 import ElementPlus from 'element-plus';
 // 栅格布局（Vue3版本）
 import { GridLayout, GridItem } from 'vue-grid-layout';
-import '/@/styles/mms.scss';
+
 // 图表
 import { VueUiRadar } from 'vue-data-ui';
 // 样式
 import '/@/theme/index.scss';
 import 'virtual:windi.css';
 import 'vue-data-ui/style.css';
+
 // VXE Table
 // ... 纯表格
 import VxeTable from 'vxe-table';
@@ -34,6 +35,7 @@ import 'vxe-pc-ui/lib/style.css';
 // 工具库
 import * as mms from '/@/utils/mms';
 import other from '/@/utils/other';
+import '/@/styles/index.scss';
 
 const app = createApp(App);
 app.component('GridLayout', GridLayout);

@@ -1,7 +1,7 @@
 <template>
   <div v-if="isShowBreadcrumb" class="layout-navbars-breadcrumb">
     <SvgIcon
-      class="layout-navbars-breadcrumb-icon"
+      class="layout-navbars-breadcrumb-icon m-4"
       :name="themeConfig.isCollapse ? 'ele-Expand' : 'ele-Fold'"
       :size="16"
       @click="onThemeConfigChange"

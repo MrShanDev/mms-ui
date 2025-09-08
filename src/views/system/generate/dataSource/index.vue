@@ -38,7 +38,7 @@
         </el-form>
       </div>
     </div>
-    <div class="layout-padding m-t-0 p-t-0">
+    <div class="layout-padding">
       <el-card>
         <el-table
           v-loading="state.dataListLoading"

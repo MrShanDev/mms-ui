@@ -1,8 +1,8 @@
 <template>
   <div class="layout-footer pb15">
     <div class="layout-footer-warp">
-      <div>Copyright © 2021-present ❤️</div>
-      <div class="mt5">MMS · XiJue 版权所有</div>
+      <div>Copyright © 2018-present ❤️</div>
+      <div class="mt5">mmsAdmin · 品创网络 版权所有</div>
     </div>
   </div>
 </template>

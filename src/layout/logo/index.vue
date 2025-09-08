@@ -32,7 +32,7 @@
 
 <style scoped lang="scss">
   .layout-logo {
-    width: 220px;
+    width: 185px;
     height: 50px;
     display: flex;
     align-items: center;

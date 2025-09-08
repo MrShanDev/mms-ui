@@ -1,8 +1,8 @@
 <template>
   <div class="block">
     <!-- Table  -->
-    <div class="system-dept-container layout-padding mt-5 p-t-0">
-      <el-card shadow="hover" class="layout-padding-auto">
+    <div class="system-dept-container layout-padding">
+      <el-card shadow="hover" class="layout-padding-auto mt-5">
         <el-container>
           <el-header>
             <!-- 功能栏 -->

@@ -1,6 +1,6 @@
 <template>
-  <div class="system-dic-container layout-padding mt-5">
-    <el-card shadow="hover" class="layout-padding-auto">
+  <div class="system-dic-container layout-padding">
+    <el-card shadow="hover" class="layout-padding-auto mt-5">
       <div class="system-user-search mb15">
         <el-upload
           ref="upload"

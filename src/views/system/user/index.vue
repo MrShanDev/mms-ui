@@ -36,7 +36,7 @@
         </el-form>
       </div>
     </div>
-    <div class="system-user-container layout-padding m-t-0 p-t-0">
+    <div class="system-user-container layout-padding">
       <el-card shadow="hover" class="layout-padding-auto">
         <el-container>
           <el-header>

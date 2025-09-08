@@ -4,11 +4,11 @@
     class="svg-icon-container iconify-container"
     :style="iconStyle"
     :class="className"
+    v-bind="$attrs"
   >
     <IconifyIcon
       :icon="iconName"
       :style="{ width: '1em', height: '1em' }"
-      v-bind="$attrs"
     />
   </span>
   <span
@@ -16,11 +16,11 @@
     class="svg-icon-container element-container"
     :style="iconStyle"
     :class="className"
+    v-bind="$attrs"
   >
     <component
       :is="elementIconComponent"
       :style="{ width: '1em', height: '1em' }"
-      v-bind="$attrs"
     />
   </span>
   <span
@@ -28,11 +28,11 @@
     class="svg-icon-container font-container"
     :style="iconStyle"
     :class="className"
+    v-bind="$attrs"
   >
     <i
       :class="iconName"
       :style="{ width: '1em', height: '1em', fontSize: '1em' }"
-      v-bind="$attrs"
     />
   </span>
   <span
@@ -40,6 +40,7 @@
     class="svg-icon-container svg-container"
     :style="iconStyle"
     :class="className"
+    v-bind="$attrs"
   >
     <svg
       :style="{ width: '1em', height: '1em' }"
@@ -53,6 +54,7 @@
     class="svg-icon-container fallback-container"
     :style="iconStyle"
     :class="className"
+    v-bind="$attrs"
   >
     {{ iconName }}
   </span>
@@ -62,6 +64,11 @@
   import { computed, defineAsyncComponent } from 'vue';
   import { Icon as IconifyIcon } from '@iconify/vue';
   import * as ElIcons from '@element-plus/icons-vue';
+
+  // 定义组件选项，确保事件和属性正确传递
+  defineOptions({
+    inheritAttrs: false
+  });
 
   interface Props {
     /** 图标名称或图标代码（主要属性名） */
@@ -74,6 +81,8 @@
     size?: string | number;
     /** 自定义class */
     className?: string;
+    /** 自定义样式，支持对象或字符串格式 */
+    customStyle?: Record<string, any> | string;
     /** 图标类型，auto自动识别 */
     type?: 'auto' | 'element' | 'iconify' | 'iconfont' | 'svg' | 'font';
   }
@@ -84,6 +93,7 @@
     color: '',
     size: '',
     className: '',
+    customStyle: undefined,
     type: 'auto'
   });
 
@@ -102,6 +112,18 @@
       // 确保所有图标类型都有统一的行高
       style.lineHeight = '1';
     }
+    
+    // 合并自定义样式
+    if (props.customStyle) {
+      if (typeof props.customStyle === 'string') {
+        // 如果是字符串格式，通过 cssText 属性应用
+        return { ...style, cssText: props.customStyle };
+      } else {
+        // 如果是对象格式，直接合并
+        Object.assign(style, props.customStyle);
+      }
+    }
+    
     return style;
   });
 

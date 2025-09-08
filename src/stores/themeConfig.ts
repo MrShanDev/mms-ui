@@ -76,7 +76,7 @@ export const useThemeConfig = defineStore('themeConfig', {
        * 界面显示
        */
       // 是否开启侧边栏 Logo
-      isShowLogo: false,
+      isShowLogo: true,
       // 初始化变量，用于 el-scrollbar 的高度更新，请勿删除
       isShowLogoChange: false,
       // 是否开启 Breadcrumb，强制经典、横向布局不显示
@@ -94,7 +94,7 @@ export const useThemeConfig = defineStore('themeConfig', {
       // 是否开启 TagsView 共用
       isShareTagsView: false,
       // 是否开启 Footer 底部版权信息
-      isFooter: false,
+      isFooter: true,
       // 是否开启灰色模式
       isGrayscale: false,
       // 是否开启色弱模式
@@ -102,14 +102,14 @@ export const useThemeConfig = defineStore('themeConfig', {
       // 是否开启水印
       isWartermark: false,
       // 水印文案
-      wartermarkText: '',
+      wartermarkText: 'mmsAdmin',
 
       /**
        * 其它设置
        */
       // Tagsview 风格：可选值"<tags-style-one|tags-style-four|tags-style-five>"，默认 tags-style-five
       // 定义的值与 `/src/layout/navBars/tagsView/tagsView.vue` 中的 class 同名
-      tagsStyle: 'tags-style-five',
+      tagsStyle: 'tags-style-one',
       // 主页面切换动画：可选值"<slide-right|slide-left|opacitys>"，默认 slide-right
       animation: 'slide-right',
       // 分栏高亮风格：可选值"<columns-round|columns-card>"，默认 columns-round

@@ -1,4 +1,7 @@
-@import './variables.scss';
-@import './layout.scss';
-@import './element.scss';
-@import './mms.scss';
+// 使用现代 SCSS 语法 @use 替代 @import
+// @use 具有更好的模块化和名称空间管理
+
+@use './variables.scss';
+@use './layout.scss';
+@use './element.scss';
+@use './mms.scss';
