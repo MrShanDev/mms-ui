@@ -34,7 +34,7 @@ export const useThemeConfig = defineStore('themeConfig', {
        * 菜单设置
        */
       // 默认菜单导航背景颜色
-      menuBar: '#ffffff',
+      menuBar: '#3b3b3b',
       // 默认菜单导航字体颜色
       menuBarColor: '#ffff',
       // 默认菜单高亮背景色

@@ -11,7 +11,7 @@ import { url } from '/@/utils/toolsValidate';
 import { EmptyArrayType, EmptyObjectType, RouteItem, RouteToFrom } from '/@/types/global';
 
 // 引入组件
-const SvgIcon = defineAsyncComponent(() => import('/@/components/svgIcon/index.vue'));
+const SvgIcon = defineAsyncComponent(() => import('/@/components/svg-icon/index'));
 
 /**
  * 导出全局注册 element plus svg 图标

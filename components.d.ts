@@ -16,6 +16,7 @@ declare module 'vue' {
     ChatCopy: typeof import('./src/components/chat-room/chat-copy.vue')['default']
     City: typeof import('./src/components/city/index.vue')['default']
     Cropper: typeof import('./src/components/cropper/index.vue')['default']
+    Demo: typeof import('./src/components/svg-icon/demo.vue')['default']
     ElAlert: typeof import('element-plus/es')['ElAlert']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElAutocomplete: typeof import('element-plus/es')['ElAutocomplete']
@@ -91,6 +92,7 @@ declare module 'vue' {
     SvgIcon: typeof import('./src/components/svg-icon/src/svg-icon.vue')['default']
     Table: typeof import('./src/components/table/index.vue')['default']
     TableTool: typeof import('./src/components/table-tool/index.vue')['default']
+    Test: typeof import('./src/components/svg-icon/test.vue')['default']
     VideoPlayer: typeof import('./src/components/video-player/index.vue')['default']
   }
   export interface GlobalDirectives {

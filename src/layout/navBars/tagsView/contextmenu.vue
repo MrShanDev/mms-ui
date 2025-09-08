@@ -20,7 +20,7 @@
             @click="onCurrentContextmenuClick(v.contextMenuClickId)"
           >
             <SvgIcon :name="v.icon" />
-            <span>{{ $t(v.txt) }}</span>
+            <span class="pl-2">{{ $t(v.txt) }}</span>
           </li>
         </template>
       </ul>
@@ -75,7 +75,7 @@
         contextMenuClickId: 4,
         txt: 'message.tagsView.fullscreen',
         affix: false,
-        icon: 'iconfont icon-fullscreen',
+        icon: 'ele-Platform',
       },
     ],
     item: {},

@@ -1,11 +1,7 @@
 <template>
   <div class="layout-navbars-close-full" v-if="isTagsViewCurrenFull">
-    <div class="layout-navbars-close-full-icon">
-      <SvgIcon
-        name="ele-Close"
-        :title="$t('message.tagsView.closeFullscreen')"
-        @click="onCloseFullscreen"
-      />
+    <div class="layout-navbars-close-full-icon" @click="onCloseFullscreen">
+      <i class="iconfont icon-quanping"></i>
     </div>
   </div>
 </template>
@@ -20,6 +16,7 @@
 
   // 关闭当前全屏
   const onCloseFullscreen = () => {
+    console.log('关闭当前全屏');
     stores.setCurrenFullscreen(false);
   };
 </script>
