@@ -16,16 +16,25 @@ system），简称：MMS，是一款基于多应用模块用户、商品、支�
 ## 🚀 快速启动
 
 
-| 启动方式           | 适用系统 | 推荐指数   | 说明              |
-| ------------------ | -------- | ---------- | ----------------- |
-| `npm run dev`      | All      | ⭐⭐⭐⭐   | 传统 npm 启动方式 |
-| `npm run pnpm:dev` | All      | ⭐⭐⭐⭐⭐ | pnpm 手动启动方式 |
+| 启动方式       | 适用系统 | 推荐指数   | 说明              |
+| -------------- | -------- | ---------- | ----------------- |
+| `npm run dev`  | All      | ⭐⭐⭐⭐   | 传统 npm 启动方式 |
+| `pnpm install` | All      | ⭐⭐⭐⭐⭐ | pnpm 手动启动方式 |
 
-> 💡 **建议**：首次使用建议使用一键启动脚本，会自动检查环境、配置镜像源和依赖安装
+> 💡 **建议**：首次使用建议使用菜单脚本，会自动检查环境、配置镜像源和依赖安装
+
+- Mac OS 亲测好用
 
 ```
-npm mirror:setup
+npm run mms
 ```
+
+- Windows 暂无测试
+```
+npm run mms:win
+```
+ 
+ ![](https://sxpcwlkj.oss-cn-beijing.aliyuncs.com/doc/2025/09/iShot_2025-09-08_23.24.06.png)
 
 ## 系统版本
 
@@ -40,7 +49,6 @@ npm mirror:setup
 | MMS商城版   | mms-mall | -[Gitee](https://gitee.com/mmsAdmin/mms-mall) | 🙋‍♂️若遇到问题请联系我们（备注：mms）<br>📢微信号：qq942879858<br>📢Q&nbsp;&nbsp;Q号：942879858 |
 
 ## **官方文档**
-
 
 [🍃 模块化管理系统 🍃](https://www.mmsadmin.cn)
 
@@ -65,7 +73,6 @@ npm mirror:setup
 ## 部署方式
 
 <img src="https://img.shields.io/docker/automated/tsund/tianchi_docker_practice.svg" alt=""/>
-
 
 ## 模块介绍
 
