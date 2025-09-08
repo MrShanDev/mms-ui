@@ -34,12 +34,12 @@ npm run mms
 npm run mms:win
 ```
  
- ![](https://sxpcwlkj.oss-cn-beijing.aliyuncs.com/doc/2025/09/iShot_2025-09-08_23.24.06.png)
+ ![](https://sxpcwlkj.oss-cn-beijing.aliyuncs.com/mms-ui-tool.png)
 
 ## 系统版本
 
 <br/>
-<img src="https://img.shields.io/badge/MMS-V1.0.0-green"/>
+<img src="https://www.mmsadmin.cn/images/MMS-V1.0.0-green"/>
 
 
 | 名称        |  项目名  |                   项目地址                   | 注意事项                                                                                            |
