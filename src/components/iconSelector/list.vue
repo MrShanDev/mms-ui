@@ -13,7 +13,7 @@
           @click="onColClick(v)"
         >
           <div class="icon-selector-warp-item" :class="{ 'icon-selector-active': prefix === v }">
-            <SvgIcon :name="v" />
+            <SvgIcon :name="v" />  
           </div>
         </el-col>
       </el-row>
@@ -53,7 +53,7 @@
 
 <style scoped lang="scss">
   .icon-selector-warp-row {
-    height: 230px;
+    height: 185px;
     overflow: hidden;
     .el-row {
       padding: 15px;

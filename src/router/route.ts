@@ -82,6 +82,15 @@ export const notFoundAndNoPower = [
       isHide: true,
     },
   },
+  {
+    path: '/demo',
+    name: 'demo',
+    component: () => import('../views/error/demo.vue'),
+    meta: {
+      title: 'Demo页面',
+      isHide: true,
+    },
+  },
 ];
 
 /**

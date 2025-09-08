@@ -146,6 +146,7 @@
     if (props.type === 'font' || props.type === 'iconfont') return true;
     if (props.type !== 'auto') return false;
     return (
+      actualIconName.value.startsWith('fa') ||
       actualIconName.value.startsWith('fa-') ||
       actualIconName.value.startsWith('fas ') ||
       actualIconName.value.startsWith('far ') ||

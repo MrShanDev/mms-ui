@@ -98,7 +98,7 @@
             <div
               v-infinite-scroll="load"
               style="height: 450px; overflow-y: auto"
-              class="home-card-item-content flex-col row-between"
+              class="home-card-item-content lay-flex-row lay-justify-between"
             >
               <div
                 v-for="(v, k) in state.docUserData.data"
@@ -106,7 +106,7 @@
                 class="item-content-term flex row-between"
               >
                 <div class="flex">
-                  <div class="user flex-col row-between">
+                  <div class="user lay-flex-row lay-justify-between">
                     <div class="f-18">{{ v.nickname }}</div>
                     <div class="f-14">
                       最后登录日期：
@@ -125,11 +125,11 @@
       <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
         <div class="home-card-item mb15">
           <div class="home-card-item-title">系统公告</div>
-          <div class="home-card-item-content flex-col row-between col-between">
+          <div class="home-card-item-content ">
             <div
               v-for="(item, index) in state.sysNoticeData"
               :key="index"
-              class="flex row-between p-10 cursor-pointer"
+              class="lay-flex-row lay-justify-between lay-items-center p-10 cursor-pointer"
               style="height: 40px"
             >
               <div class="f-16">{{ index + 1 }}. {{ item.title }}</div>
@@ -149,7 +149,7 @@
       >
         <div class="home-card-item mb15 setting">
           <div class="home-card-item-title">系统信息</div>
-          <div class="home-card-item-content flex-col row-between col-between p-20">
+          <div class="home-card-item-content  p-20">
             <el-row :gutter="30">
               <el-col
                 :xs="24"
@@ -158,18 +158,18 @@
                 :lg="auth('docAdmin:docUser:list') ? 24 : 8"
                 :xl="auth('docAdmin:docUser:list') ? 24 : 8"
               >
-                <div class="flex">
+                <div class="lay-flex-row">
                   <div
-                    class="f-16 flex-1"
+                    class="f-16 lay-flex-1"
                     style="color: #858585"
                     :style="{ marginTop: auth('docAdmin:docUser:list') ? '' : '20%' }"
                   >
                     <VueDataUi component="VueUiSparkline" :dataset="dataset1" :config="config1" />
                   </div>
                 </div>
-                <div class="flex">
+                <div class="lay-flex-row">
                   <div
-                    class="f-16 flex-1"
+                    class="f-16 lay-flex-1"
                     style="color: #858585"
                     :style="{ marginTop: auth('docAdmin:docUser:list') ? '' : '20%' }"
                   >
@@ -184,31 +184,31 @@
                 :lg="auth('docAdmin:docUser:list') ? 24 : 16"
                 :xl="auth('docAdmin:docUser:list') ? 24 : 16"
               >
-                <div class="flex" style="margin-top: 8px">
-                  <div class="f-16 flex-1 system_title" style="line-height: 30px">系统名称：</div>
-                  <div class="f-14 flex-4" style="color: #858585; line-height: 30px">
+                <div class="lay-flex-row" style="margin-top: 8px">
+                  <div class="f-16 lay-flex-1 system_title" style="line-height: 30px">系统名称：</div>
+                  <div class="f-14 lay-flex-4" style="color: #858585; line-height: 30px">
                     {{ state.systemData.systemInfo.name }}
                   </div>
                 </div>
-                <div :class="!auth('docAdmin:docUser:list') ? 'mt20' : ''" class="flex">
-                  <div class="f-16 flex-1 system_title" style="line-height: 30px">系统版本：</div>
-                  <div class="f-14 flex-4" style="color: #858585; line-height: 30px">
+                <div :class="!auth('docAdmin:docUser:list') ? 'mt20' : ''" class="lay-flex-row">
+                  <div class="f-16 lay-flex-1 system_title" style="line-height: 30px">系统版本：</div>
+                  <div class="f-14 lay-flex-4" style="color: #858585; line-height: 30px">
                     {{ state.systemData.systemInfo.version }}
                   </div>
                 </div>
-                <div :class="!auth('docAdmin:docUser:list') ? 'mt20' : ''" class="flex">
-                  <div class="f-16 flex-1 system_title" style="line-height: 30px">系统文档：</div>
+                <div :class="!auth('docAdmin:docUser:list') ? 'mt20' : ''" class="lay-flex-row">
+                  <div class="f-16 lay-flex-1 system_title" style="line-height: 30px">系统文档：</div>
                   <div
-                    class="f-14 flex-4 shou"
+                    class="f-14 lay-flex-4 shou"
                     style="color: #858585; line-height: 30px"
                     @click="openWindow(state.systemData.systemInfo.docUrl)"
                   >
                     {{ state.systemData.systemInfo.docUrl }}
                   </div>
                 </div>
-                <div :class="!auth('docAdmin:docUser:list') ? 'mt20' : ''" class="flex">
-                  <div class="f-16 flex-1 system_title" style="line-height: 30px">系统简述：</div>
-                  <div class="f-12 flex-4" style="color: #858585; line-height: 20px">
+                <div :class="!auth('docAdmin:docUser:list') ? 'mt20' : ''" class="lay-flex-row">
+                  <div class="f-16 lay-flex-1 system_title" style="line-height: 30px">系统简述：</div>
+                  <div class="f-12 lay-flex-4" style="color: #858585; line-height: 20px">
                     {{ state.systemData.systemInfo.describe }}
                   </div>
                 </div>

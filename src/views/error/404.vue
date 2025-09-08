@@ -1,6 +1,6 @@
 <template>
-  <div class="error layout-padding mt15">
-    <div class="layout-padding-auto layout-padding-view">
+  <div class="error layout-padding ">
+    <div class="layout-padding-auto layout-padding-view mt15">
       <div class="error-flex">
         <div class="left">
           <div class="left-item">

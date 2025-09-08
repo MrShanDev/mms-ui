@@ -13,8 +13,7 @@
           :key="!v.meta.tagsViewName ? v.meta.title : v.meta.tagsViewName"
         >
           <span v-if="k === state.breadcrumbList.length - 1" class="layout-navbars-breadcrumb-span">
-            <i
-              :class="v.meta.icon"
+            <SvgIcon :name="v.meta.icon"
               class="layout-navbars-breadcrumb-iconfont"
               v-if="themeConfig.isBreadcrumbIcon"
             />
@@ -22,8 +21,7 @@
             <div v-else>{{ v.meta.tagsViewName }}</div>
           </span>
           <a v-else @click.prevent="onBreadcrumbClick(v)">
-            <i
-              :class="v.meta.icon"
+            <SvgIcon :name="v.meta.icon"
               class="layout-navbars-breadcrumb-iconfont"
               v-if="themeConfig.isBreadcrumbIcon"
             />

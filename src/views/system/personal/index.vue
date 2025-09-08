@@ -1,5 +1,5 @@
 <template>
-  <div class="personal layout-pd mt10">
+  <div class="personal layout-pd">
     <el-row>
       <!-- 个人信息 -->
       <el-col :xs="24" :sm="16">
