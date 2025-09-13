@@ -262,9 +262,7 @@ img, image {
 /* =========================================================
    🎨 间距系统 (Spacing System) - 4px递增体系
    ========================================================= */
-$spacers: (0, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64);
-
-@each $i in $spacers {
+@for $i from 0 through 50 {
   .m-#{$i} { margin: #{$i}px !important; }
   .mt-#{$i} { margin-top: #{$i}px !important; }
   .mr-#{$i} { margin-right: #{$i}px !important; }
