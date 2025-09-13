@@ -1,160 +1,314 @@
 @charset "utf-8";
 
 /* =============================================================================
-   📱 MMS-UI 工具类样式库 - 见名知意版本
+   📱 MMS-UI 工具类样式库 - 优化版
    
    🎯 设计理念：
    - 与 WindiCSS 协同工作，避免命名冲突
    - WindiCSS 处理：基础工具类（p-*, m-*, text-*, bg-*等）
-   - MMS.scss 处理：业务特定样式（lay-*, sp-*, interact-*, anim-*等）
+   - MMS.scss 处理：业务特定样式（flex-*, justify-*, items-*等）
    
-   📐 统一数值体系：4px 递增（1=4px, 2=8px, 3=12px...）
+   📐 统一数值体系：4px 递增（0, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64）
    🎨 统一色彩体系：与 WindiCSS 共享 primary、success、warning、danger
    📱 统一断点体系：mobile(<640px), tablet(640-1023px), desktop(>=1024px)
    
-   命名规范：[功能][细节][状态]
-   - lay-* : 布局相关（MMS专属）
-   - sp-*  : 间距相关（MMS专属，4px递增体系）
-   - font-*: 字体相关（语义化命名，与WindiCSS配合）
-   - color-*: 颜色相关（MMS专属，业务色彩）
-   - text-*: 文本相关（与WindiCSS配合）
-   - border-*: 边框相关（MMS专属扩展）
-   - bg-*: 背景相关（MMS专属扩展）
-   - d-*: 显示相关（MMS专属）
-   - interact-*: 交互效果（MMS专属）
-   - anim-*: 动画效果（MMS专属）
-   - resp-*: 响应式布局（MMS专属）
-   - util-*: 工具类（MMS专属）
+   命名规范：语义化命名，减少冗余前缀
 ============================================================================= */
 
-/* 🎯 布局系统 (Layout) - lay-*
-========================================= */
-.lay-flex-row { display: flex !important; flex-direction: row; }
-.lay-flex-col { display: flex !important; flex-direction: column; }
-.lay-flex-wrap { flex-wrap: wrap; }
-.lay-flex-nowrap { flex-wrap: nowrap; }
+/* =========================================================
+   🔄 初始化样式 (Reset & Base Styles)
+   ========================================================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  outline: none !important;
+}
 
-/* 弹性比例 */
-.lay-flex-0 { flex: 0; }
-.lay-flex-1 { flex: 1; }
-.lay-flex-2 { flex: 2; }
-.lay-flex-3 { flex: 3; }
-.lay-flex-4 { flex: 4; }
-.lay-flex-auto { flex: auto; }
-.lay-flex-none { flex: none; }
+:root {
+  --mms-color-white: #ffffff;
+  --mms-bg-main-color: #f8f8f8;
+  --mms-bg-color: #f5f5ff;
+  --mms-border-color-light: #f1f2f3;
+  --mms-color-primary-lighter: #ecf5ff;
+  --mms-color-success-lighter: #f0f9eb;
+  --mms-color-warning-lighter: #fdf6ec;
+  --mms-color-danger-lighter: #fef0f0;
+  --mms-color-dark-hover: #0000001a;
+  --mms-color-menu-hover: rgba(0, 0, 0, 0.2);
+  --mms-color-user-hover: rgba(0, 0, 0, 0.04);
+  --mms-color-seting-main: #e9eef3;
+  --mms-color-seting-aside: #d3dce6;
+  --mms-color-seting-header: #b3c0d1;
+}
 
-/* 对齐方式 */
-.lay-items-start { align-items: flex-start; }
-.lay-items-center { align-items: center; }
-.lay-items-end { align-items: flex-end; }
-.lay-items-stretch { align-items: stretch; }
+html,
+body,
+#app {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  font-family:
+    Helvetica Neue,
+    Helvetica,
+    PingFang SC,
+    Hiragino Sans GB,
+    Microsoft YaHei,
+    SimSun,
+    sans-serif;
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -webkit-tap-highlight-color: transparent;
+  background-color: var(--mms-bg-main-color);
+  font-size: 14px;
+  overflow: hidden;
+  position: relative;
+}
 
-.lay-justify-start { justify-content: flex-start; }
-.lay-justify-center { justify-content: center; }
-.lay-justify-end { justify-content: flex-end; }
-.lay-justify-between { justify-content: space-between; }
-.lay-justify-around { justify-content: space-around; }
+li {
+  list-style: none;
+}
 
-/* 浮动 & 定位 */
-.lay-float-left { float: left !important; }
-.lay-float-right { float: right !important; }
-.lay-float-none { float: none !important; }
+a {
+  text-decoration: none;
+}
+a:hover, a:active, a:focus, a:visited, a:link {
+  text-decoration: none;
+}
 
-.lay-pos-relative { position: relative; }
-.lay-pos-absolute { position: absolute; }
-.lay-pos-fixed { position: fixed; }
+img, image {
+  vertical-align: middle;
+}
 
-.lay-center-xy {
+/* =========================================================
+   📏 布局系统 (Layout System)
+   ========================================================= */
+
+/* Flex 布局 - 弹性盒子布局系统
+   使用方法：给容器添加这些类来控制子元素的排列方式 */
+.flex { display: flex !important; } /* 将元素设置为弹性容器 */
+.flex-row { display: flex !important; flex-direction: row; } /* 水平排列子元素（默认） */
+.flex-col { display: flex !important; flex-direction: column; } /* 垂直排列子元素 */
+.flex-wrap { flex-wrap: wrap; } /* 允许子元素在必要时换行 */
+.flex-nowrap { flex-wrap: nowrap; } /* 不允许子元素换行，可能导致溢出 */
+
+/* 弹性比例 - 控制弹性容器中子元素如何分配空间
+   使用方法：给弹性容器的子元素添加这些类来控制它们占用空间的比例 */
+.flex-0 { flex: 0; } /* 元素不会伸展 */
+.flex-1 { flex: 1; } /* 元素会平均分配剩余空间（常用） */
+.flex-2 { flex: 2; } /* 元素分配空间是flex-1的两倍 */
+.flex-3 { flex: 3; } /* 元素分配空间是flex-1的三倍 */
+.flex-4 { flex: 4; } /* 元素分配空间是flex-1的四倍 */
+.flex-auto { flex: auto; } /* 元素根据内容自动分配空间 */
+.flex-none { flex: none; } /* 元素保持原有尺寸，不伸缩 */
+
+/* 对齐方式 - 控制弹性容器中元素的对齐方式
+   使用方法：给弹性容器添加这些类来控制子元素的对齐方式 */
+
+/* 垂直对齐方式（align-items）- 控制元素在交叉轴（通常是垂直方向）上的对齐 */
+.items-start { align-items: flex-start; } /* 元素在容器顶部对齐 */
+.items-center { align-items: center; } /* 元素在容器垂直中心对齐（常用） */
+.items-end { align-items: flex-end; } /* 元素在容器底部对齐 */
+.items-stretch { align-items: stretch; } /* 元素拉伸填满容器高度（默认值） */
+
+/* 水平对齐方式（justify-content）- 控制元素在主轴（通常是水平方向）上的对齐 */
+.justify-start { justify-content: flex-start; } /* 元素在容器左侧对齐（默认值） */
+.justify-center { justify-content: center; } /* 元素在容器水平中心对齐 */
+.justify-end { justify-content: flex-end; } /* 元素在容器右侧对齐 */
+.justify-between { justify-content: space-between; } /* 元素均匀分布，首尾紧贴容器边缘 */
+.justify-around { justify-content: space-around; } /* 元素均匀分布，包括首尾间距 */
+
+/* 常用布局模式 */
+.center-container {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* 绝对居中定位 - 适用于已定位元素在父容器中水平垂直居中 
+   使用方法：给元素添加 .center-xy 类，同时父元素需要设置 position: relative */
+.center-xy {
   position: absolute; top: 50%; left: 50%;
   transform: translate(-50%, -50%);
 }
 
-/* 🎯 尺寸系统 (Size) - size-*
-========================================= */
-.size-w-10p { width: 10% !important; }
-.size-w-20p { width: 20% !important; }
-.size-w-25p { width: 25% !important; }
-.size-w-30p { width: 30% !important; }
-.size-w-33p { width: 33.333% !important; }
-.size-w-40p { width: 40% !important; }
-.size-w-50p { width: 50% !important; }
-.size-w-60p { width: 60% !important; }
-.size-w-66p { width: 66.666% !important; }
-.size-w-70p { width: 70% !important; }
-.size-w-75p { width: 75% !important; }
-.size-w-80p { width: 80% !important; }
-.size-w-90p { width: 90% !important; }
-.size-w-100p { width: 100% !important; }
+/* 垂直居中 - 使元素在垂直方向上居中对齐
+   使用方法：给容器添加 .vertical-center 类，其子元素将垂直居中 */
+.vertical-center {
+  display: flex !important;
+  align-items: center !important;
+}
 
-.size-w-auto { width: auto !important; }
-.size-w-full { width: 100% !important; }
-.size-h-auto { height: auto !important; }
-.size-h-full { height: 100% !important; }
-.size-h-screen { height: 100vh !important; }
+/* 水平居中 - 使元素在水平方向上居中对齐
+   使用方法：给容器添加 .horizontal-center 类，其子元素将水平居中 */
+.horizontal-center {
+  display: flex !important;
+  justify-content: center !important;
+}
 
-/* 🎯 间距系统 (Space) - sp-*
-========================================= */
-/* 内边距 */
-.sp-p-0 { padding: 0 !important; }
-.sp-p-1 { padding: 4px !important; }
-.sp-p-2 { padding: 8px !important; }
-.sp-p-3 { padding: 12px !important; }
-.sp-p-4 { padding: 16px !important; }
-.sp-p-5 { padding: 20px !important; }
-.sp-p-6 { padding: 24px !important; }
+/* 两端对齐 - 元素分布在容器两端，中间间距相等
+   使用方法：给容器添加 .space-between 类，子元素将分布在两端 */
+.space-between {
+  display: flex !important;
+  justify-content: space-between !important;
+}
 
-.sp-pt-0 { padding-top: 0 !important; }
-.sp-pt-2 { padding-top: 8px !important; }
-.sp-pt-4 { padding-top: 16px !important; }
-.sp-pt-6 { padding-top: 24px !important; }
+/* 等间距分布 - 元素在容器中均匀分布，包括首尾间距
+   使用方法：给容器添加 .space-around 类，子元素将均匀分布 */
+.space-around {
+  display: flex !important;
+  justify-content: space-around !important;
+}
 
-.sp-pb-0 { padding-bottom: 0 !important; }
-.sp-pb-2 { padding-bottom: 8px !important; }
-.sp-pb-4 { padding-bottom: 16px !important; }
-.sp-pb-6 { padding-bottom: 24px !important; }
+/* 浮动 & 定位 - 控制元素在页面中的位置和流动方式
+   使用方法：给元素添加这些类来控制其定位方式 */
 
-.sp-pl-0 { padding-left: 0 !important; }
-.sp-pl-2 { padding-left: 8px !important; }
-.sp-pl-4 { padding-left: 16px !important; }
-.sp-pl-6 { padding-left: 24px !important; }
+/* 浮动 - 使元素脱离正常文档流，向左或向右浮动
+   注意：使用浮动后，可能需要清除浮动（使用.clearfix）以防止父容器高度塌陷 */
+.float-left { float: left !important; } /* 元素向左浮动，文本将环绕在右侧 */
+.float-right { float: right !important; } /* 元素向右浮动，文本将环绕在左侧 */
+.float-none { float: none !important; } /* 取消元素的浮动效果 */
 
-.sp-pr-0 { padding-right: 0 !important; }
-.sp-pr-2 { padding-right: 8px !important; }
-.sp-pr-4 { padding-right: 16px !important; }
-.sp-pr-6 { padding-right: 24px !important; }
+/* 定位 - 控制元素的定位方式，影响元素在页面中的位置计算方式 */
+.relative { position: relative; } /* 相对定位，相对于元素原本位置定位，不脱离文档流 */
+.absolute { position: absolute; } /* 绝对定位，相对于最近的定位祖先元素定位，脱离文档流 */
+.fixed { position: fixed; } /* 固定定位，相对于浏览器视口定位，滚动时位置不变，脱离文档流 */
 
-/* 外边距 */
-.sp-m-0 { margin: 0 !important; }
-.sp-m-1 { margin: 4px !important; }
-.sp-m-2 { margin: 8px !important; }
-.sp-m-3 { margin: 12px !important; }
-.sp-m-4 { margin: 16px !important; }
-.sp-m-5 { margin: 20px !important; }
-.sp-m-auto { margin: auto !important; }
+/* 显示属性 - 控制元素的显示方式
+   使用方法：给元素添加这些类来控制其显示行为 */
+.hidden { display: none !important; } /* 完全隐藏元素，不占用空间 */
+.block { display: block !important; } /* 元素显示为块级元素，独占一行，可设置宽高 */
+.inline { display: inline !important; } /* 元素显示为内联元素，不独占一行，不可设置宽高 */
+.inline-block { display: inline-block !important; } /* 元素显示为内联块元素，不独占一行，但可设置宽高 */
 
-.sp-mt-0 { margin-top: 0 !important; }
-.sp-mt-2 { margin-top: 8px !important; }
-.sp-mt-4 { margin-top: 16px !important; }
-.sp-mt-6 { margin-top: 24px !important; }
+/* 溢出处理 - 控制内容超出容器边界时的显示方式
+   使用方法：给有固定尺寸的容器添加这些类来控制内容溢出时的行为 */
+.overflow-auto { overflow: auto !important; } /* 内容溢出时显示滚动条（仅在需要时显示） */
+.overflow-hidden { overflow: hidden !important; } /* 内容溢出时隐藏溢出部分，不显示滚动条 */
+.overflow-visible { overflow: visible !important; } /* 内容溢出时仍然可见（默认行为） */
+.overflow-scroll { overflow: scroll !important; } /* 内容溢出时始终显示滚动条，即使内容未溢出 */
 
-.sp-mb-0 { margin-bottom: 0 !important; }
-.sp-mb-2 { margin-bottom: 8px !important; }
-.sp-mb-4 { margin-bottom: 16px !important; }
-.sp-mb-6 { margin-bottom: 24px !important; }
+/* z-index 层级 - 控制元素的堆叠顺序
+   使用方法：给定位元素（position非static）添加这些类来控制其在z轴上的堆叠顺序
+   数值越大，元素显示在越上层 */
+.z-0 { z-index: 0 !important; } /* 基础层级 */
+.z-10 { z-index: 10 !important; } /* 低层级，适用于一般UI元素 */
+.z-20 { z-index: 20 !important; } /* 中低层级 */
+.z-30 { z-index: 30 !important; } /* 中层级，适用于下拉菜单等 */
+.z-40 { z-index: 40 !important; } /* 中高层级 */
+.z-50 { z-index: 50 !important; } /* 高层级，适用于模态框等 */
+.z-auto { z-index: auto !important; } /* 自动计算层级（默认值） */
 
-.sp-ml-0 { margin-left: 0 !important; }
-.sp-ml-2 { margin-left: 8px !important; }
-.sp-ml-4 { margin-left: 16px !important; }
-.sp-ml-6 { margin-left: 24px !important; }
+/* 清除浮动 */
+.clearfix::after { content: ""; display: table; clear: both; }
 
-.sp-mr-0 { margin-right: 0 !important; }
-.sp-mr-2 { margin-right: 8px !important; }
-.sp-mr-4 { margin-right: 16px !important; }
-.sp-mr-6 { margin-right: 24px !important; }
+/* =========================================================
+   📐 尺寸系统 (Size System)
+   ========================================================= */
 
-/* 🎯 字体系统 (Font) - font-*
-========================================= */
-/* 字体大小 */
+/* 宽度百分比 */
+.w-10 { width: 10% !important; }
+.w-20 { width: 20% !important; }
+.w-25 { width: 25% !important; }
+.w-30 { width: 30% !important; }
+.w-33 { width: 33.333% !important; }
+.w-40 { width: 40% !important; }
+.w-50 { width: 50% !important; }
+.w-60 { width: 60% !important; }
+.w-66 { width: 66.666% !important; }
+.w-70 { width: 70% !important; }
+.w-75 { width: 75% !important; }
+.w-80 { width: 80% !important; }
+.w-90 { width: 90% !important; }
+.w-100 { width: 100% !important; }
+
+/* 宽高快捷值 */
+.w-auto { width: auto !important; }
+.w-full { width: 100% !important; }
+.h-auto { height: auto !important; }
+.h-full { height: 100% !important; }
+.h-screen { height: 100vh !important; }
+
+/* 最大宽度 */
+.max-w-xs { max-width: 320px !important; }
+.max-w-sm { max-width: 480px !important; }
+.max-w-md { max-width: 768px !important; }
+.max-w-lg { max-width: 1024px !important; }
+.max-w-xl { max-width: 1280px !important; }
+.max-w-full { max-width: 100% !important; }
+
+/* 最大高度 */
+.max-h-xs { max-height: 320px !important; }
+.max-h-sm { max-height: 480px !important; }
+.max-h-md { max-height: 768px !important; }
+.max-h-lg { max-height: 1024px !important; }
+.max-h-full { max-height: 100% !important; }
+.max-h-screen { max-height: 100vh !important; }
+
+/* 最小宽度 */
+.min-w-xs { min-width: 320px !important; }
+.min-w-sm { min-width: 480px !important; }
+.min-w-md { min-width: 768px !important; }
+.min-w-full { min-width: 100% !important; }
+
+/* 最小高度 */
+.min-h-xs { min-height: 320px !important; }
+.min-h-sm { min-height: 480px !important; }
+.min-h-md { min-height: 768px !important; }
+.min-h-full { min-height: 100% !important; }
+.min-h-screen { min-height: 100vh !important; }
+
+/* =========================================================
+   🎨 间距系统 (Spacing System) - 4px递增体系
+   ========================================================= */
+$spacers: (0, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64);
+
+@each $i in $spacers {
+  .m-#{$i} { margin: #{$i}px !important; }
+  .mt-#{$i} { margin-top: #{$i}px !important; }
+  .mr-#{$i} { margin-right: #{$i}px !important; }
+  .mb-#{$i} { margin-bottom: #{$i}px !important; }
+  .ml-#{$i} { margin-left: #{$i}px !important; }
+  .p-#{$i} { padding: #{$i}px !important; }
+  .pt-#{$i} { padding-top: #{$i}px !important; }
+  .pr-#{$i} { padding-right: #{$i}px !important; }
+  .pb-#{$i} { padding-bottom: #{$i}px !important; }
+  .pl-#{$i} { padding-left: #{$i}px !important; }
+}
+
+/* 内外边距组合 */
+.p-xy-16 { padding: 16px !important; }
+.p-xy-24 { padding: 24px !important; }
+.p-xy-32 { padding: 32px !important; }
+.ptb-16 { padding-top: 16px !important; padding-bottom: 16px !important; }
+.ptb-24 { padding-top: 24px !important; padding-bottom: 24px !important; }
+.ptb-32 { padding-top: 32px !important; padding-bottom: 32px !important; }
+.plr-16 { padding-left: 16px !important; padding-right: 16px !important; }
+.plr-24 { padding-left: 24px !important; padding-right: 24px !important; }
+.plr-32 { padding-left: 32px !important; padding-right: 32px !important; }
+.m-xy-16 { margin: 16px !important; }
+.m-xy-24 { margin: 24px !important; }
+.m-xy-32 { margin: 32px !important; }
+.mtb-16 { margin-top: 16px !important; margin-bottom: 16px !important; }
+.mtb-24 { margin-top: 24px !important; margin-bottom: 24px !important; }
+.mtb-32 { margin-top: 32px !important; margin-bottom: 32px !important; }
+.mlr-16 { margin-left: 16px !important; margin-right: 16px !important; }
+.mlr-24 { margin-left: 24px !important; margin-right: 24px !important; }
+.mlr-32 { margin-left: 32px !important; margin-right: 32px !important; }
+
+/* =========================================================
+   🔤 字体系统 (Typography System)
+   ========================================================= */
+
+/* 字体大小 - 数值型 */
+@each $size in (10, 12, 14, 16, 18, 20, 24, 28, 32) {
+  .text-#{$size} {
+    font-size: #{$size}px !important;
+  }
+}
+
+/* 字体大小 - 语义型 */
 .font-xs { font-size: 10px !important; }
 .font-sm { font-size: 12px !important; }
 .font-base { font-size: 14px !important; }
@@ -171,21 +325,59 @@
 .font-medium { font-weight: 500 !important; }
 .font-semibold { font-weight: 600 !important; }
 .font-bold { font-weight: 700 !important; }
+.font-extrabold { font-weight: 800 !important; }
+.font-black { font-weight: 900 !important; }
 
-/* 🎯 颜色系统 (Color) - color-* & bg-*
-========================================= */
+/* 文本对齐与样式 */
+.text-left { text-align: left !important; }
+.text-center { text-align: center !important; }
+.text-right { text-align: right !important; }
+.text-nowrap { white-space: nowrap !important; }
+.text-break { word-break: break-all !important; }
+.text-underline { text-decoration: underline !important; }
+.text-line-through { text-decoration: line-through !important; }
+.text-no-decoration { text-decoration: none !important; }
+.text-uppercase { text-transform: uppercase !important; }
+.text-lowercase { text-transform: lowercase !important; }
+.text-capitalize { text-transform: capitalize !important; }
+
+/* 文本溢出省略 - 处理文本内容超出容器时的显示方式
+   使用方法：给包含文本的容器添加这些类来控制文本溢出时的显示效果 */
+
+/* 单行文本溢出省略 - 文本超出容器宽度时显示省略号
+   使用场景：标题、列表项等需要单行显示的文本 */
+.text-ellipsis {
+  overflow: hidden; /* 隐藏溢出内容 */
+  white-space: nowrap; /* 防止文本换行 */
+  text-overflow: ellipsis; /* 显示省略号 */
+}
+
+/* 多行文本溢出省略 - 文本超出指定行数时显示省略号
+   使用场景：描述文本、内容摘要等需要限制行数的文本
+   注意：这是WebKit浏览器特有的属性，在某些浏览器可能不支持 */
+.text-ellipsis-2 {
+  display: -webkit-box; /* 必须设置为-webkit-box才能使用line-clamp */
+  -webkit-box-orient: vertical; /* 设置文本方向为垂直 */
+  -webkit-line-clamp: 2; /* 限制显示2行 */
+  overflow: hidden; /* 隐藏溢出内容 */
+  text-overflow: ellipsis; /* 显示省略号 */
+}
+
+/* =========================================================
+   🎨 颜色系统 (Color System)
+   ========================================================= */
+
 /* 文字颜色 */
-.color-primary { color: #1e97f8 !important; }
-.color-success { color: #2dac34 !important; }
-.color-warning { color: #fe6701 !important; }
-.color-danger { color: #f56c6c !important; }
-.color-info { color: #909399 !important; }
-
-.color-black { color: #000000 !important; }
-.color-white { color: #ffffff !important; }
-.color-gray-dark { color: #333333 !important; }
-.color-gray { color: #666666 !important; }
-.color-gray-light { color: #999999 !important; }
+.text-primary { color: #1e97f8 !important; }
+.text-success { color: #2dac34 !important; }
+.text-warning { color: #fe6701 !important; }
+.text-danger { color: #f56c6c !important; }
+.text-info { color: #909399 !important; }
+.text-black { color: #000000 !important; }
+.text-white { color: #ffffff !important; }
+.text-gray-dark { color: #333333 !important; }
+.text-gray { color: #666666 !important; }
+.text-gray-light { color: #999999 !important; }
 
 /* 背景颜色 */
 .bg-primary { background-color: #1e97f8 !important; }
@@ -196,236 +388,113 @@
 .bg-gray { background-color: #f5f5f5 !important; }
 .bg-transparent { background-color: transparent !important; }
 
-/* 🎯 文本系统 (Text) - text-*
-========================================= */
-.text-left { text-align: left !important; }
-.text-center { text-align: center !important; }
-.text-right { text-align: right !important; }
-.text-nowrap { white-space: nowrap !important; }
-.text-break { word-break: break-all !important; }
+/* 透明度 */
+.opacity-0 { opacity: 0 !important; }
+.opacity-25 { opacity: 0.25 !important; }
+.opacity-50 { opacity: 0.5 !important; }
+.opacity-75 { opacity: 0.75 !important; }
+.opacity-100 { opacity: 1 !important; }
 
-.text-underline { text-decoration: underline !important; }
-.text-line-through { text-decoration: line-through !important; }
-.text-no-decoration { text-decoration: none !important; }
+/* =========================================================
+   🔲 边框与圆角系统 (Border & Radius System)
+   ========================================================= */
 
-/* 文本溢出省略 */
-.text-ellipsis {
-  overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+/* 边框 - 控制元素边框的显示
+   使用方法：给元素添加这些类来设置边框样式
+   默认边框颜色为浅灰色(#e5e7eb) */
+
+.border-0 { border: none !important; } /* 移除所有边框 */
+.border-1 { border: 1px solid #e5e7eb !important; } /* 添加1像素宽的边框到所有四边 */
+.border-t { border-top: 1px solid #e5e7eb !important; } /* 仅添加顶部边框 */
+.border-b { border-bottom: 1px solid #e5e7eb !important; } /* 仅添加底部边框 */
+.border-l { border-left: 1px solid #e5e7eb !important; } /* 仅添加左侧边框 */
+.border-r { border-right: 1px solid #e5e7eb !important; } /* 仅添加右侧边框 */
+
+/* 圆角 - 控制元素边角的圆润程度
+   使用方法：给元素添加这些类来设置边角的圆角效果
+   数值越大，圆角越明显 */
+
+.rounded-none { border-radius: 0 !important; } /* 无圆角，显示为直角 */
+.rounded-sm { border-radius: 2px !important; } /* 小圆角，适用于小型元素 */
+.rounded { border-radius: 4px !important; } /* 标准圆角，适用于大多数UI元素 */
+.rounded-md { border-radius: 6px !important; } /* 中等圆角 */
+.rounded-lg { border-radius: 8px !important; } /* 大圆角，适用于卡片等较大元素 */
+.rounded-full { border-radius: 50% !important; } /* 完全圆形，适用于头像、徽章等 */
+
+/* 阴影 - 为元素添加阴影效果，增强立体感和层次感
+   使用方法：给元素添加这些类来设置不同程度的阴影效果
+   数值越大，阴影越明显，元素看起来离页面越远 */
+
+.shadow-none { box-shadow: none !important; } /* 无阴影，平面效果 */
+.shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important; } /* 轻微阴影，适用于小型元素 */
+.shadow { box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important; } /* 标准阴影，适用于卡片等常规元素 */
+.shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important; } /* 中等阴影，适用于弹出菜单等 */
+.shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important; } /* 大阴影，适用于模态框等需要强调的元素 */
+
+/* =========================================================
+   📱 响应式系统 (Responsive System)
+   ========================================================= */
+
+/* 响应式容器 */
+.resp-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 16px;
 }
 
-.text-ellipsis-2 {
-  display: -webkit-box; -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2; overflow: hidden; text-overflow: ellipsis;
+.resp-container-sm {
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 0 16px;
 }
 
-/* 🎯 边框系统 (Border) - border-*
-========================================= */
-.border-0 { border: none !important; }
-.border-1 { border: 1px solid #e5e7eb !important; }
-.border-t { border-top: 1px solid #e5e7eb !important; }
-.border-b { border-bottom: 1px solid #e5e7eb !important; }
-.border-l { border-left: 1px solid #e5e7eb !important; }
-.border-r { border-right: 1px solid #e5e7eb !important; }
-
-/* 圆角 */
-.rounded-none { border-radius: 0 !important; }
-.rounded-sm { border-radius: 2px !important; }
-.rounded { border-radius: 4px !important; }
-.rounded-md { border-radius: 6px !important; }
-.rounded-lg { border-radius: 8px !important; }
-.rounded-full { border-radius: 50% !important; }
-
-/* 🎯 阴影系统 (Shadow) - shadow-*
-========================================= */
-.shadow-none { box-shadow: none !important; }
-.shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important; }
-.shadow { box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1) !important; }
-.shadow-md { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important; }
-.shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1) !important; }
-
-/* 🎯 显示系统 (Display) - d-*
-========================================= */
-.d-none { display: none !important; }
-.d-block { display: block !important; }
-.d-inline { display: inline !important; }
-.d-inline-block { display: inline-block !important; }
-.d-flex { display: flex !important; }
-
-/* 🎯 工具类 (Utilities) - util-*
-========================================= */
-.util-clearfix::after { content: ""; display: table; clear: both; }
-.util-img-cover { object-fit: cover !important; }
-.util-img-contain { object-fit: contain !important; }
-.util-img-grayscale { filter: grayscale(100%) !important; }
-
-.util-overlay {
-  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-  background-color: rgba(0, 0, 0, 0.5); z-index: 9999;
+.resp-container-lg {
+  width: 100%;
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 16px;
 }
 
-.cursor-pointer { cursor: pointer !important; }
-.cursor-not-allowed { cursor: not-allowed !important; }
+/* Grid 网格系统 */
+.resp-grid { display: grid !important; }
+.resp-grid-1 { grid-template-columns: 1fr !important; }
+.resp-grid-2 { grid-template-columns: repeat(2, 1fr) !important; }
+.resp-grid-3 { grid-template-columns: repeat(3, 1fr) !important; }
+.resp-grid-4 { grid-template-columns: repeat(4, 1fr) !important; }
+.resp-grid-5 { grid-template-columns: repeat(5, 1fr) !important; }
+.resp-grid-6 { grid-template-columns: repeat(6, 1fr) !important; }
 
-/* 🎯 动画系统 - anim-*
-========================================= */
-.anim-fade-in { animation: fadeIn 0.3s ease-in-out; }
-.transition-all { transition: all 0.3s ease !important; }
+/* Grid 间距 */
+.resp-gap-1 { gap: 4px !important; }
+.resp-gap-2 { gap: 8px !important; }
+.resp-gap-3 { gap: 12px !important; }
+.resp-gap-4 { gap: 16px !important; }
+.resp-gap-5 { gap: 20px !important; }
+.resp-gap-6 { gap: 24px !important; }
 
-/* 🎯 动画关键帧定义 (Keyframes)
-========================================= */
+/* 响应式显示/隐藏 */
+.resp-show-mobile { display: none !important; }
+.resp-show-tablet { display: none !important; }
+.resp-show-desktop { display: block !important; }
 
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
+/* 响应式工具类 */
+.resp-block { display: block !important; }
+.resp-inline { display: inline !important; }
+.resp-inline-block { display: inline-block !important; }
+.resp-flex { display: flex !important; }
+.resp-none { display: none !important; }
 
-@keyframes fadeOut {
-  from { opacity: 1; }
-  to { opacity: 0; }
-}
+/* 响应式文本对齐 */
+.resp-text-left { text-align: left !important; }
+.resp-text-center { text-align: center !important; }
+.resp-text-right { text-align: right !important; }
 
-@keyframes slideUp {
-  from { 
-    opacity: 0;
-    transform: translateY(30px); 
-  }
-  to { 
-    opacity: 1;
-    transform: translateY(0); 
-  }
-}
-
-@keyframes slideDown {
-  from { 
-    opacity: 0;
-    transform: translateY(-30px); 
-  }
-  to { 
-    opacity: 1;
-    transform: translateY(0); 
-  }
-}
-
-@keyframes slideLeft {
-  from { 
-    opacity: 0;
-    transform: translateX(30px); 
-  }
-  to { 
-    opacity: 1;
-    transform: translateX(0); 
-  }
-}
-
-@keyframes slideRight {
-  from { 
-    opacity: 0;
-    transform: translateX(-30px); 
-  }
-  to { 
-    opacity: 1;
-    transform: translateX(0); 
-  }
-}
-
-@keyframes zoomIn {
-  from { 
-    opacity: 0;
-    transform: scale(0.9); 
-  }
-  to { 
-    opacity: 1;
-    transform: scale(1); 
-  }
-}
-
-@keyframes zoomOut {
-  from { 
-    opacity: 1;
-    transform: scale(1); 
-  }
-  to { 
-    opacity: 0;
-    transform: scale(0.9); 
-  }
-}
-
-@keyframes bounce {
-  0%, 20%, 53%, 80%, 100% {
-    animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
-    transform: translate3d(0,0,0);
-  }
-  40%, 43% {
-    animation-timing-function: cubic-bezier(0.755, 0.050, 0.855, 0.060);
-    transform: translate3d(0, -30px, 0);
-  }
-  70% {
-    animation-timing-function: cubic-bezier(0.755, 0.050, 0.855, 0.060);
-    transform: translate3d(0, -15px, 0);
-  }
-  90% {
-    transform: translate3d(0,-4px,0);
-  }
-}
-
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
-  20%, 40%, 60%, 80% { transform: translateX(10px); }
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-@keyframes ping {
-  75%, 100% {
-    transform: scale(2);
-    opacity: 0;
-  }
-}
-
-@keyframes pulseRing {
-  0% {
-    transform: translate(-50%, -50%) scale(0.5);
-    opacity: 1;
-  }
-  100% {
-    transform: translate(-50%, -50%) scale(1.5);
-    opacity: 0;
-  }
-}
-
-@keyframes skeleton {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
-
-@keyframes dots {
-  0% { content: '.'; }
-  33% { content: '..'; }
-  66% { content: '...'; }
-  100% { content: '....'; }
-}
-
-@keyframes typewriter {
-  from { width: 0; }
-  to { width: 100%; }
-}
-
-@keyframes blink {
-  from, to { border-color: transparent; }
-  50% { border-color: #1e97f8; }
-}
-
-/* 🎯 响应式断点系统 (Responsive Breakpoints)
-========================================= */
+/* 响应式浮动 */
+.resp-float-left { float: left !important; }
+.resp-float-right { float: right !important; }
+.resp-float-none { float: none !important; }
 
 /* 移动设备 (Mobile) - 小于 640px */
 @media (max-width: 639px) {
@@ -473,55 +542,167 @@
   .resp-show-desktop { display: block !important; }
 }
 
-/* 🎯 响应式布局系统 (Responsive) - resp-*
-========================================= */
+/* =========================================================
+   🎭 组件样式系统 (Component System)
+   ========================================================= */
 
-/* Grid 网格系统 */
-.resp-grid { display: grid !important; }
-.resp-grid-1 { grid-template-columns: 1fr !important; }
-.resp-grid-2 { grid-template-columns: repeat(2, 1fr) !important; }
-.resp-grid-3 { grid-template-columns: repeat(3, 1fr) !important; }
-.resp-grid-4 { grid-template-columns: repeat(4, 1fr) !important; }
-.resp-grid-5 { grid-template-columns: repeat(5, 1fr) !important; }
-.resp-grid-6 { grid-template-columns: repeat(6, 1fr) !important; }
+/* 卡片样式 - 创建卡片式UI组件
+   使用方法：给容器添加.card类来创建一个基础卡片，可选择添加.card-hover实现悬停效果
+   适用场景：内容块、信息卡、产品展示等 */
 
-/* Grid 间距 */
-.resp-gap-1 { gap: 4px !important; }
-.resp-gap-2 { gap: 8px !important; }
-.resp-gap-3 { gap: 12px !important; }
-.resp-gap-4 { gap: 16px !important; }
-.resp-gap-5 { gap: 20px !important; }
-.resp-gap-6 { gap: 24px !important; }
-
-/* 自适应容器 */
-.resp-container {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 16px;
+/* 基础卡片 - 带有白色背景、圆角和轻微阴影的容器 */
+.card {
+  background-color: #ffffff !important; /* 白色背景 */
+  border-radius: 8px !important; /* 圆角边缘 */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important; /* 轻微阴影 */
+  padding: 16px !important; /* 内边距 */
+  transition: all 0.3s ease !important; /* 平滑过渡效果 */
 }
 
-.resp-container-sm {
-  width: 100%;
-  max-width: 640px;
-  margin: 0 auto;
-  padding: 0 16px;
+/* 卡片悬停效果 - 鼠标悬停时增强阴影并微微上浮
+   使用方法：同时添加.card和.card-hover类 */
+.card-hover:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important; /* 增强阴影 */
+  transform: translateY(-2px) !important; /* 向上微移，创造悬浮感 */
 }
 
-.resp-container-lg {
-  width: 100%;
-  max-width: 1440px;
-  margin: 0 auto;
-  padding: 0 16px;
+/* 按钮样式 - 创建各种按钮组件
+   使用方法：给<button>或<a>元素添加.btn类，再搭配其他修饰类使用
+   适用场景：表单提交、操作触发、链接按钮等 */
+
+/* 基础按钮 - 定义按钮的基本外观和行为 */
+.btn {
+  display: inline-block !important; /* 内联块显示，可设置宽高 */
+  padding: 8px 16px !important; /* 内边距：上下8px，左右16px */
+  border-radius: 4px !important; /* 圆角边缘 */
+  font-size: 14px !important; /* 字体大小 */
+  font-weight: 500 !important; /* 字体粗细：中等粗 */
+  text-align: center !important; /* 文本居中 */
+  cursor: pointer !important; /* 鼠标指针样式：手型 */
+  transition: all 0.2s ease !important; /* 平滑过渡效果 */
+  border: 1px solid transparent !important; /* 透明边框，便于扩展 */
 }
 
-/* 响应式隐藏显示 */
-.resp-show-mobile { display: none !important; }
-.resp-show-tablet { display: none !important; }
-.resp-show-desktop { display: block !important; }
+/* 小型按钮 - 适用于空间有限的区域
+   使用方法：同时添加.btn和.btn-sm类 */
+.btn-sm {
+  padding: 4px 8px !important; /* 更小的内边距 */
+  font-size: 12px !important; /* 更小的字体 */
+}
 
-/* 🎯 交互效果系统 (Interactive) - interact-*
-========================================= */
+/* 大型按钮 - 适用于需要强调的主要操作
+   使用方法：同时添加.btn和.btn-lg类 */
+.btn-lg {
+  padding: 12px 24px !important; /* 更大的内边距 */
+  font-size: 16px !important; /* 更大的字体 */
+}
+
+/* 块级按钮 - 占满容器宽度的按钮
+   使用方法：同时添加.btn和.btn-block类
+   适用场景：移动端全宽按钮、表单提交按钮等 */
+.btn-block {
+  display: block !important; /* 块级显示 */
+  width: 100% !important; /* 宽度100% */
+}
+
+/* 表单元素样式 */
+.form-control {
+  display: block !important;
+  width: 100% !important;
+  padding: 8px 12px !important;
+  font-size: 14px !important;
+  line-height: 1.5 !important;
+  color: #333333 !important;
+  background-color: #ffffff !important;
+  background-clip: padding-box !important;
+  border: 1px solid #e5e7eb !important;
+  border-radius: 4px !important;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
+}
+
+.form-control:focus {
+  border-color: #1e97f8 !important;
+  box-shadow: 0 0 0 3px rgba(30, 151, 248, 0.1) !important;
+}
+
+.form-label {
+  display: inline-block !important;
+  margin-bottom: 4px !important;
+  font-weight: 500 !important;
+}
+
+/* 图标样式 */
+.icon-sm { width: 16px !important; height: 16px !important; }
+.icon-md { width: 24px !important; height: 24px !important; }
+.icon-lg { width: 32px !important; height: 32px !important; }
+.icon-xl { width: 48px !important; height: 48px !important; }
+
+/* 状态指示系统 - 用于表示不同状态的视觉样式
+   使用方法：给元素添加对应的状态类来表示不同的状态
+   适用场景：提示信息、状态标签、操作结果反馈等 */
+
+/* 成功状态 - 表示操作成功或积极状态
+   使用场景：成功提示、完成状态、正常运行等 */
+.status-success {
+  color: #2dac34 !important; /* 绿色文字 */
+  background-color: #f0f9f0 !important; /* 浅绿色背景 */
+  border: 1px solid #b3d9b3 !important; /* 绿色边框 */
+}
+
+/* 警告状态 - 表示需要注意但不严重的状态
+   使用场景：警告提示、需要关注的项目、即将到期等 */
+.status-warning {
+  color: #fe6701 !important; /* 橙色文字 */
+  background-color: #fff8f0 !important; /* 浅橙色背景 */
+  border: 1px solid #fdb566 !important; /* 橙色边框 */
+}
+
+/* 错误状态 - 表示操作失败或严重问题
+   使用场景：错误提示、失败状态、严重警告等 */
+.status-error {
+  color: #f56c6c !important; /* 红色文字 */
+  background-color: #fef0f0 !important; /* 浅红色背景 */
+  border: 1px solid #f5b2b2 !important; /* 红色边框 */
+}
+
+/* 信息状态 - 表示中性信息或提示
+   使用场景：一般信息提示、系统通知、操作指引等 */
+.status-info {
+  color: #1e97f8 !important; /* 蓝色文字 */
+  background-color: #f0f8ff !important; /* 浅蓝色背景 */
+  border: 1px solid #b3d9f8 !important; /* 蓝色边框 */
+}
+
+/* 交互状态 */
+.disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+  pointer-events: none !important;
+}
+
+.selected {
+  background-color: #e3f2fd !important;
+  border-color: #1e97f8 !important;
+}
+
+.active {
+  background-color: #1e97f8 !important;
+  color: #ffffff !important;
+}
+
+/* 遮罩层 */
+.overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); z-index: 9999;
+}
+
+/* =========================================================
+   ✨ 交互效果系统 (Interactive Effects)
+   ========================================================= */
+
+/* 鼠标样式 */
+.cursor-pointer { cursor: pointer !important; }
+.cursor-not-allowed { cursor: not-allowed !important; }
 
 /* 悬停效果 */
 .interact-hover-lift {
@@ -599,52 +780,39 @@
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1) !important;
 }
 
-/* 🎯 动画效果系统 (Animation) - anim-*
-========================================= */
+/* =========================================================
+   🔄 动画系统 (Animation System)
+   ========================================================= */
 
-/* 基础动画类 */
-.anim-fade-in { animation: fadeIn 0.3s ease-in-out; }
-.anim-fade-out { animation: fadeOut 0.3s ease-in-out; }
-.anim-slide-up { animation: slideUp 0.4s ease-out; }
-.anim-slide-down { animation: slideDown 0.4s ease-out; }
-.anim-slide-left { animation: slideLeft 0.4s ease-out; }
-.anim-slide-right { animation: slideRight 0.4s ease-out; }
-.anim-zoom-in { animation: zoomIn 0.3s ease-out; }
-.anim-zoom-out { animation: zoomOut 0.3s ease-out; }
-.anim-bounce { animation: bounce 0.6s ease-in-out; }
-.anim-shake { animation: shake 0.6s ease-in-out; }
-.anim-pulse { animation: pulse 2s infinite; }
-.anim-spin { animation: spin 1s linear infinite; }
-.anim-ping { animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite; }
+/* 基础动画类 - 为元素添加各种动画效果
+   使用方法：给元素添加对应的动画类来应用动画效果
+   适用场景：页面切换、元素出现/消失、状态变化等 */
 
-/* 延迟动画 */
-.anim-delay-100 { animation-delay: 0.1s !important; }
-.anim-delay-200 { animation-delay: 0.2s !important; }
-.anim-delay-300 { animation-delay: 0.3s !important; }
-.anim-delay-500 { animation-delay: 0.5s !important; }
+/* 淡入/淡出动画 - 通过透明度变化实现元素的平滑出现/消失 */
+.fade-in { animation: fadeIn 0.3s ease-in-out; } /* 元素淡入显示 */
+.fade-out { animation: fadeOut 0.3s ease-in-out; } /* 元素淡出消失 */
 
-/* 持续时间 */
-.anim-duration-fast { animation-duration: 0.15s !important; }
-.anim-duration-normal { animation-duration: 0.3s !important; }
-.anim-duration-slow { animation-duration: 0.5s !important; }
+/* 滑动动画 - 元素从不同方向滑入/滑出 */
+.slide-up { animation: slideUp 0.4s ease-out; } /* 元素从下向上滑入 */
+.slide-down { animation: slideDown 0.4s ease-out; } /* 元素从上向下滑入 */
+.slide-left { animation: slideLeft 0.4s ease-out; } /* 元素从右向左滑入 */
+.slide-right { animation: slideRight 0.4s ease-out; } /* 元素从左向右滑入 */
 
-/* 过渡效果 */
-.transition-none { transition: none !important; }
-.transition-all { transition: all 0.3s ease !important; }
-.transition-colors { transition: color 0.3s ease, background-color 0.3s ease, border-color 0.3s ease !important; }
-.transition-transform { transition: transform 0.3s ease !important; }
-.transition-opacity { transition: opacity 0.3s ease !important; }
-.transition-shadow { transition: box-shadow 0.3s ease !important; }
+/* 缩放动画 - 元素大小变化 */
+.zoom-in { animation: zoomIn 0.3s ease-out; } /* 元素从小变大 */
+.zoom-out { animation: zoomOut 0.3s ease-out; } /* 元素从大变小 */
 
-/* 缓动函数 */
-.ease-linear { transition-timing-function: linear !important; }
-.ease-in { transition-timing-function: ease-in !important; }
-.ease-out { transition-timing-function: ease-out !important; }
-.ease-in-out { transition-timing-function: ease-in-out !important; }
+/* 特效动画 - 各种特殊效果 */
+.bounce { animation: bounce 0.6s ease-in-out; } /* 元素弹跳效果 */
+.shake { animation: shake 0.6s ease-in-out; } /* 元素左右摇晃效果，常用于错误提示 */
+.pulse { animation: pulse 2s infinite; } /* 元素脉冲效果，透明度循环变化 */
+.spin { animation: spin 1s linear infinite; } /* 元素旋转效果，常用于加载指示器 */
+.ping { animation: ping 1s cubic-bezier(0, 0, 0.2, 1) infinite; } /* 元素扩散效果，类似水波纹 */
 
-/* 🎯 加载状态系统 (Loading) - loading-*
-========================================= */
+/* 过渡效果 - 为所有属性变化添加平滑过渡 */
+.transition-all { transition: all 0.3s ease !important; } /* 所有CSS属性变化时平滑过渡 */
 
+/* 加载状态动画 */
 .loading-spinner {
   display: inline-block;
   width: 20px;
@@ -653,7 +821,31 @@
   border-top: 3px solid #1e97f8;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-}
+}<!-- 基本 Flex 布局 -->
+<div class="flex-row">水平排列</div>
+<div class="flex-col">垂直排列</div>
+
+<!-- 换行控制 -->
+<div class="flex-wrap">换行</div>
+<div class="flex-nowrap">不换行</div>
+
+<!-- 弹性比例 -->
+<div class="flex-1">占1份</div>
+<div class="flex-2">占2份</div>
+<div class="flex-auto">自动分配</div>
+<div class="flex-none">不分配</div>
+
+<!-- 对齐方式 -->
+<div class="items-start">交叉轴起始对齐</div>
+<div class="items-center">交叉轴居中对齐</div>
+<div class="items-end">交叉轴末尾对齐</div>
+<div class="items-stretch">交叉轴拉伸对齐</div>
+
+<div class="justify-start">主轴起始对齐</div>
+<div class="justify-center">主轴居中对齐</div>
+<div class="justify-end">主轴末尾对齐</div>
+<div class="justify-between">主轴两端对齐</div>
+<div class="justify-around">主轴均匀分布</div>
 
 .loading-dots {
   display: inline-block;
@@ -670,44 +862,13 @@
   animation: skeleton 2s infinite;
 }
 
-/* 🎯 状态指示系统 (Status) - status-*
-========================================= */
-
-.status-success {
-  color: #2dac34 !important;
-  background-color: #f0f9f0 !important;
-  border: 1px solid #b3d9b3 !important;
-}
-
-.status-warning {
-  color: #fe6701 !important;
-  background-color: #fff8f0 !important;
-  border: 1px solid #fdb566 !important;
-}
-
-.status-error {
-  color: #f56c6c !important;
-  background-color: #fef0f0 !important;
-  border: 1px solid #f5b2b2 !important;
-}
-
-.status-info {
-  color: #1e97f8 !important;
-  background-color: #f0f8ff !important;
-  border: 1px solid #b3d9f8 !important;
-}
-
-/* 🎯 特效系统 (Effects) - effect-*
-========================================= */
-
-/* 毛玻璃效果 */
+/* 特效系统 */
 .effect-glass {
   backdrop-filter: blur(10px) !important;
   background-color: rgba(255, 255, 255, 0.25) !important;
   border: 1px solid rgba(255, 255, 255, 0.18) !important;
 }
 
-/* 渐变文字 */
 .effect-gradient-text {
   background: linear-gradient(135deg, #1e97f8, #fe6701) !important;
   background-clip: text !important;
@@ -715,13 +876,11 @@
   -webkit-text-fill-color: transparent !important;
 }
 
-/* 发光边框 */
 .effect-glow-border {
   border: 2px solid #1e97f8 !important;
   box-shadow: 0 0 10px rgba(30, 151, 248, 0.5) !important;
 }
 
-/* 脉冲动画 */
 .effect-pulse-ring {
   position: relative;
 }
@@ -738,9 +897,6 @@
   transform: translate(-50%, -50%);
   animation: pulseRing 2s infinite;
 }
-
-/* 🎯 工具动画类 (Utility Animations) - util-anim-*
-========================================= */
 
 /* 点击波纹效果 */
 .util-anim-ripple {
@@ -774,35 +930,128 @@
   animation: typewriter 3s steps(40, end), blink 0.75s step-end infinite;
 }
 
-/* 浮动标签 */
-.util-anim-float-label {
-  position: relative;
+/* =========================================================
+   🎬 动画关键帧定义 (Keyframes)
+   ========================================================= */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
-.util-anim-float-label input:focus + label,
-.util-anim-float-label input:not(:placeholder-shown) + label {
-  transform: translateY(-20px) scale(0.8);
-  color: #1e97f8;
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0; }
 }
 
-.util-anim-float-label label {
-  position: absolute;
-  left: 12px;
-  top: 12px;
-  transition: all 0.2s ease;
-  pointer-events: none;
-  color: #999;
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-/* 🔄 向后兼容的别名 - 保持项目兼容性
-   为了避免与WindiCSS冲突，这里提供了向后兼容的别名
-   建议新代码使用 WindiCSS 原生类名或 MMS 的语义化类名
-========================================= */
-.flex { display: flex !important; flex-direction: row; }
-.flex-col { display: flex !important; flex-direction: column; }
-.col-center { align-items: center; }
-.row-center { justify-content: center; }
-.w-50 { width: 50% !important; }
-.f-14 { font-size: 14px !important; }
-.p-10 { padding: 8px !important; }
-.m-10 { margin: 8px !important; }
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideLeft {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes slideRight {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes zoomIn {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes zoomOut {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.9); }
+}
+
+@keyframes bounce {
+  0%, 20%, 53%, 80%, 100% {
+    animation-timing-function: cubic-bezier(0.215, 0.610, 0.355, 1.000);
+    transform: translate3d(0,0,0);
+  }
+  40%, 43% {
+    animation-timing-function: cubic-bezier(0.755, 0.050, 0.855, 0.060);
+    transform: translate3d(0, -30px, 0);
+  }
+  70% {
+    animation-timing-function: cubic-bezier(0.755, 0.050, 0.855, 0.060);
+    transform: translate3d(0, -15px, 0);
+  }
+  90% {
+    transform: translate3d(0,-4px,0);
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-10px); }
+  20%, 40%, 60%, 80% { transform: translateX(10px); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes ping {
+  75%, 100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes pulseRing {
+  0% {
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1.5);
+    opacity: 0;
+  }
+}
+
+@keyframes skeleton {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes dots {
+  0% { content: '.'; }
+  33% { content: '..'; }
+  66% { content: '...'; }
+  100% { content: '....'; }
+}
+
+@keyframes typewriter {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@keyframes blink {
+  from, to { border-color: transparent; }
+  50% { border-color: #1e97f8; }
+}
+
+/* =========================================================
+   🔄 工具类别名 (Aliases)
+   ========================================================= */
+.f-row { display: flex !important; flex-direction: row; }
+.f-col { display: flex !important; flex-direction: column; }
+.y-center { align-items: center; }
+.x-end { justify-content: flex-end; }
