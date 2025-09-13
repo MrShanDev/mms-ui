@@ -34,12 +34,12 @@ npm run mms
 npm run mms:win
 ```
  
- ![](https://sxpcwlkj.oss-cn-beijing.aliyuncs.com/mms-ui-tool.png)
+ ![](https://www.mmsadmin.cn/images/mms-ui-tool.png)
 
 ## 系统版本
 
 <br/>
-<img src="https://www.mmsadmin.cn/images/MMS-V1.0.0-green"/>
+<img src="https://img.shields.io/badge/MMS-V1.X-green"/>
 
 
 | 名称        |  项目名  |                   项目地址                   | 注意事项                                                                                            |
@@ -182,28 +182,18 @@ cd ./mms-ui
 # 安装pnpm
 npm install -g pnpm
 
+# 使安装依赖
+pnpm install
+
 # 使用 pnpm 启动开发服务器
-pnpm run dev
+pnpm dev
 
 # 使用 pnpm 构建项目
-pnpm run build
-
-# 使用项目提供的 pnpm 脚本
-npm run pnpm:dev
-
-npm run pnpm:build
+pnpm build
 
 
-# ===扩展代码===
-# 1.删除依赖
-rm -rf node_modules pnpm-lock.yaml
-# 2.运行格式化
-npm run format
-# 3.代码质量检查
-npm run lint
-# 4.清除 pnpm 缓存
-pnpm store prune
-```
+
+
 
 #### 🛠️ PNPM 脚本功能说明
 
