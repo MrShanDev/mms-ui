@@ -821,31 +821,7 @@ $spacers: (0, 4, 8, 12, 16, 20, 24, 32, 40, 48, 64);
   border-top: 3px solid #1e97f8;
   border-radius: 50%;
   animation: spin 1s linear infinite;
-}<!-- 基本 Flex 布局 -->
-<div class="flex-row">水平排列</div>
-<div class="flex-col">垂直排列</div>
-
-<!-- 换行控制 -->
-<div class="flex-wrap">换行</div>
-<div class="flex-nowrap">不换行</div>
-
-<!-- 弹性比例 -->
-<div class="flex-1">占1份</div>
-<div class="flex-2">占2份</div>
-<div class="flex-auto">自动分配</div>
-<div class="flex-none">不分配</div>
-
-<!-- 对齐方式 -->
-<div class="items-start">交叉轴起始对齐</div>
-<div class="items-center">交叉轴居中对齐</div>
-<div class="items-end">交叉轴末尾对齐</div>
-<div class="items-stretch">交叉轴拉伸对齐</div>
-
-<div class="justify-start">主轴起始对齐</div>
-<div class="justify-center">主轴居中对齐</div>
-<div class="justify-end">主轴末尾对齐</div>
-<div class="justify-between">主轴两端对齐</div>
-<div class="justify-around">主轴均匀分布</div>
+}
 
 .loading-dots {
   display: inline-block;
