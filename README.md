@@ -52,7 +52,7 @@ npm run mms
 npm run mms:win
 ```
  
- ![](https://www.mmsadmin.cn/images/mms-ui-tool.png)
+<img src="https://www.mmsadmin.cn/images/mms-ui-tool.png" width="60%" />
 
 ## 系统版本
 
