@@ -96,6 +96,7 @@ declare module 'vue' {
     Table: typeof import('./src/components/table/index.vue')['default']
     TableTool: typeof import('./src/components/table-tool/index.vue')['default']
     Test: typeof import('./src/components/svg-icon/test.vue')['default']
+    Video: typeof import('./src/components/fast-upload/video.vue')['default']
     VideoPlayer: typeof import('./src/components/video-player/index.vue')['default']
   }
   export interface GlobalDirectives {
