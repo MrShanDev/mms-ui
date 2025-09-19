@@ -5,7 +5,7 @@
       v-model:file-list="_fileList"
       action="#"
       list-type="picture-card"
-      :class="['upload', self_disabled ? 'disabled' : '', drag ? 'no-border' : '']"
+      :class="['upload', self_disabled ? 'disabled' : '', drag ? 'no-border' : '', _fileList.length >= limit ? 'hide-upload' : '']"
       :multiple="true"
       :disabled="self_disabled"
       :limit="limit"
@@ -617,6 +617,12 @@
           font-size: 28px;
           color: var(--el-text-color-secondary);
         }
+      }
+    }
+    // 隐藏上传按钮的样式
+    :deep(.hide-upload) {
+      .el-upload--picture-card {
+        display: none;
       }
     }
     .el-upload__tip {
