@@ -14,6 +14,7 @@
       :on-exceed="handleExceed"
       :on-success="uploadSuccess"
       :on-error="uploadError"
+      :on-change="handleChange"
       :drag="drag"
       :accept="fileType.join(',')"
     >
@@ -61,8 +62,9 @@
     UploadUserFile,
     UploadRequestOptions,
     ElMessage,
+    ElNotification,
   } from 'element-plus';
-  import { ElNotification, formContextKey, formItemContextKey } from 'element-plus';
+  import { formContextKey, formItemContextKey } from 'element-plus';
 
   interface UploadFileProps {
     fileList: UploadUserFile[];
@@ -127,7 +129,7 @@
   });
   const emit = defineEmits<{
     'update:modelValue': [value: string];
-    success: [value: any];
+    success: [value: { urls: string; fileList: UploadUserFile[] } | string];
   }>();
   // 获取 el-form 组件上下文
   const formContext = inject(formContextKey, void 0);
@@ -135,23 +137,42 @@
   const formItemContext = inject(formItemContextKey, void 0);
   // 判断是否禁用上传和删除
   const self_disabled = computed(() => {
-    return props.disabled || formContext?.disabled;
+    const disabled = props.disabled || formContext?.disabled;
+    console.log('Self disabled:', disabled, 'props.disabled:', props.disabled, 'formContext?.disabled:', formContext?.disabled);
+    return disabled;
   });
   // 默认回显图片
   const _fileList = ref<UploadUserFile[]>([]);
+
+  // 监听文件列表变化，确保数据同步
+  watch(
+    () => _fileList.value,
+    (newVal) => {
+      // 可以在这里添加调试日志
+      // console.log('File list updated:', newVal);
+    },
+    { deep: true }
+  );
+
   // 在组件挂载后执行一些逻辑
   onMounted(() => {
+    console.log('Component mounted, modelValue:', props.modelValue);
     if (props.modelValue == null || props.modelValue.length == 0) {
+      console.log('No initial model value');
       return;
     }
     const arryIngs: Array<string> = props.modelValue.split(',');
+    console.log('Split model value:', arryIngs);
     if (arryIngs.length > 0) {
       arryIngs.map((item: string) => {
         if (item.length > 0) {
-          _fileList.value.push({ url: item, name: item.length + '' });
+          // 为每个文件生成唯一的UID
+          const uid = Date.now() + Math.floor(Math.random() * 1000);
+          _fileList.value.push({ url: item, name: item.length + '', uid });
         }
       });
     }
+    console.log('Initialized file list:', _fileList.value);
 
     // 可以在这里执行初始化逻辑，比如获取数据等
   });
@@ -159,20 +180,31 @@
   watch(
     () => props.modelValue,
     (n: string) => {
-      _fileList.value = [];
-      // eslint-disable-next-line no-console
-      console.log('update:modelValue', n);
-      if (n == null || n.length == 0) {
-        return;
+      console.log('Model value changed:', n);
+      // 只有当新的值与当前文件列表不匹配时才更新
+      const currentUrls = _fileList.value.map((obj) => obj.url).join(',');
+      console.log('Current URLs:', currentUrls);
+      if (n !== currentUrls) {
+        _fileList.value = [];
+        // eslint-disable-next-line no-console
+        console.log('update:modelValue', n);
+        if (n == null || n.length == 0) {
+          console.log('New value is empty');
+          return;
+        }
+        const arryIngs: Array<string> = n.split(',');
+        console.log('Split new value:', arryIngs);
+        if (arryIngs.length > 0) {
+          arryIngs.map((item: string) => {
+            if (item.length > 0) {
+              // 为每个文件生成唯一的UID
+              const uid = Date.now() + Math.floor(Math.random() * 1000);
+              _fileList.value.push({ url: item, name: item.length + '', uid });
+            }
+          });
+        }
       }
-      const arryIngs: Array<string> = n.split(',');
-      if (arryIngs.length > 0) {
-        arryIngs.map((item: string) => {
-          if (item.length > 0) {
-            _fileList.value.push({ url: item, name: item.length + '' });
-          }
-        });
-      }
+      console.log('Updated file list:', _fileList.value);
     }
   );
 
@@ -181,6 +213,7 @@
    * @param rawFile 选择的文件
    * */
   const beforeUpload: UploadProps['beforeUpload'] = (rawFile) => {
+    console.log('Before upload, file:', rawFile);
     const imgSize = rawFile.size / 1024 / 1024 < props.fileSize;
     const imgType = props.fileType.includes(rawFile.type);
     if (!imgType) {
@@ -189,6 +222,7 @@
         message: '上传图片不符合所需的格式！',
         type: 'warning',
       });
+      console.log('File type not allowed:', rawFile.type, 'Allowed types:', props.fileType);
     }
     if (!imgSize) {
       setTimeout(() => {
@@ -198,8 +232,22 @@
           type: 'warning',
         });
       }, 0);
+      console.log('File size too large:', rawFile.size, 'Max size (MB):', props.fileSize);
     }
-    return imgType && imgSize;
+    const result = imgType && imgSize;
+    console.log('Before upload result:', result);
+    return result;
+  };
+
+  /**
+   * @description 文件状态改变时的钩子
+   * @param file 文件对象
+   * @param fileList 文件列表
+   * */
+  const handleChange: UploadProps['onChange'] = (file, fileList) => {
+    // 确保文件列表正确更新
+    _fileList.value = [...fileList];
+    console.log('File changed:', file, 'File list:', fileList);
   };
 
   /**
@@ -207,12 +255,15 @@
    * @param options upload 所有配置项
    * */
   const handleHttpUpload = async (options: UploadRequestOptions) => {
+    console.log('Starting upload for file:', options.file);
     let formData = new FormData();
     formData.append('file', options.file);
     try {
       const { data } = await uploadImg(formData);
+      console.log('Upload success, response:', data);
       options.onSuccess(data);
     } catch (error) {
+      console.error('Upload error:', error);
       options.onError(error as any);
     }
   };
@@ -224,16 +275,41 @@
    * */
 
   const uploadSuccess = (response: { url: string } | undefined, uploadFile: UploadFile) => {
+    console.log('Upload success callback, response:', response, 'uploadFile:', uploadFile);
     if (!response) {
       return;
     }
+    // 确保每个文件都有独立的URL
     uploadFile.url = response.url;
+  
+    // 更新文件列表，确保所有文件都被正确跟踪
+    const existingFileIndex = _fileList.value.findIndex(
+      (file) => file.uid === uploadFile.uid
+    );
+  
+    if (existingFileIndex !== -1) {
+      // 如果文件已存在，更新它
+      _fileList.value[existingFileIndex].url = response.url;
+    } else {
+      // 如果是新文件，添加到列表中
+      _fileList.value.push({
+        name: uploadFile.name,
+        url: response.url,
+        uid: uploadFile.uid
+      });
+    }
+  
+    // 发送更新后的完整URL列表
     const imgs = _fileList.value.map((obj) => obj.url).join(',');
     emit('update:modelValue', imgs);
-    emit('success', imgs);
-    // 调用 el-form 内部的校验方法（可自动校验）
+    emit('success', {
+      urls: imgs,
+      fileList: [..._fileList.value]
+    });
+  
     // 调用 el-form 内部的校验方法（可自动校验）
     formItemContext?.prop && formContext?.validateField([formItemContext.prop as string]);
+  
     ElNotification({
       title: '温馨提示',
       message: '图片上传成功！',
@@ -246,17 +322,20 @@
    * @param file 删除的文件
    * */
   const handleRemove = (file: UploadFile) => {
+    console.log('Removing file:', file);
     _fileList.value = _fileList.value.filter(
       (item) => item.url !== file.url || item.name !== file.name
     );
     const imgs = _fileList.value.map((obj) => obj.url).join(',');
     emit('update:modelValue', imgs);
+    console.log('After removal, file list:', _fileList.value);
   };
 
   /**
    * @description 图片上传错误
    * */
-  const uploadError = () => {
+  const uploadError = (error: any, uploadFile: UploadFile, uploadFiles: UploadFile[]) => {
+    console.error('Upload error:', error, 'File:', uploadFile, 'All files:', uploadFiles);
     ElNotification({
       title: '温馨提示',
       message: '图片上传失败，请您重新上传！',
@@ -273,6 +352,7 @@
       message: `当前最多只能上传 ${props.limit} 张图片，请移除后上传！`,
       type: 'warning',
     });
+    console.log('File limit exceeded, limit:', props.limit);
   };
 
   /**
@@ -282,6 +362,7 @@
   const viewImageUrl = ref('');
   const imgViewVisible = ref(false);
   const handlePictureCardPreview: UploadProps['onPreview'] = (file) => {
+    console.log('Previewing file:', file);
     viewImageUrl.value = file.url!;
     imgViewVisible.value = true;
   };
@@ -300,7 +381,7 @@
     isShowDialog: false,
     cropperImg: '',
     cropperImgBase64: '',
-    cropper: '' as RefType,
+    cropper: null as Cropper | null,
   });
 
   /**
@@ -347,7 +428,9 @@
    */
   const changeScale = (num: number) => {
     num = num || 1;
-    state.cropper.zoom(num);
+    if (state.cropper) {
+      state.cropper.zoom(num);
+    }
   };
   /**
    * 向左边旋转90度
@@ -355,7 +438,9 @@
    */
   const rotateLeft = (num: number) => {
     num = num || 1;
-    state.cropper.rotate(num);
+    if (state.cropper) {
+      state.cropper.rotate(num);
+    }
   };
   /**
    * 向右边旋转90度
@@ -363,7 +448,9 @@
    */
   const rotateRight = (num: number) => {
     num = num || 1;
-    state.cropper.rotate(num);
+    if (state.cropper) {
+      state.cropper.rotate(num);
+    }
   };
   /**
    * 裁剪图片
@@ -375,7 +462,7 @@
         height: props.cropperHeight,
       });
       // base64 格式
-      croppedImageSrc.value = canvas.toDataURL('image/png');
+      croppedImageSrc.value = canvas.toDataURL('image/png') as any;
     }
   };
   /**
@@ -392,11 +479,11 @@
       formData.append('file', blob, 'avatar.png'); // 注意这里的表单字段名应为'file'
       await uploadImg(formData).then((response) => {
         if (response.code === 200) {
-          _fileList.value.forEach((item, index) => {
-            if (item.uid === uid.value) {
-              _fileList.value[index].url = response.data.url;
-            }
-          });
+          // 使用更可靠的查找方式更新文件
+          const fileIndex = _fileList.value.findIndex(item => item.uid === uid.value);
+          if (fileIndex !== -1) {
+            _fileList.value[fileIndex].url = response.data.url;
+          }
           const imgs = _fileList.value.map((obj) => obj.url).join(',');
           emit('update:modelValue', imgs);
           ElMessage.success('上传成功');
