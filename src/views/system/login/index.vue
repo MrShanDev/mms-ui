@@ -139,46 +139,6 @@ const getThemeConfig = reactive({
   demoPassword: ''
 });
 
-const baseStart = () => {
-  startBase().then((res) => {
-    if (res.code == 200) {
-      getThemeConfig.globalTitle = res.data.globalTitle;
-      getThemeConfig.globalDescription = res.data.globalDescription;
-      getThemeConfig.logo = res.data.logo;
-      getThemeConfig.loginType = res.data.loginType;
-      getThemeConfig.captchaState = res.data.captchaState;
-      getThemeConfig.demoMode = res.data.demoMode;
-      getThemeConfig.demoAccount = res.data.demoAccount;
-      getThemeConfig.demoPassword = res.data.demoPassword;
-      if (res.data.loginBg != null && res.data.loginBg.length > 0) {
-        getThemeConfig.loginBg = res.data.loginBg;
-      }
-      if(res.data.codeUrl!=null && res.data.codeUrl.length>0){
-        getThemeConfig.codeUrl=res.data.codeUrl;
-      }
-      
-      // 初始化当前登录方式为第一个可用的方式
-      if (getThemeConfig.loginType.length > 0) {
-        state.currentLoginMethod = getThemeConfig.loginType[0];
-      }
-    }
-  }).catch((err) => {
-    state.msg="后端接口异常: "+err;
-  });
-
-  // 获取布局配置信息
-  const getThemeConfig = reactive({
-    globalTitle: themeConfig.value.globalTitle,
-    globalDescription: themeConfig.value.globalViceTitleMsg,
-    logo: logoMini,
-    loginType: [] as Array<string>,
-    loginBg: loginMain,
-    captchaState: false,
-    codeUrl: '',
-    demoMode: false,
-    demoAccount: '',
-    demoPassword: '',
-  });
 
   const baseStart = () => {
     startBase()
