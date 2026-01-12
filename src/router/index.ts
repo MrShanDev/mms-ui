@@ -31,19 +31,19 @@ const { isRequestRoutes } = themeConfig.value;
  * @link 参考：https://next.router.vuejs.org/zh/api/#createrouter
  */
 export const router = createRouter({
-	history: createWebHashHistory(),
-	/**
-	 * 说明：
-	 * 1、notFoundAndNoPower 默认添加 404、401 界面，防止一直提示 No match found for location with path 'xxx'
-	 * 2、backEnd.ts(后端控制路由)、frontEnd.ts(前端控制路由) 中也需要加 notFoundAndNoPower 404、401 界面。
-	 *    防止 404、401 不在 layout 布局中，不设置的话，404、401 界面将全屏显示
-	 */
-	routes: [
-		//错误页面路由
-		...notFoundAndNoPower,
-		//静态固定路由（login） 
-		...staticRoutes
-	],
+  history: createWebHashHistory(),
+  /**
+   * 说明：
+   * 1、notFoundAndNoPower 默认添加 404、401 界面，防止一直提示 No match found for location with path 'xxx'
+   * 2、backEnd.ts(后端控制路由)、frontEnd.ts(前端控制路由) 中也需要加 notFoundAndNoPower 404、401 界面。
+   *    防止 404、401 不在 layout 布局中，不设置的话，404、401 界面将全屏显示
+   */
+  routes: [
+    //错误页面路由
+    ...notFoundAndNoPower,
+    //静态固定路由（login）
+    ...staticRoutes,
+  ],
 });
 
 /**
@@ -52,13 +52,13 @@ export const router = createRouter({
  * @returns 返回处理后的一维路由菜单数组
  */
 export function formatFlatteningRoutes(arr: any) {
-	if (arr.length <= 0) return false;
-	for (let i = 0; i < arr.length; i++) {
-		if (arr[i].children) {
-			arr = arr.slice(0, i + 1).concat(arr[i].children, arr.slice(i + 1));
-		}
-	}
-	return arr;
+  if (arr.length <= 0) return false;
+  for (let i = 0; i < arr.length; i++) {
+    if (arr[i].children) {
+      arr = arr.slice(0, i + 1).concat(arr[i].children, arr.slice(i + 1));
+    }
+  }
+  return arr;
 }
 
 /**
@@ -69,75 +69,82 @@ export function formatFlatteningRoutes(arr: any) {
  * @returns 返回将一维数组重新处理成 `定义动态路由（dynamicRoutes）` 的格式
  */
 export function formatTwoStageRoutes(arr: any) {
-	if (arr.length <= 0) return false;
-	const newArr: any = [];
-	const cacheList: Array<string> = [];
-	arr.forEach((v: any) => {
-		if (v.path === '/') {
-			newArr.push({ component: v.component, name: v.name, path: v.path, redirect: v.redirect, meta: v.meta, children: [] });
-		} else {
-			// 判断是否是动态路由（xx/:id/:name），用于 tagsView 等中使用
-			if (v.path.indexOf('/:') > -1) {
-				v.meta['isDynamic'] = true;
-				v.meta['isDynamicPath'] = v.path;
-			}
-			newArr[0].children.push({ ...v });
-			// 存 name 值，keep-alive 中 include 使用，实现路由的缓存
-			// 路径：/@/layout/routerView/parent.vue
-			if (newArr[0].meta.isKeepAlive && v.meta.isKeepAlive) {
-				cacheList.push(v.name);
-				const stores = useKeepALiveNames(pinia);
-				stores.setCacheKeepAlive(cacheList);
-			}
-		}
-	});
-	return newArr;
+  if (arr.length <= 0) return false;
+  const newArr: any = [];
+  const cacheList: Array<string> = [];
+  arr.forEach((v: any) => {
+    if (v.path === '/') {
+      newArr.push({
+        component: v.component,
+        name: v.name,
+        path: v.path,
+        redirect: v.redirect,
+        meta: v.meta,
+        children: [],
+      });
+    } else {
+      // 判断是否是动态路由（xx/:id/:name），用于 tagsView 等中使用
+      if (v.path.indexOf('/:') > -1) {
+        v.meta['isDynamic'] = true;
+        v.meta['isDynamicPath'] = v.path;
+      }
+      newArr[0].children.push({ ...v });
+      // 存 name 值，keep-alive 中 include 使用，实现路由的缓存
+      // 路径：/@/layout/routerView/parent.vue
+      if (newArr[0].meta.isKeepAlive && v.meta.isKeepAlive) {
+        cacheList.push(v.name);
+        const stores = useKeepALiveNames(pinia);
+        stores.setCacheKeepAlive(cacheList);
+      }
+    }
+  });
+  return newArr;
 }
 
 // 路由加载前
 router.beforeEach(async (to, from, next) => {
-	NProgress.configure({ showSpinner: false });
-	if (to.meta.title) NProgress.start();
-	const token = Session.get('token');
-	if (to.path === '/login' && !token) {
-		next();
-		NProgress.done();
-	} else {
-		if (!token) {
-			if(to.path==='/'){
-				to.path='/index';
-			}
-			next(`/login?redirect=${to.path}&params=${JSON.stringify(to.query ? to.query : to.params)}`);
-			Session.clear();
-			NProgress.done();
-		} else if (token && to.path === '/login') {
-			next('/index');
-			NProgress.done();
-		} else {
-			const storesRoutesList = useRoutesList(pinia);
-			//将状态存储在 store 中转换为 ref 对象的辅助函数(保持响应式更新)
-			const { routesList } = storeToRefs(storesRoutesList);
-			if (routesList.value.length === 0) {
-				if (isRequestRoutes) {
-					// 后端控制路由：路由数据初始化，防止刷新时丢失
-					await initBackEndControlRoutes();
-					// 解决刷新时，一直跳 404 页面问题，关联问题 No match found for location with path 'xxx'
-					// to.query 防止页面刷新时，普通路由带参数时，参数丢失。动态路由（xxx/:id/:name"）isDynamic 无需处理
-					next({ path: to.path, query: to.query });
-				} else {
-					await initFrontEndControlRoutes();
-					next({ path: to.path, query: to.query });
-				}
-			} else {
-				next();
-			}
-		}
-	}
+  NProgress.configure({ showSpinner: false });
+  if (to.meta.title) NProgress.start();
+  const token = Session.get('token');
+  if (to.path === '/login' && !token) {
+    next();
+    NProgress.done();
+  } else {
+    if (!token) {
+      if (to.path === '/') {
+        to.path = '/index';
+      }
+      next(`/login?redirect=${to.path}&params=${JSON.stringify(to.query ? to.query : to.params)}`);
+      Session.clear();
+      NProgress.done();
+    } else if (token && to.path === '/login') {
+      next('/index');
+      NProgress.done();
+    } else {
+      const storesRoutesList = useRoutesList(pinia);
+      //将状态存储在 store 中转换为 ref 对象的辅助函数(保持响应式更新)
+      const { routesList } = storeToRefs(storesRoutesList);
+      if (routesList.value.length === 0) {
+        if (isRequestRoutes) {
+          // 后端控制路由：路由数据初始化，防止刷新时丢失
+          await initBackEndControlRoutes();
+          // 解决刷新时，一直跳 404 页面问题，关联问题 No match found for location with path 'xxx'
+          // to.query 防止页面刷新时，普通路由带参数时，参数丢失。动态路由（xxx/:id/:name"）isDynamic 无需处理
+          next({ path: to.path, query: to.query });
+        } else {
+          await initFrontEndControlRoutes();
+          next({ path: to.path, query: to.query });
+        }
+      } else {
+        next();
+      }
+    }
+  }
 });
 
 // 路由加载后
 router.afterEach(() => {
-	NProgress.done();
+  NProgress.done();
 });
 
 // 导出路由

@@ -1,4 +1,4 @@
-import { withInstall } from '/@/utils/mms'
-import FastTableColumn from './src/fast-table-column.vue'
+import { withInstall } from '/@/utils/mms';
+import FastTableColumn from './src/fast-table-column.vue';
 
-export default withInstall(FastTableColumn)
+export default withInstall(FastTableColumn);

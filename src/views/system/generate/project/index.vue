@@ -10,10 +10,7 @@
           @keyup.enter="getDataList()"
         >
           <el-form-item>
-            <el-input
-              v-model="state.queryForm.projectName"
-              placeholder="项目名"
-            ></el-input>
+            <el-input v-model="state.queryForm.projectName" placeholder="项目名"></el-input>
           </el-form-item>
           <el-form-item>
             <el-button @click="getDataList()">查询</el-button>
@@ -76,15 +73,15 @@
             width="180"
           >
             <template #default="scope">
-              <el-button type="primary" link @click="addOrUpdateHandle(scope.row.id)"
-                >修改</el-button
-              >
-              <el-button type="primary" link @click="downloadHandle(scope.row.id)"
-                >源码下载</el-button
-              >
-              <el-button type="primary" link @click="deleteBatchHandle(scope.row.id)"
-                >删除</el-button
-              >
+              <el-button type="primary" link @click="addOrUpdateHandle(scope.row.id)">
+                修改
+              </el-button>
+              <el-button type="primary" link @click="downloadHandle(scope.row.id)">
+                源码下载
+              </el-button>
+              <el-button type="primary" link @click="deleteBatchHandle(scope.row.id)">
+                删除
+              </el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -97,14 +94,10 @@
           layout="total, sizes, prev, pager, next, jumper"
           @size-change="sizeChangeHandle"
           @current-change="currentChangeHandle"
-        >
-        </el-pagination>
+        ></el-pagination>
 
         <!-- 弹窗, 新增 / 修改 -->
-        <add-or-update
-          ref="addOrUpdateRef"
-          @refresh-data-list="getDataList"
-        ></add-or-update>
+        <add-or-update ref="addOrUpdateRef" @refresh-data-list="getDataList"></add-or-update>
         <!-- 源码下载 -->
         <download ref="downloadRef"></download>
       </el-card>
@@ -113,41 +106,41 @@
 </template>
 
 <script setup lang="ts">
-import { useCrud } from "/@/hooks";
-import { reactive, ref } from "vue";
-import AddOrUpdate from "./add-or-update.vue";
-import Download from "./download.vue";
-import { IHooksOptions } from "/@/hooks/interface";
-import {getEnv} from '/@/utils/mms';
-const state: IHooksOptions = reactive({
-  dataListUrl: getEnv() + "/gen/project/page",
-  deleteUrl: getEnv() + "/gen/project",
-  queryForm: {
-    projectName: "",
-  },
-});
+  import { useCrud } from '/@/hooks';
+  import { reactive, ref } from 'vue';
+  import AddOrUpdate from './add-or-update.vue';
+  import Download from './download.vue';
+  import { IHooksOptions } from '/@/hooks/interface';
+  import { getEnv } from '/@/utils/mms';
+  const state: IHooksOptions = reactive({
+    dataListUrl: getEnv() + '/gen/project/page',
+    deleteUrl: getEnv() + '/gen/project',
+    queryForm: {
+      projectName: '',
+    },
+  });
 
-const addOrUpdateRef = ref();
-const addOrUpdateHandle = (id?: number) => {
-  addOrUpdateRef.value.init(id);
-};
+  const addOrUpdateRef = ref();
+  const addOrUpdateHandle = (id?: number) => {
+    addOrUpdateRef.value.init(id);
+  };
 
-const downloadRef = ref();
-const downloadHandle = (id?: number) => {
-  downloadRef.value.init(id);
-};
+  const downloadRef = ref();
+  const downloadHandle = (id?: number) => {
+    downloadRef.value.init(id);
+  };
 
-const {
-  getDataList,
-  selectionChangeHandle,
-  sizeChangeHandle,
-  currentChangeHandle,
-  deleteBatchHandle,
-} = useCrud(state);
-const init = (id: number) => {
-  getDataList();
-};
-defineExpose({
-  init,
-});
+  const {
+    getDataList,
+    selectionChangeHandle,
+    sizeChangeHandle,
+    currentChangeHandle,
+    deleteBatchHandle,
+  } = useCrud(state);
+  const init = (id: number) => {
+    getDataList();
+  };
+  defineExpose({
+    init,
+  });
 </script>

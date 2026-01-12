@@ -8,7 +8,7 @@
           size="default"
           :model="state.tableData.param"
           class="form-tool"
-           @keyup.enter="getTableData"
+          @keyup.enter="getTableData"
         >
           <el-form-item>
             <el-input
@@ -17,8 +17,7 @@
               placeholder="请输入角色名称"
               style="max-width: 180px"
               clearable
-            >
-            </el-input>
+            ></el-input>
           </el-form-item>
           <el-form-item>
             <el-button
@@ -31,7 +30,7 @@
               v-auth="'system:role:list'"
             >
               <SvgIcon name="iconfont icon-search1" />
-              {{ $t("message.form.search") }}
+              {{ $t('message.form.search') }}
             </el-button>
           </el-form-item>
         </el-form>
@@ -63,25 +62,17 @@
               style="width: 100%"
             >
               <el-table-column type="selection" label="序号" width="50" />
-              <el-table-column
-                prop="name"
-                label="角色名称"
-                show-overflow-tooltip
-              ></el-table-column>
-              <el-table-column
-                prop="code"
-                label="角色标识"
-                show-overflow-tooltip
-              ></el-table-column>
+              <el-table-column prop="name" label="角色名称" show-overflow-tooltip></el-table-column>
+              <el-table-column prop="code" label="角色标识" show-overflow-tooltip></el-table-column>
               <el-table-column prop="status" label="角色状态" show-overflow-tooltip>
                 <template #default="scope">
                   <!-- <el-tag type="success" v-if="scope.row.status == 0">启用</el-tag>
                   <el-tag type="info" v-else>禁用</el-tag> -->
                   <fast-switch
-                      v-model="scope.row.status"
-                      dict-type="SYS_STATE"
-                      placeholder="角色状态"
-								></fast-switch>
+                    v-model="scope.row.status"
+                    dict-type="SYS_STATE"
+                    placeholder="角色状态"
+                  ></fast-switch>
                 </template>
               </el-table-column>
               <el-table-column
@@ -89,10 +80,7 @@
                 label="角色描述"
                 show-overflow-tooltip
               ></el-table-column>
-              <el-table-column
-                prop="level"
-                label="角色级别"
-                show-overflow-tooltip>
+              <el-table-column prop="level" label="角色级别" show-overflow-tooltip>
                 <template #default="scope">
                   <el-tag type="warning">{{ scope.row.level }}级</el-tag>
                 </template>
@@ -146,8 +134,7 @@
               v-model:page-size="state.tableData.param.pageSize"
               layout="total, sizes, prev, pager, next, jumper"
               :total="state.tableData.total"
-            >
-            </el-pagination>
+            ></el-pagination>
           </el-footer>
         </el-container>
       </el-card>
@@ -157,153 +144,153 @@
 </template>
 
 <script setup lang="ts" name="systemRole">
-import { defineAsyncComponent, reactive, onMounted, ref } from "vue";
-import { ElMessageBox, ElMessage, tabBarProps } from "element-plus";
-import { roleApi } from "/@/api/system/role";
-import { isEmpty, generateUUID } from "/@/utils/mms";
-import { CURDEnum } from "/@/enums/CURDEnum";
-import {NextLoading} from "/@/utils/loading";
-import {RowRoleType, SysRoleState} from "/@/api/system/role/type";
-import { Eleme } from "@element-plus/icons-vue";
-import FastSwitch from "/@/components/fast-switch/src/fast-switch.vue";
+  import { defineAsyncComponent, reactive, onMounted, ref } from 'vue';
+  import { ElMessageBox, ElMessage, tabBarProps } from 'element-plus';
+  import { roleApi } from '/@/api/system/role';
+  import { isEmpty, generateUUID } from '/@/utils/mms';
+  import { CURDEnum } from '/@/enums/CURDEnum';
+  import { NextLoading } from '/@/utils/loading';
+  import { RowRoleType, SysRoleState } from '/@/api/system/role/type';
+  import { Eleme } from '@element-plus/icons-vue';
+  import FastSwitch from '/@/components/fast-switch/src/fast-switch.vue';
 
-// 引入组件
-const RoleDialog = defineAsyncComponent(() => import("/@/views/system/role/dialog.vue"));
-const TableTool = defineAsyncComponent(() => import("/@/components/table-tool/index.vue"));
+  // 引入组件
+  const RoleDialog = defineAsyncComponent(() => import('/@/views/system/role/dialog.vue'));
+  const TableTool = defineAsyncComponent(() => import('/@/components/table-tool/index.vue'));
 
-// 定义变量内容
-const baseApi = roleApi();
-const curdEnum= CURDEnum;
-const dialogRef = ref();
-const tableToolRef = ref();
-const componentKey = ref(generateUUID());
+  // 定义变量内容
+  const baseApi = roleApi();
+  const curdEnum = CURDEnum;
+  const dialogRef = ref();
+  const tableToolRef = ref();
+  const componentKey = ref(generateUUID());
 
-const state = reactive<SysRoleState>({
-  tableData: {
-    data: [],
-    total: 0,
-    loading: false,
-    param: {
-      selectIds: "",
-      name: "",
-      pageNum: 1,
-      pageSize: 10,
+  const state = reactive<SysRoleState>({
+    tableData: {
+      data: [],
+      total: 0,
+      loading: false,
+      param: {
+        selectIds: '',
+        name: '',
+        pageNum: 1,
+        pageSize: 10,
+      },
     },
-  },
-});
-// 初始化表格数据
-const getTableData = () => {
-  state.tableData.loading = true;
-  baseApi
-    .getList(state.tableData.param)
-    .then((res) => {
-      state.tableData.data = res.rows;
-      state.tableData.total = res.total;
-      state.tableData.loading = false;
-    })
-    .catch(async (err) => {
-      ElMessage.warning(err);
-    })
-    .finally(() => {});
-};
-// 打开修改角色弹窗
-const onCURD = (obj: { type: CURDEnum; ids?: string }) => {
-    // 新增操作
-  if (obj.type === CURDEnum.INSERT) {
-     dialogRef.value.openDialog(obj.type);
-  }
-  if (obj.type == CURDEnum.EDIT) {
+  });
+  // 初始化表格数据
+  const getTableData = () => {
+    state.tableData.loading = true;
     baseApi
-      .query(obj.ids)
+      .getList(state.tableData.param)
       .then((res) => {
-        dialogRef.value.openDialog(obj.type, res.data);
+        state.tableData.data = res.rows;
+        state.tableData.total = res.total;
+        state.tableData.loading = false;
       })
       .catch(async (err) => {
         ElMessage.warning(err);
       })
       .finally(() => {});
-  }
-  if (obj.type == CURDEnum.DELETE) {
-    ElMessageBox.confirm(`此操作将永久删除，是否继续?`, "提示", {
-      confirmButtonText: "确认",
-      cancelButtonText: "取消",
-      type: "warning",
-    })
-      .then(() => {
-        baseApi
-          .delete(obj.ids)
-          .then((res) => {
-            getTableData();
-            ElMessage.success("删除成功");
-          })
-          .catch(async (err) => {
-            ElMessage.warning(err);
-          })
-          .finally(() => {});
+  };
+  // 打开修改角色弹窗
+  const onCURD = (obj: { type: CURDEnum; ids?: string | undefined }) => {
+    // 新增操作
+    if (obj.type === CURDEnum.INSERT) {
+      dialogRef.value.openDialog(obj.type);
+    }
+    if (obj.type == CURDEnum.EDIT) {
+      baseApi
+        .query(obj.ids)
+        .then((res) => {
+          dialogRef.value.openDialog(obj.type, res.data);
+        })
+        .catch(async (err) => {
+          ElMessage.warning(err);
+        })
+        .finally(() => {});
+    }
+    if (obj.type == CURDEnum.DELETE) {
+      ElMessageBox.confirm(`此操作将永久删除，是否继续?`, '提示', {
+        confirmButtonText: '确认',
+        cancelButtonText: '取消',
+        type: 'warning',
       })
-      .catch(() => {});
-  }
-};
-// 接受子组件传值
-const formSubmit = (row: RowRoleType) => {
-  if (isEmpty(row.id)) {
-    //新增
-      NextLoading.open()
-    baseApi
-      .insert(row)
-      .then((row) => {
-        dialogRef.value.closeDialog();
-        ElMessage.success(row.msg);
-        setTimeout(() => {
-          getTableData();
-        }, 1000);
-      })
-      .catch(async (err) => {
-        dialogRef.value.resetLoading();
-        ElMessage.warning(err);
-      })
-      .finally(() => {
-          NextLoading.close();
-      });
-  } else {
-    //更新
+        .then(() => {
+          baseApi
+            .delete(obj.ids)
+            .then((res) => {
+              getTableData();
+              ElMessage.success('删除成功');
+            })
+            .catch(async (err) => {
+              ElMessage.warning(err);
+            })
+            .finally(() => {});
+        })
+        .catch(() => {});
+    }
+  };
+  // 接受子组件传值
+  const formSubmit = (row: RowRoleType) => {
+    if (isEmpty(row.id)) {
+      //新增
       NextLoading.open();
-    baseApi
-      .edit(row)
-      .then((row) => {
-        dialogRef.value.closeDialog();
-        ElMessage.success(row.msg);
-        setTimeout(() => {
-          getTableData();
-        }, 1000);
-      })
-      .catch(async (err) => {
+      baseApi
+        .insert(row)
+        .then((row) => {
+          dialogRef.value.closeDialog();
+          ElMessage.success(row.msg);
+          setTimeout(() => {
+            getTableData();
+          }, 1000);
+        })
+        .catch(async (err) => {
           dialogRef.value.resetLoading();
-        ElMessage.warning(err);
-      })
-      .finally(() => {
+          ElMessage.warning(err);
+        })
+        .finally(() => {
           NextLoading.close();
-      });
-  }
-};
-// 分页改变
-const onHandleSizeChange = (val: number) => {
-  state.tableData.param.pageSize = val;
-  getTableData();
-};
-// 分页改变
-const onHandleCurrentChange = (val: number) => {
-  state.tableData.param.pageNum = val;
-  getTableData();
-};
-//选择项改变
-const handleSelectionChange = (val: RowRoleType[]) => {
-  state.tableData.param.selectIds = val.map((item: RowRoleType) => item.id).join(",");
-};
-// 页面加载时
-onMounted(() => {
-  getTableData();
-});
+        });
+    } else {
+      //更新
+      NextLoading.open();
+      baseApi
+        .edit(row)
+        .then((row) => {
+          dialogRef.value.closeDialog();
+          ElMessage.success(row.msg);
+          setTimeout(() => {
+            getTableData();
+          }, 1000);
+        })
+        .catch(async (err) => {
+          dialogRef.value.resetLoading();
+          ElMessage.warning(err);
+        })
+        .finally(() => {
+          NextLoading.close();
+        });
+    }
+  };
+  // 分页改变
+  const onHandleSizeChange = (val: number) => {
+    state.tableData.param.pageSize = val;
+    getTableData();
+  };
+  // 分页改变
+  const onHandleCurrentChange = (val: number) => {
+    state.tableData.param.pageNum = val;
+    getTableData();
+  };
+  //选择项改变
+  const handleSelectionChange = (val: RowRoleType[]) => {
+    state.tableData.param.selectIds = val.map((item: RowRoleType) => item.id).join(',');
+  };
+  // 页面加载时
+  onMounted(() => {
+    getTableData();
+  });
 </script>
 
 <style scoped lang="scss"></style>

@@ -1,8 +1,8 @@
-import appPackage from '../../package.json'
+import appPackage from '../../package.json';
 /**
  * 常量
  */
 export default {
-    // 版本号
-    version: appPackage.version,
-}
+  // 版本号
+  version: appPackage.version,
+};

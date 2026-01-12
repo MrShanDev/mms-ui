@@ -142,6 +142,12 @@ npm run dev
 
 # 打包发布
 npm run build
+
+# ===扩展代码===
+# 运行格式化
+npm run format
+# 代码质量检查
+npm run lint
 ```
 
 
@@ -154,3 +160,15 @@ npm run build
 
 2. 有时候会出现`Couldn't find any versions for "@rollup/rollup-linux-riscv64-gnu" that matches "4.34.2"? Please choose a version of "@rollup/rollup-linux-riscv64-gnu" from this list: (Use arrow keys)`
    找不到与“4.34.2”匹配的“@rollup/rollup-linux-riscv64-gnu”的任何版本 ？ 请从这个列表中选择一个“@rollup/rollup-linux-riscv64-gnu”的版本：**（使用箭头键）**
+3. 代码质量检测 `npm run lint` , 代码自动修复（简单的警告会修复）`npm run lint-fix` 或者 `npx prettier --write src/`
+4. 对于确实需要保留的 console 和 debugger，添加禁用注释,否则会被自动修复注释：
+```javascript
+// eslint-disable-next-line no-console
+console.log('调试信息');
+
+// eslint-disable-next-line no-debugger  
+debugger;
+```
+5. 批量修复空格/制表符问题,这个很好用，格式化代码  `npx prettier --write "src/views/system/**/*.vue"`
+6. 清除 npm 缓存 `npm cache clean --force`
+7. 删除 node_modules 和 package-lock.json `rm -rf node_modules package-lock.json`

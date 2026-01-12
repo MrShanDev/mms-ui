@@ -4,7 +4,7 @@ import { getEnv } from '/@/utils/mms';
 import { AxiosPromise } from 'axios';
 
 export const uploadImg = <T = any>(params: FormData): AxiosPromise<T> => {
-	return request.postForm(getEnv() + '/system/oss/elUpload', params);
+  return request.postForm(getEnv() + '/system/oss/elUpload', params);
 };
 
 /**
@@ -14,7 +14,11 @@ export const uploadImg = <T = any>(params: FormData): AxiosPromise<T> => {
  * @returns
  */
 export const downloadTemplate = (modelUrl: string, modelName: string) => {
-	return download(getEnv() + '/' + modelUrl + '/importTemplate', {}, `${modelName}_${new Date().getTime()}.xlsx`);
+  return download(
+    getEnv() + '/' + modelUrl + '/importTemplate',
+    {},
+    `${modelName}_${new Date().getTime()}.xlsx`
+  );
 };
 
 /**
@@ -25,7 +29,11 @@ export const downloadTemplate = (modelUrl: string, modelName: string) => {
  * @returns
  */
 export const exportData = (modelUrl: string, modelName: string, params: FormData) => {
-	return download(getEnv() + '/' + modelUrl + '/export', params, `${modelName}_${new Date().getTime()}.xlsx`);
+  return download(
+    getEnv() + '/' + modelUrl + '/export',
+    params,
+    `${modelName}_${new Date().getTime()}.xlsx`
+  );
 };
 /**
  * 导入
@@ -34,7 +42,7 @@ export const exportData = (modelUrl: string, modelName: string, params: FormData
  * @param modelUrl
  */
 export const importData = <T = any>(params: FormData, modelUrl: string): AxiosPromise<T> => {
-	return request.postForm(getEnv() + '/' + modelUrl + '/import', params);
+  return request.postForm(getEnv() + '/' + modelUrl + '/import', params);
 };
 /**
  * 打印
@@ -43,9 +51,9 @@ export const importData = <T = any>(params: FormData, modelUrl: string): AxiosPr
  * @param modelUrl
  */
 export const printData = <T = any>(params: FormData, modelUrl: string): AxiosPromise<T> => {
-	return request.request({
-		url: getEnv() + '/' + modelUrl + '/print',
-		method: 'post',
-		data: params,
-	});
+  return request.request({
+    url: getEnv() + '/' + modelUrl + '/print',
+    method: 'post',
+    data: params,
+  });
 };

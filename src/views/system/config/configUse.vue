@@ -9,19 +9,13 @@
           size="default"
           :model="state.tableData.param"
           class="form-tool"
-           @keyup.enter="getTableData"
+          @keyup.enter="getTableData"
         >
           <el-form-item>
-            <el-input
-              v-model="state.tableData.param.configName"
-              placeholder="配置名称"
-            ></el-input>
+            <el-input v-model="state.tableData.param.configName" placeholder="配置名称"></el-input>
           </el-form-item>
           <el-form-item>
-            <el-input
-              v-model="state.tableData.param.configKey"
-              placeholder="配置键"
-            ></el-input>
+            <el-input v-model="state.tableData.param.configKey" placeholder="配置键"></el-input>
           </el-form-item>
           <el-form-item class="mb-0">
             <el-button
@@ -31,7 +25,7 @@
               v-auth="'system:user:list'"
             >
               <SvgIcon name="iconfont icon-search1" />
-              {{ $t("message.form.search") }}
+              {{ $t('message.form.search') }}
             </el-button>
           </el-form-item>
         </el-form>
@@ -75,14 +69,19 @@
                 header-align="center"
                 align="center"
               ></el-table-column>
-              <el-table-column prop="configKey" label="配置键" header-align="center" align="center"></el-table-column>
+              <el-table-column
+                prop="configKey"
+                label="配置键"
+                header-align="center"
+                align="center"
+              ></el-table-column>
               <fast-table-column prop="configType" label="配置类型" dict-type="CONFIG_TYPE" />
               <el-table-column prop="status" label="状态" dict-type="SYS_STATE">
                 <template #default="scope">
                   <fast-switch
-                      v-model="scope.row.status"
-                      dict-type="SYS_STATE"
-                      placeholder="配置状态"
+                    v-model="scope.row.status"
+                    dict-type="SYS_STATE"
+                    placeholder="配置状态"
                   ></fast-switch>
                 </template>
               </el-table-column>
@@ -93,7 +92,7 @@
                 show-overflow-tooltip
               >
                 <template #default="scope">
-                  {{ $ut.parseTime(scope.row.createdTime, "{y}-{m}-{d} {h}:{i}:{s}") }}
+                  {{ $ut.parseTime(scope.row.createdTime, '{y}-{m}-{d} {h}:{i}:{s}') }}
                 </template>
               </el-table-column>
               <el-table-column fixed="right" width="100" label="操作">
@@ -136,8 +135,7 @@
               v-model:page-size="state.tableData.param.pageSize"
               layout="total, sizes, prev, pager, next, jumper"
               :total="state.tableData.total"
-            >
-            </el-pagination>
+            ></el-pagination>
           </el-footer>
         </el-container>
       </el-card>
@@ -146,161 +144,157 @@
   </div>
 </template>
 <script setup lang="ts">
-import { defineAsyncComponent, onMounted, reactive, ref } from "vue";
-import { sysConfigApi } from "/@/api/system/config";
-import { ElMessage, ElMessageBox } from "element-plus";
-import FastTableColumn from "/@/components/fast-table-column/src/fast-table-column.vue";
-import FastSwitch from "/@/components/fast-switch/src/fast-switch.vue";
-import { CURDEnum } from "/@/enums/CURDEnum";
-import { isEmpty, generateUUID } from "/@/utils/mms";
-const baseApi = sysConfigApi();
-const SysConfigDialog = defineAsyncComponent(
-  () => import("/src/views/system/config/dialog.vue")
-);
-const TableTool = defineAsyncComponent(
-  () => import("/@/components/table-tool/index.vue")
-);
-const sysConfigDialogRef = ref();
-const curdEnum= CURDEnum;
-const props = defineProps({
-  value: {
-    type: Array,
-    default: () => [],
-  },
-});
-const state = reactive<SysConfigState>({
-  tableData: {
-    data: [],
-    total: 0,
-    loading: false,
-    param: {
-      selectIds: "",
-      configName: "",
-      configKey: "",
-      configType: "2",
-      pageNum: 1,
-      pageSize: 10,
+  import { defineAsyncComponent, onMounted, reactive, ref } from 'vue';
+  import { sysConfigApi } from '/@/api/system/config';
+  import { ElMessage, ElMessageBox } from 'element-plus';
+  import FastTableColumn from '/@/components/fast-table-column/src/fast-table-column.vue';
+  import FastSwitch from '/@/components/fast-switch/src/fast-switch.vue';
+  import { CURDEnum } from '/@/enums/CURDEnum';
+  import { isEmpty, generateUUID } from '/@/utils/mms';
+  const baseApi = sysConfigApi();
+  const SysConfigDialog = defineAsyncComponent(() => import('/src/views/system/config/dialog.vue'));
+  const TableTool = defineAsyncComponent(() => import('/@/components/table-tool/index.vue'));
+  const sysConfigDialogRef = ref();
+  const curdEnum = CURDEnum;
+  const props = defineProps({
+    value: {
+      type: Array,
+      default: () => [],
     },
-  },
-});
-const tableToolRef = ref();
-const componentKey = ref(generateUUID());
-// 初始化表格数据
-const getTableData = () => {
-  state.tableData.loading = true;
-  baseApi
-    .list(state.tableData.param)
-    .then((res) => {
-      state.tableData.data = res.rows;
-      state.tableData.total = res.total;
-      state.tableData.loading = false;
-    })
-    .catch(async (err) => {
-      ElMessage.warning(err);
-    })
-    .finally(() => {});
-};
+  });
+  const state = reactive<SysConfigState>({
+    tableData: {
+      data: [],
+      total: 0,
+      loading: false,
+      param: {
+        selectIds: '',
+        configName: '',
+        configKey: '',
+        configType: '2',
+        pageNum: 1,
+        pageSize: 10,
+      },
+    },
+  });
+  const tableToolRef = ref();
+  const componentKey = ref(generateUUID());
+  // 初始化表格数据
+  const getTableData = () => {
+    state.tableData.loading = true;
+    baseApi
+      .list(state.tableData.param)
+      .then((res) => {
+        state.tableData.data = res.rows;
+        state.tableData.total = res.total;
+        state.tableData.loading = false;
+      })
+      .catch(async (err) => {
+        ElMessage.warning(err);
+      })
+      .finally(() => {});
+  };
 
-//搜索按钮操作
-function handleQuery() {
-  state.tableData.param.pageNum = 1;
-  getTableData();
-}
-
-// 打开修改用户弹窗
-const onCURD = (obj: { type: CURDEnum; ids?: string }) => {
-  if (obj.type === CURDEnum.INSERT) {
-    sysConfigDialogRef.value.openDialog(obj.type);
-    return false;
+  //搜索按钮操作
+  function handleQuery() {
+    state.tableData.param.pageNum = 1;
+    getTableData();
   }
-  if (obj.type === CURDEnum.DELETE) {
-    ElMessageBox.confirm(`此操作将永久删除吗?`, "提示", {
-      confirmButtonText: "确认",
-      cancelButtonText: "取消",
-      type: "warning",
-    })
-      .then(() => {
-        baseApi
-          .delete(obj.ids)
-          .then((res) => {
+
+  // 打开修改用户弹窗
+  const onCURD = (obj: { type: CURDEnum; ids?: string }) => {
+    if (obj.type === CURDEnum.INSERT) {
+      sysConfigDialogRef.value.openDialog(obj.type);
+      return false;
+    }
+    if (obj.type === CURDEnum.DELETE) {
+      ElMessageBox.confirm(`此操作将永久删除吗?`, '提示', {
+        confirmButtonText: '确认',
+        cancelButtonText: '取消',
+        type: 'warning',
+      })
+        .then(() => {
+          baseApi
+            .delete(obj.ids)
+            .then((res) => {
+              getTableData();
+              ElMessage.success('删除成功');
+            })
+            .catch(async (err) => {
+              ElMessage.warning(err);
+            })
+            .finally(() => {});
+        })
+        .catch(() => {});
+      return false;
+    }
+    if (obj.type === CURDEnum.EDIT) {
+      baseApi
+        .query(obj.ids)
+        .then((res) => {
+          sysConfigDialogRef.value.openDialog(obj.type, res.data);
+        })
+        .catch(async (err) => {
+          ElMessage.warning(err);
+        })
+        .finally(() => {});
+    }
+  };
+
+  // 接收子组件传值
+  const formSubmit = (row: RowSysConfigType) => {
+    if (isEmpty(row.id)) {
+      //新增
+      baseApi
+        .insert(row)
+        .then((row) => {
+          sysConfigDialogRef.value.closeDialog();
+          ElMessage.success(row.msg);
+          setTimeout(() => {
             getTableData();
-            ElMessage.success("删除成功");
-          })
-          .catch(async (err) => {
-            ElMessage.warning(err);
-          })
-          .finally(() => {});
-      })
-      .catch(() => {});
-    return false;
-  }
-  if (obj.type === CURDEnum.EDIT){
-    baseApi
-    .query(obj.ids)
-    .then((res) => {
-      sysConfigDialogRef.value.openDialog(obj.type, res.data);
-    })
-    .catch(async (err) => {
-      ElMessage.warning(err);
-    })
-    .finally(() => {});
-  }
-};
-
-// 接收子组件传值
-const formSubmit = (row: RowSysConfigType) => {
-  if (isEmpty(row.id)) {
-    //新增
-    baseApi
-      .insert(row)
-      .then((row) => {
-        sysConfigDialogRef.value.closeDialog();
-        ElMessage.success(row.msg);
-        setTimeout(() => {
-          getTableData();
-        }, 1000);
-      })
-      .catch(async (err) => {
-        ElMessage.warning(err);
-      })
-      .finally(() => {});
-  } else {
-    //更新
-    baseApi
-      .edit(row)
-      .then((row) => {
-        sysConfigDialogRef.value.closeDialog();
-        ElMessage.success(row.msg);
-        setTimeout(() => {
-          getTableData();
-        }, 1000);
-      })
-      .catch(async (err) => {
-        ElMessage.warning(err);
-      })
-      .finally(() => {});
-  }
-};
-// 分页改变
-const onHandleSizeChange = (val: number) => {
-  state.tableData.param.pageSize = val;
-  getTableData();
-};
-// 分页改变
-const onHandleCurrentChange = (val: number) => {
-  state.tableData.param.pageNum = val;
-  getTableData();
-};
-//选择项改变
-const handleSelectionChange = (val: RowSysConfigType[]) => {
-  state.tableData.param.selectIds = val.map((item: RowSysConfigType) => item.id).join(",");
-};
-onMounted(() => {
-  getTableData();
-});
-// 暴露变量
-defineExpose({
-  getTableData,
-});
+          }, 1000);
+        })
+        .catch(async (err) => {
+          ElMessage.warning(err);
+        })
+        .finally(() => {});
+    } else {
+      //更新
+      baseApi
+        .edit(row)
+        .then((row) => {
+          sysConfigDialogRef.value.closeDialog();
+          ElMessage.success(row.msg);
+          setTimeout(() => {
+            getTableData();
+          }, 1000);
+        })
+        .catch(async (err) => {
+          ElMessage.warning(err);
+        })
+        .finally(() => {});
+    }
+  };
+  // 分页改变
+  const onHandleSizeChange = (val: number) => {
+    state.tableData.param.pageSize = val;
+    getTableData();
+  };
+  // 分页改变
+  const onHandleCurrentChange = (val: number) => {
+    state.tableData.param.pageNum = val;
+    getTableData();
+  };
+  //选择项改变
+  const handleSelectionChange = (val: RowSysConfigType[]) => {
+    state.tableData.param.selectIds = val.map((item: RowSysConfigType) => item.id).join(',');
+  };
+  onMounted(() => {
+    getTableData();
+  });
+  // 暴露变量
+  defineExpose({
+    getTableData,
+  });
 </script>
 <style scoped lang="css"></style>

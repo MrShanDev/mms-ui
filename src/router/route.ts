@@ -18,16 +18,16 @@ import { RouteRecordRaw } from 'vue-router';
 
 // 扩展 RouteMeta 接口
 declare module 'vue-router' {
-	interface RouteMeta {
-		title?: string;
-		isLink?: string;
-		isHide?: boolean;
-		isKeepAlive?: boolean;
-		isAffix?: boolean;
-		isIframe?: boolean;
-		roles?: string[];
-		icon?: string;
-	}
+  interface RouteMeta {
+    title?: string;
+    isLink?: string;
+    isHide?: boolean;
+    isKeepAlive?: boolean;
+    isAffix?: boolean;
+    isIframe?: boolean;
+    roles?: string[];
+    icon?: string;
+  }
 }
 
 /**
@@ -38,16 +38,16 @@ declare module 'vue-router' {
  * @returns 返回路由菜单数据
  */
 export const dynamicRoutes: Array<RouteRecordRaw> = [
-	{
-		path: '/',
-		name: '/',
-		component: () => import('/@/layout/index.vue'),
-		redirect: '/index',
-		meta: {
-			isKeepAlive: true,
-		},
-		children: [],
-	},
+  {
+    path: '/',
+    name: '/',
+    component: () => import('/@/layout/index.vue'),
+    redirect: '/index',
+    meta: {
+      isKeepAlive: true,
+    },
+    children: [],
+  },
 ];
 
 /**
@@ -55,33 +55,33 @@ export const dynamicRoutes: Array<RouteRecordRaw> = [
  * @link 参考：https://next.router.vuejs.org/zh/guide/essentials/history-mode.html#netlify
  */
 export const notFoundAndNoPower = [
-	{
-		path: '/:path(.*)*',
-		name: 'notFound',
-		component: () => import('/@/views/error/404.vue'),
-		meta: {
-			title: 'message.staticRoutes.notFound',
-			isHide: true,
-		},
-	},
-	{
-		path: '/401',
-		name: 'noPower',
-		component: () => import('/@/views/error/401.vue'),
-		meta: {
-			title: 'message.staticRoutes.noPower',
-			isHide: true,
-		},
-	},
-	{
-		path: '/403',
-		name: 'noRights',
-		component: () => import('/@/views/error/403.vue'),
-		meta: {
-			title: 'message.staticRoutes.noRights',
-			isHide: true,
-		},
-	},
+  {
+    path: '/:path(.*)*',
+    name: 'notFound',
+    component: () => import('/@/views/error/404.vue'),
+    meta: {
+      title: 'message.staticRoutes.notFound',
+      isHide: true,
+    },
+  },
+  {
+    path: '/401',
+    name: 'noPower',
+    component: () => import('/@/views/error/401.vue'),
+    meta: {
+      title: 'message.staticRoutes.noPower',
+      isHide: true,
+    },
+  },
+  {
+    path: '/403',
+    name: 'noRights',
+    component: () => import('/@/views/error/403.vue'),
+    meta: {
+      title: 'message.staticRoutes.noRights',
+      isHide: true,
+    },
+  },
 ];
 
 /**
@@ -91,12 +91,12 @@ export const notFoundAndNoPower = [
  * @returns 返回路由菜单数据
  */
 export const staticRoutes: Array<RouteRecordRaw> = [
-	{
-		path: '/login',
-		name: 'login',
-		component: () => import('/@/views/system/login/index.vue'),
-		meta: {
-			title: '登录',
-		},
-	},
+  {
+    path: '/login',
+    name: 'login',
+    component: () => import('/@/views/system/login/index.vue'),
+    meta: {
+      title: '登录',
+    },
+  },
 ];

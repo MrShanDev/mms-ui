@@ -2,6 +2,6 @@
  * 加密方式
  */
 export enum EncryptTypeEnum {
-    AES = 'AES',
-    RSA = 'RSA'
+  AES = 'AES',
+  RSA = 'RSA',
 }

@@ -11,7 +11,9 @@ body,
   padding: 0;
   width: 100%;
   height: 100%;
-  font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑', Arial, sans-serif;
+  font-family:
+    'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', '微软雅黑',
+    Arial, sans-serif;
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
@@ -56,7 +58,7 @@ a:hover {
     overflow: hidden;
     width: 100%;
     background-color: var(--theme-main-bg-color);
-    .layout-card{
+    .layout-card {
       min-height: calc(100vh - 30px - var(--theme-header-height));
     }
   }
@@ -64,6 +66,4 @@ a:hover {
     height: calc(100vh - 30px - var(--theme-header-height));
     padding: 15px;
   }
-  
 }
-

@@ -1,4 +1,4 @@
-import { withInstall } from '/@/utils/mms'
-import FastSelect from './src/fast-select.vue'
+import { withInstall } from '/@/utils/mms';
+import FastSelect from './src/fast-select.vue';
 
-export default withInstall(FastSelect)
+export default withInstall(FastSelect);

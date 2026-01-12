@@ -71,21 +71,15 @@
             width="280"
           >
             <template #default="scope">
-              <el-button type="primary" link @click="previewHandle(scope.row.id)"
-                >预览</el-button
-              >
-              <el-button type="primary" link @click="generatorHandle(scope.row.id)"
-                >基础信息</el-button
-              >
-              <el-button type="primary" link @click="editHandle(scope.row.id)"
-                >编辑</el-button
-              >
-              <el-button type="primary" link @click="deleteBatchHandle(scope.row.id)"
-                >删除</el-button
-              >
-              <el-button type="primary" link @click="syncHandle(scope.row)"
-                >同步</el-button
-              >
+              <el-button type="primary" link @click="previewHandle(scope.row.id)">预览</el-button>
+              <el-button type="primary" link @click="generatorHandle(scope.row.id)">
+                基础信息
+              </el-button>
+              <el-button type="primary" link @click="editHandle(scope.row.id)">编辑</el-button>
+              <el-button type="primary" link @click="deleteBatchHandle(scope.row.id)">
+                删除
+              </el-button>
+              <el-button type="primary" link @click="syncHandle(scope.row)">同步</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -98,12 +92,16 @@
           layout="total, sizes, prev, pager, next, jumper"
           @size-change="sizeChangeHandle"
           @current-change="currentChangeHandle"
-        >
-        </el-pagination>
+        ></el-pagination>
       </el-card>
     </div>
     <import ref="importRef" @refresh-data-list="getDataList"></import>
-    <preview :key="componentKey" @close="componentKey = generateUUID()" ref="previewRef" @refresh-data-list="getDataList"></preview>
+    <preview
+      :key="componentKey"
+      @close="componentKey = generateUUID()"
+      ref="previewRef"
+      @refresh-data-list="getDataList"
+    ></preview>
     <edit ref="editRef" @refresh-data-list="getDataList"></edit>
     <generator ref="generatorRef" @refresh-data-list="getDataList"></generator>
     <setting ref="settingRef"></setting>
@@ -111,81 +109,81 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from "vue";
-import { IHooksOptions } from "/@/hooks/interface";
-import { useCrud } from "/@/hooks";
-import Import from "./import.vue";
-import Preview from "./preview.vue";
-import Edit from "./edit.vue";
-import Generator from "./generator.vue";
-import Setting from "./setting.vue";
-import { useTableSyncApi,useDownloadApi,usePreviewApi } from "/@/api/gen";
-import { ElMessage, ElMessageBox } from "element-plus";
-import {getEnv,generateUUID} from '/@/utils/mms';
-const componentKey = ref(generateUUID());
-const state: IHooksOptions = reactive({
-  dataListUrl: getEnv()+ "/gen/table/page",
-  deleteUrl: getEnv()+ "/gen/table",
-  queryForm: {
-    tableName: "",
-  },
-});
+  import { reactive, ref } from 'vue';
+  import { IHooksOptions } from '/@/hooks/interface';
+  import { useCrud } from '/@/hooks';
+  import Import from './import.vue';
+  import Preview from './preview.vue';
+  import Edit from './edit.vue';
+  import Generator from './generator.vue';
+  import Setting from './setting.vue';
+  import { useTableSyncApi, useDownloadApi, usePreviewApi } from '/@/api/gen';
+  import { ElMessage, ElMessageBox } from 'element-plus';
+  import { getEnv, generateUUID } from '/@/utils/mms';
+  const componentKey = ref(generateUUID());
+  const state: IHooksOptions = reactive({
+    dataListUrl: getEnv() + '/gen/table/page',
+    deleteUrl: getEnv() + '/gen/table',
+    queryForm: {
+      tableName: '',
+    },
+  });
 
-const importRef = ref();
-const previewRef = ref();
-const editRef = ref();
-const generatorRef = ref();
-const settingRef = ref();
-const importHandle = (id?: number) => {
-  importRef.value.init(id);
-};
+  const importRef = ref();
+  const previewRef = ref();
+  const editRef = ref();
+  const generatorRef = ref();
+  const settingRef = ref();
+  const importHandle = (id?: number) => {
+    importRef.value.init(id);
+  };
 
-const editHandle = (id?: number) => {
-  editRef.value.init(id);
-};
+  const editHandle = (id?: number) => {
+    editRef.value.init(id);
+  };
 
-const generatorHandle = (id?: number) => {
-  generatorRef.value.init(id);
-};
+  const generatorHandle = (id?: number) => {
+    generatorRef.value.init(id);
+  };
 
-const downloadBatchHandle = () => {
-  const tableIds = state.dataListSelections ? state.dataListSelections : [];
+  const downloadBatchHandle = () => {
+    const tableIds = state.dataListSelections ? state.dataListSelections : [];
 
-  if (tableIds.length === 0) {
-    ElMessage.warning("请选择生成代码的表");
-    return;
-  }
+    if (tableIds.length === 0) {
+      ElMessage.warning('请选择生成代码的表');
+      return;
+    }
 
-  useDownloadApi(tableIds);
-};
-const settingBatchHandle = (id?: number) => {
-  settingRef.value.init(id);
-};
-const syncHandle = (row: any) => {
-  ElMessageBox.confirm(`确定同步数据表${row.tableName}吗?`, "提示", {
-    confirmButtonText: "确定",
-    cancelButtonText: "取消",
-    type: "warning",
-  })
-    .then(() => {
-      useTableSyncApi(row.id).then(() => {
-        ElMessage.success("同步成功");
-      });
+    useDownloadApi(tableIds);
+  };
+  const settingBatchHandle = (id?: number) => {
+    settingRef.value.init(id);
+  };
+  const syncHandle = (row: any) => {
+    ElMessageBox.confirm(`确定同步数据表${row.tableName}吗?`, '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      type: 'warning',
     })
-    .catch(() => {});
-};
+      .then(() => {
+        useTableSyncApi(row.id).then(() => {
+          ElMessage.success('同步成功');
+        });
+      })
+      .catch(() => {});
+  };
 
-const previewHandle= (id: any) => {
-  usePreviewApi(id).then((res) => {
-    previewRef.value.init(res.data);
-  })
-}
+  const previewHandle = (id: any) => {
+    usePreviewApi(id).then((res) => {
+      previewRef.value.init(res.data);
+    });
+  };
 
-const {
-  getDataList,
-  selectionChangeHandle,
-  sizeChangeHandle,
-  currentChangeHandle,
-  deleteBatchHandle,
-} = useCrud(state);
+  const {
+    getDataList,
+    selectionChangeHandle,
+    sizeChangeHandle,
+    currentChangeHandle,
+    deleteBatchHandle,
+  } = useCrud(state);
 </script>

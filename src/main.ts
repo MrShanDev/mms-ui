@@ -10,57 +10,56 @@ import router from '/@/router';
 import { directive } from '/@/directive';
 // 国际化
 import { i18n } from '/@/i18n';
-// ELement Plus
+// Element Plus
 import ElementPlus from 'element-plus';
 // 栅格布局（Vue3版本）
-import { GridLayout, GridItem } from 'vue-grid-layout'
+import { GridLayout, GridItem } from 'vue-grid-layout';
 // 图标系统
 import SvgIcon from '/@/components/svg-icon';
-import '/@/icons/iconfont/iconfont'
-import '/@/styles/myStyle.scss'
+import '/@/styles/myStyle.scss';
 // 图表
-import { VueUiRadar } from "vue-data-ui"
+import { VueUiRadar } from 'vue-data-ui';
 // 样式
 import '/@/theme/index.scss';
 import 'virtual:windi.css';
-import "vue-data-ui/style.css"
+import 'vue-data-ui/style.css';
 // VXE Table
 // ... 纯表格
-import VxeTable from 'vxe-table'
-import 'vxe-table/lib/style.css'
+import VxeTable from 'vxe-table';
+import 'vxe-table/lib/style.css';
 // ...
 
 // ...可选 UI
-import VxeUI from 'vxe-pc-ui'
-import 'vxe-pc-ui/lib/style.css'
+import VxeUI from 'vxe-pc-ui';
+import 'vxe-pc-ui/lib/style.css';
 
 // 工具库
 import * as mms from '/@/utils/mms';
-import other from "/@/utils/other";
+import other from '/@/utils/other';
 
 const app = createApp(App);
-app.component('GridLayout', GridLayout)
-app.component('GridItem', GridItem)
-app.component("VueUiRadar", VueUiRadar)
+app.component('GridLayout', GridLayout);
+app.component('GridItem', GridItem);
+app.component('VueUiRadar', VueUiRadar);
 // 自定义指令
 directive(app);
 //自定义标签
 other.elSvg(app);
-
 
 // 全局属性
 app.config.globalProperties.$ut = mms;
 
 // 生产环境忽略警告
 if (import.meta.env.PROD) {
-    app.config.warnHandler = () => null;
+  app.config.warnHandler = () => null;
 }
 
 app
-    .use(pinia)
-    .use(router)
-    .use(i18n)
-    .use(ElementPlus)
-    .use(VxeUI).use(VxeTable)
-    .use(SvgIcon)
-    .mount('#app');
+  .use(pinia)
+  .use(router)
+  .use(i18n)
+  .use(ElementPlus)
+  .use(VxeUI)
+  .use(VxeTable)
+  .use(SvgIcon)
+  .mount('#app');
