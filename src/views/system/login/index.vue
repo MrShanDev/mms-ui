@@ -16,22 +16,14 @@
       </div> -->
       <div class="login-left-img">
         <Animate class="flex flex-center">
-<<<<<<< HEAD
         <img src="https://sxpcwlkj-test.oss-accelerate.aliyuncs.com/mmsMall/upload/69649624f176d6c9a798a18d.png" alt="loginMain" />
         </Animate>
       </div>
       <!-- <img :src="loginBg" class="login-left-waves " alt="bg" /> -->
-=======
-          <img :src="getThemeConfig.loginBg" alt="loginMain" />
-        </Animate>
-      </div>
-      <img :src="loginBg" class="login-left-waves" alt="bg" />
->>>>>>> 846071d972f2dd7d27101b30674155b32d75cdff
     </div>
     <div class="login-right flex">
       <div class="login-right-warp flex-margin">
         <div class="login-right-warp-mian">
-<<<<<<< HEAD
           <div class="login-right-warp-main-title flex">
             <Animate>
               <img :src="getThemeConfig.logo" alt="logo" />
@@ -63,42 +55,6 @@
                   <div class="mt20 other-login-content-item-title">{{ loginMethod.title }}</div>
                 </div>
               </div>
-=======
-          <div class="login-right-warp-main-title">
-            <Animate inCss="at-item">{{ getThemeConfig.globalTitle }} 欢迎您！</Animate>
-          </div>
-          <div class="login-right-warp-main-form" v-if="getThemeConfig.loginType.length > 0">
-            <el-tabs v-model="state.tabsActiveName" @tab-change="changeTab">
-              <el-tab-pane
-                v-if="getThemeConfig.loginType.includes('1')"
-                :label="$t('message.label.one1')"
-                name="account"
-              >
-                <Account
-                  :captchaState="getThemeConfig.captchaState"
-                  :demoMode="getThemeConfig.demoMode"
-                  :demoAccount="getThemeConfig.demoAccount"
-                  :demoPassword="getThemeConfig.demoPassword"
-                />
-              </el-tab-pane>
-              <el-tab-pane
-                v-if="getThemeConfig.loginType.includes('2')"
-                :label="$t('message.label.two2')"
-                name="mobile"
-              >
-                <Mobile />
-              </el-tab-pane>
-              <el-tab-pane
-                v-if="getThemeConfig.loginType.includes('3')"
-                label="扫码登录"
-                name="code"
-              >
-                <Scan v-if="state.isScan" />
-              </el-tab-pane>
-            </el-tabs>
-            <div class="font12 mt30 login-animation4 login-msg">
-              {{ $t('message.mobile.msgText') }}
->>>>>>> 846071d972f2dd7d27101b30674155b32d75cdff
             </div>
           </div>
           <div class="error mx-auto mt-20" v-else>
@@ -129,7 +85,6 @@
 
   // 定义变量内容
 
-<<<<<<< HEAD
 const storesThemeConfig = useThemeConfig();
 const { themeConfig } = storeToRefs(storesThemeConfig);
 const state = reactive({
@@ -209,14 +164,6 @@ const baseStart = () => {
     }
   }).catch((err) => {
     state.msg="后端接口异常: "+err;
-=======
-  const storesThemeConfig = useThemeConfig();
-  const { themeConfig } = storeToRefs(storesThemeConfig);
-  const state = reactive({
-    tabsActiveName: 'account',
-    isScan: false,
-    msg: '~ 后端接口异常！',
->>>>>>> 846071d972f2dd7d27101b30674155b32d75cdff
   });
 
   // 获取布局配置信息
@@ -273,7 +220,6 @@ const baseStart = () => {
 </script>
 
 <style scoped lang="scss">
-<<<<<<< HEAD
 .login-container {
   height: 100%;
   background: url("https://sxpcwlkj-test.oss-accelerate.aliyuncs.com/mmsMall/upload/696495e4f176d6c9a798a18c.png") no-repeat;
@@ -371,90 +317,6 @@ const baseStart = () => {
             transition: all ease 0.3s;
             color: var(--el-color-primary);
             &-delta {
-=======
-  .login-container {
-    height: 100%;
-    background: var(--el-color-white);
-    .login-left {
-      flex: 1;
-      position: relative;
-      background-color: rgba(211, 239, 255, 1);
-      margin-right: 100px;
-      .login-left-logo {
-        display: flex;
-        align-items: center;
-        position: absolute;
-        top: 50px;
-        left: 80px;
-        z-index: 1;
-        animation: logoAnimation 0.3s ease;
-        img {
-          width: 52px;
-          height: 52px;
-        }
-        .login-left-logo-text {
-          display: flex;
-          flex-direction: column;
-          span {
-            margin-left: 10px;
-            font-size: 24px;
-            color: #26a59a;
-            margin-bottom: 5px;
-          }
-          .login-left-logo-text-msg {
-            font-size: 12px;
-            color: #32a99e;
-          }
-        }
-      }
-      .login-left-img {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 100%;
-        height: 52%;
-        img {
-          width: 50%;
-          height: 100%;
-          animation: error-num 0.6s ease;
-          text-align: center;
-        }
-      }
-      .login-left-waves {
-        position: absolute;
-        top: 0;
-        right: -100px;
-      }
-    }
-    .login-right {
-      width: 700px;
-      .login-right-warp {
-        border-radius: 3px;
-        width: 500px;
-        height: 500px;
-        position: relative;
-        overflow: hidden;
-        background-color: var(--el-color-white);
-        .login-right-warp-mian {
-          display: flex;
-          flex-direction: column;
-          height: 100%;
-          .login-right-warp-main-title {
-            height: 130px;
-            line-height: 130px;
-            font-size: 27px;
-            text-align: center;
-            letter-spacing: 3px;
-            animation: logoAnimation 0.3s ease;
-            animation-delay: 0.3s;
-            color: var(--el-text-color-primary);
-          }
-          .login-right-warp-main-form {
-            flex: 1;
-            padding: 0 50px 50px;
-            .login-content-main-sacn {
->>>>>>> 846071d972f2dd7d27101b30674155b32d75cdff
               position: absolute;
               top: 0;
               right: 0;
@@ -493,7 +355,6 @@ const baseStart = () => {
         }
       }
     }
-<<<<<<< HEAD
     .other-login{
       .other-login-title{
         text-align: center;
@@ -555,17 +416,4 @@ const baseStart = () => {
     height: auto;
   }
 }
-=======
-    .login-msg {
-      color: var(--el-text-color-placeholder);
-    }
-    .error {
-      font-size: 20px;
-    }
-    .fa {
-      font-size: 30px;
-      margin-right: 10px0;
-    }
-  }
->>>>>>> 846071d972f2dd7d27101b30674155b32d75cdff
 </style>

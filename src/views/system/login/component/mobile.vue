@@ -17,7 +17,6 @@
     <el-form-item class="login-animation2">
       <div class="login-content-title">验证码</div>
       <el-col :span="15">
-<<<<<<< HEAD
           <el-input
             text
             maxlength="6"
@@ -39,42 +38,6 @@
     <el-form-item class="login-animation3">
       <el-button type="primary" @click="loginByPhoneHttp" v-waves class="login-content-submit">
         <span>{{ $t("message.mobile.btnText") }}</span>
-=======
-        <el-input
-          text
-          maxlength="6"
-          :placeholder="$t('message.mobile.placeholder2')"
-          v-model="state.ruleForm.code"
-          clearable
-          autocomplete="off"
-        >
-          <template #prefix>
-            <el-icon class="el-input__icon"><ele-Position /></el-icon>
-          </template>
-        </el-input>
-      </el-col>
-      <el-col :span="1"></el-col>
-      <el-col :span="8">
-        <el-button
-          :disabled="exitTime !== 60"
-          @click="getSmsCode"
-          v-waves
-          class="login-content-code"
-        >
-          {{ exitTime != 60 ? exitTime + 'S' : $t('message.mobile.codeText') }}
-        </el-button>
-      </el-col>
-    </el-form-item>
-    <el-form-item class="login-animation3">
-      <el-button
-        round
-        type="primary"
-        @click="loginByPhoneHttp"
-        v-waves
-        class="login-content-submit"
-      >
-        <span>{{ $t('message.mobile.btnText') }}</span>
->>>>>>> 846071d972f2dd7d27101b30674155b32d75cdff
       </el-button>
     </el-form-item>
   </el-form>
@@ -203,7 +166,6 @@
 </script>
 
 <style scoped lang="scss">
-<<<<<<< HEAD
 .login-content-form {
   margin-top: 20px;
   .login-content-title{
@@ -231,28 +193,4 @@
     font-size: 16px;
   }
 }
-=======
-  .login-content-form {
-    margin-top: 20px;
-    @for $i from 1 through 4 {
-      .login-animation#{$i} {
-        opacity: 0;
-        animation-name: error-num;
-        animation-duration: 0.5s;
-        animation-fill-mode: forwards;
-        animation-delay: calc($i/10) + s;
-      }
-    }
-    .login-content-code {
-      width: 100%;
-      padding: 0;
-    }
-    .login-content-submit {
-      width: 100%;
-      letter-spacing: 2px;
-      font-weight: 300;
-      margin-top: 15px;
-    }
-  }
->>>>>>> 846071d972f2dd7d27101b30674155b32d75cdff
 </style>

@@ -61,22 +61,12 @@
     </el-form-item>
     <el-form-item class="login-animation4">
       <el-button
-<<<<<<< HEAD
           v-waves
           type="primary"
           class="login-content-submit"
           @click="onSignIn"
           @keydown.enter="keyDown"
           :loading="state.loading.signIn"
-=======
-        v-waves
-        type="primary"
-        class="login-content-submit"
-        round
-        @click="onSignIn"
-        @keydown.enter="keyDown"
-        :loading="state.loading.signIn"
->>>>>>> 846071d972f2dd7d27101b30674155b32d75cdff
       >
         <span>{{ $t('message.account.accountBtnText') }}</span>
       </el-button>
@@ -270,7 +260,6 @@
 </script>
 
 <style scoped lang="scss">
-<<<<<<< HEAD
 .login-content-form {
   margin-top: 20px;
   .login-content-title{
@@ -311,43 +300,4 @@
     font-size: 16px;
   }
 }
-=======
-  .login-content-form {
-    margin-top: 20px;
-
-    @for $i from 1 through 4 {
-      .login-animation#{$i} {
-        opacity: 0;
-        animation-name: error-num;
-        animation-duration: 0.5s;
-        animation-fill-mode: forwards;
-        animation-delay: calc($i/10) + s;
-      }
-    }
-
-    .login-content-password {
-      display: inline-block;
-      width: 20px;
-      cursor: pointer;
-
-      &:hover {
-        color: #909399;
-      }
-    }
-
-    .login-content-code {
-      width: 100%;
-      padding: 0;
-      font-weight: bold;
-      letter-spacing: 5px;
-    }
-
-    .login-content-submit {
-      width: 100%;
-      letter-spacing: 2px;
-      font-weight: 300;
-      margin-top: 15px;
-    }
-  }
->>>>>>> 846071d972f2dd7d27101b30674155b32d75cdff
 </style>
