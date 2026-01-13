@@ -1,5 +1,15 @@
 <template>
   <div class="layout-navbars-breadcrumb-user pr15" :style="{ flex: layoutUserFlexNum }">
+    <!-- 搜索框 -->
+    <div class="search-section">
+      <el-input
+        placeholder="搜索"
+        :prefix-icon="eleSearchIcon"
+        clearable
+        class="search-input"
+        @click="onSearchClick"
+      />
+    </div>
     <el-dropdown
       :show-timeout="70"
       :hide-timeout="50"
@@ -112,6 +122,7 @@
 
 <script setup lang="ts" name="layoutBreadcrumbUser">
   import { defineAsyncComponent, ref, unref, computed, reactive, onMounted } from 'vue';
+  import { Search as eleSearchIcon } from '@element-plus/icons-vue';
   import { useRouter } from 'vue-router';
   import { ElMessageBox, ElMessage, ClickOutside as vClickOutside } from 'element-plus';
   import screenfull from 'screenfull';
@@ -259,6 +270,38 @@
 </script>
 
 <style scoped lang="scss">
+  .search-section {
+    margin-right: 15px;
+
+    .search-input {
+      width: 200px;
+
+      :deep(.el-input__wrapper) {
+        background-color: #ECF3FD;
+        border-radius: 8px;
+        box-shadow: none;
+        border: none;
+
+        .el-input__inner {
+          color: #4487EC;
+          font-size: 14px;
+          background-color: #ECF3FD;
+
+          &::placeholder {
+            color: #4487EC;
+          }
+        }
+
+        .el-input__prefix {
+          color: #409eff;
+        }
+      }
+
+      &:hover :deep(.el-input__wrapper) {
+        background-color: #ECF3FD;
+      }
+    }
+  }
   .layout-navbars-breadcrumb-user {
     display: flex;
     align-items: center;

@@ -3,6 +3,7 @@
     <!-- 功能栏  -->
     <div class="views-tool">
       <div class="tool-left">
+        <div class="tool-left-title">筛选查询</div>
         <el-form
           :inline="true"
           size="default"

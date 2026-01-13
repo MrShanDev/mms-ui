@@ -2,6 +2,7 @@
 
 .el-menu {
   border-right: none !important;
+
   &:not(.el-menu--collapse) {
     width: var(--theme-aside-width);
   }
@@ -41,7 +42,7 @@
   text-align: center;
 }
 
-.el-sub-menu.is-active > :first-child {
+.el-sub-menu.is-active> :first-child {
   overflow: hidden;
   color: var(--theme-menu-hover-color) !important;
 }
@@ -53,6 +54,7 @@
   overflow: hidden;
   color: var(--theme-menu-hover-color) !important;
   background-color: var(--theme-menu-hover-bg-color) !important;
+
   &:hover {
     background-color: var(--theme-menu-hover-bg-color) !important;
   }
@@ -91,6 +93,7 @@
   border-bottom: 1px solid var(--el-border-color);
   color: var(--el-text-color-primary);
 }
+
 .el-card.is-always-shadow {
   box-shadow: none !important;
 }

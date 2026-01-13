@@ -1,7 +1,7 @@
 <template>
   <div class="layout-logo" v-if="setShowLogo" @click="onThemeConfigChange">
     <img :src="logoMini" class="layout-logo-medium-img" />
-    <span>{{ themeConfig.globalTitle }}</span>
+    <div>{{ themeConfig.globalTitle }}</div>
   </div>
   <div class="layout-logo-size" v-else @click="onThemeConfigChange">
     <img :src="logoMini" class="layout-logo-size-img" />
@@ -32,16 +32,20 @@
 
 <style scoped lang="scss">
   .layout-logo {
-    width: 220px;
-    height: 50px;
+    width: 200px;
+    height: 130px;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     box-shadow: rgb(0 21 41 / 2%) 0px 1px 4px;
-    color: var(--el-color-primary);
+    background: #4487EC;
+    color: var(--el-color-white);
     font-size: 16px;
     cursor: pointer;
     animation: logoAnimation 0.3s ease-in-out;
+    border-bottom-right-radius: 10px;
+    
     span {
       white-space: nowrap;
       display: inline-block;
@@ -52,8 +56,8 @@
       }
     }
     &-medium-img {
-      width: 20px;
-      margin-right: 5px;
+      width: 50px;
+      margin-bottom: 10px;
     }
   }
   .layout-logo-size {

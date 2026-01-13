@@ -33,6 +33,11 @@
       </transition-group>
     </el-breadcrumb>
   </div>
+  <!-- 欢迎信息 -->
+  <div v-if="!isShowBreadcrumb" class="welcome-section">
+      <span class="welcome-icon">👏</span>
+      <span class="welcome-text">欢迎回来，{{ userInfos.userName }}</span>
+  </div>
 </template>
 
 <script setup lang="ts" name="layoutBreadcrumb">
@@ -43,12 +48,19 @@
   import { storeToRefs } from 'pinia';
   import { useThemeConfig } from '/@/stores/themeConfig';
   import { useRoutesList } from '/@/stores/routesList';
+  import { useUserInfo } from '/@/stores/userInfo';
+
+
+  const storesUserInfo = useUserInfo();
+  const { userInfos } = storeToRefs(storesUserInfo);
 
   // 定义变量内容
   const stores = useRoutesList();
   const storesThemeConfig = useThemeConfig();
   const { themeConfig } = storeToRefs(storesThemeConfig);
   const { routesList } = storeToRefs(stores);
+  
+
   const route = useRoute();
   const router = useRouter();
   const state = reactive<BreadcrumbState>({
@@ -125,6 +137,7 @@
     height: inherit;
     display: flex;
     align-items: center;
+    
     .layout-navbars-breadcrumb-icon {
       cursor: pointer;
       font-size: 18px;
@@ -155,6 +168,22 @@
       &:hover {
         color: var(--el-color-primary) !important;
       }
+    }
+  }
+  .welcome-section {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 10px;
+
+    .welcome-icon {
+      font-size: 20px;
+    }
+
+    .welcome-text {
+      font-size: 18px;
+      color: #1D2129;
+      font-weight: 400;
     }
   }
 </style>

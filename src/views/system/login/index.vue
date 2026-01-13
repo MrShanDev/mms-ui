@@ -186,6 +186,7 @@ const getThemeConfig = reactive({
   background-size: 100% 100%;
   box-shadow: 20px 20px 39px #DEE1FF;
   justify-content: flex-end;
+  position: relative;
   .login-left {
     flex: 1;
     position: relative;
@@ -238,18 +239,27 @@ const getThemeConfig = reactive({
   }
   .login-right {
     width: 900px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px 0;
     .login-right-warp {
       border-radius: 16px;
       width: 550px;
       height: auto;
+      max-height: calc(100vh - 40px);
       position: relative;
       overflow: hidden;
+      display: flex;
+      flex-direction: column;
       // background-color: var(--el-color-white);
       background-color: rgba(255, 255, 255, 0.5);
       .login-right-warp-mian {
         display: flex;
         flex-direction: column;
         height: 100%;
+        max-height: calc(100vh - 40px);
+        overflow-y: auto;
         .login-right-warp-main-title {
           align-items: center;
           padding: 50px 80px 20px;
@@ -374,6 +384,243 @@ const getThemeConfig = reactive({
   .login-form-component {
     min-height: 300px;
     height: auto;
+  }
+
+  // 响应式适配 - 大屏幕 (1920px+)
+  @media screen and (min-width: 1920px) {
+    .login-right {
+      width: 1000px;
+      .login-right-warp {
+        width: 650px;
+        .login-right-warp-mian {
+          .login-right-warp-main-title {
+            font-size: 32px;
+            padding: 60px 100px 30px;
+            img {
+              width: 70px;
+              height: 70px;
+            }
+          }
+          .login-right-warp-main-form {
+            padding: 0 100px 60px;
+          }
+        }
+      }
+    }
+  }
+
+  // 响应式适配 - 中等屏幕 (1366px - 1600px)
+  @media screen and (max-width: 1600px) {
+    .login-right {
+      width: 700px;
+      .login-right-warp {
+        width: 480px;
+        .login-right-warp-mian {
+          .login-right-warp-main-title {
+            font-size: 24px;
+            padding: 40px 60px 20px;
+            img {
+              width: 50px;
+              height: 50px;
+            }
+          }
+          .login-right-warp-main-form {
+            padding: 0 60px 40px;
+          }
+        }
+      }
+    }
+    .login-left {
+      .login-left-img {
+        left: 35%;
+        img {
+          width: 55%;
+        }
+      }
+    }
+  }
+
+  // 响应式适配 - 小屏幕 (1024px - 1366px)
+  @media screen and (max-width: 1366px) {
+    .login-right {
+      width: 600px;
+      .login-right-warp {
+        width: 420px;
+        .login-right-warp-mian {
+          .login-right-warp-main-title {
+            font-size: 22px;
+            padding: 35px 50px 15px;
+            img {
+              width: 45px;
+              height: 45px;
+            }
+          }
+          .login-right-warp-main-form {
+            padding: 0 50px 35px;
+          }
+        }
+      }
+    }
+    .other-login {
+      .other-login-title {
+        margin: 30px 0 20px;
+      }
+      .other-login-content {
+        .other-login-content-item {
+          .other-login-content-item-icon {
+            padding: 8px 40px;
+          }
+        }
+      }
+    }
+  }
+
+  // 响应式适配 - 平板横屏 (768px - 1024px)
+  @media screen and (max-width: 1200px) {
+    justify-content: center;
+    .login-left {
+      display: none;
+    }
+    .login-right {
+      width: 100%;
+      max-width: 500px;
+      padding: 15px;
+      .login-right-warp {
+        width: 90%;
+        max-width: 450px;
+        max-height: calc(100vh - 30px);
+        .login-right-warp-mian {
+          max-height: calc(100vh - 30px);
+          .login-right-warp-main-title {
+            font-size: 20px;
+            padding: 30px 40px 15px;
+            img {
+              width: 40px;
+              height: 40px;
+            }
+          }
+          .login-right-warp-main-form {
+            padding: 0 40px 30px;
+          }
+        }
+      }
+    }
+    .other-login {
+      .other-login-title {
+        margin: 25px 0 15px;
+        font-size: 14px;
+      }
+      .other-login-content {
+        .other-login-content-item {
+          .other-login-content-item-icon {
+            padding: 6px 30px;
+          }
+          .other-login-content-item-title {
+            font-size: 12px;
+          }
+        }
+      }
+    }
+    .fa {
+      font-size: 24px;
+    }
+  }
+
+  // 响应式适配 - 平板竖屏 (480px - 768px)
+  @media screen and (max-width: 768px) {
+    .login-right {
+      max-width: 420px;
+      padding: 10px;
+      .login-right-warp {
+        width: 95%;
+        max-height: calc(100vh - 20px);
+        .login-right-warp-mian {
+          max-height: calc(100vh - 20px);
+          .login-right-warp-main-title {
+            font-size: 18px;
+            padding: 25px 30px 12px;
+            img {
+              width: 36px;
+              height: 36px;
+            }
+          }
+          .login-right-warp-main-form {
+            padding: 0 30px 25px;
+          }
+        }
+      }
+    }
+    .other-login {
+      .other-login-title {
+        margin: 20px 0 12px;
+      }
+      .other-login-content {
+        flex-wrap: wrap;
+        .other-login-content-item {
+          width: 100% !important;
+          margin-bottom: 15px;
+          .other-login-content-item-icon {
+            padding: 5px 25px;
+          }
+        }
+      }
+    }
+    .fa {
+      font-size: 20px;
+    }
+  }
+
+  // 响应式适配 - 手机屏幕 (max-width: 480px)
+  @media screen and (max-width: 480px) {
+    .login-right {
+      padding: 10px;
+      .login-right-warp {
+        width: 100%;
+        border-radius: 12px;
+        max-height: calc(100vh - 20px);
+        .login-right-warp-mian {
+          max-height: calc(100vh - 20px);
+          .login-right-warp-main-title {
+            font-size: 16px;
+            padding: 20px 20px 10px;
+            img {
+              width: 32px;
+              height: 32px;
+            }
+          }
+          .login-right-warp-main-form {
+            padding: 0 20px 20px;
+            overflow-y: auto;
+          }
+        }
+      }
+    }
+    .other-login {
+      .other-login-title {
+        margin: 15px 0 10px;
+        font-size: 12px;
+      }
+      .other-login-content {
+        .other-login-content-item {
+          margin-bottom: 10px;
+          .other-login-content-item-icon {
+            padding: 4px 20px;
+            border-radius: 15px;
+          }
+          .other-login-content-item-title {
+            font-size: 11px;
+            margin-top: 8px;
+          }
+        }
+      }
+    }
+    .fa {
+      font-size: 18px;
+      margin-right: 5px;
+    }
+    .error {
+      font-size: 16px;
+    }
   }
 }
 </style>
