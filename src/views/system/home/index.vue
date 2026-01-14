@@ -133,7 +133,7 @@
               v-for="(item, index) in state.quickMenuData"
               :key="index"
               @click="router.push(item.path)"
-              class="quick-menu-item flex-col row-center col-center cursor-pointer"
+              class="quick-menu-item cursor-pointer"
             >
               <div class="quick-menu-icon">
                 <el-icon style="font-size: 3rem"><component :is="item.icon" /></el-icon>
@@ -187,14 +187,13 @@
             <el-table :data="state.afterSalesData" style="width: 100%">
               <el-table-column prop="orderNo" label="订单id" width="120" />
               <el-table-column prop="phone" label="购买方式" />
-              <el-table-column prop="area" label="购买方式" />
+              <el-table-column prop="area" label="购买游戏" />
               <el-table-column prop="price" label="购买价格" />
-              <el-table-column prop="freight" label="快递信息" />
+              <el-table-column prop="freight" label="保险价格" />
               <el-table-column prop="paymentTime" label="购买时间" />
-              <el-table-column prop="isRefund" label="是否退款" />
-              <el-table-column label="操作">
+              <el-table-column label="是否理赔">
                 <template #default>
-                  <el-button type="primary" link>详情查看</el-button>
+                  <el-button type="primary" link>待理赔</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -300,8 +299,7 @@
         area: '王者荣耀地区',
         price: '￥699.00',
         freight: '￥35.00',
-        paymentTime: '2026-01-08',
-        isRefund: '详情查看',
+        paymentTime: '2026-01-08'
       },
       {
         orderNo: '王大豪',
@@ -309,8 +307,7 @@
         area: '王者荣耀地区',
         price: '￥699.00',
         freight: '￥35.00',
-        paymentTime: '2026-01-08',
-        isRefund: '详情查看',
+        paymentTime: '2026-01-08'
       },
       {
         orderNo: '王大豪',
@@ -318,8 +315,7 @@
         area: '王者荣耀地区',
         price: '￥699.00',
         freight: '￥35.00',
-        paymentTime: '2026-01-08',
-        isRefund: '详情查看',
+        paymentTime: '2026-01-08'
       },
       {
         orderNo: '王大豪',
@@ -327,8 +323,7 @@
         area: '王者荣耀地区',
         price: '￥699.00',
         freight: '￥35.00',
-        paymentTime: '2026-01-08',
-        isRefund: '详情查看',
+        paymentTime: '2026-01-08'
       },
     ] as AfterSalesData[],
   });
@@ -698,6 +693,10 @@
         }
 
         .quick-menu-item {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
           width: 20%;
           padding: 20px 10px;
           transition: all 0.3s;

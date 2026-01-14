@@ -1006,7 +1006,7 @@
 
             &:hover,
             &.active {
-              background: #f0f7ff;
+              background: #f0f7ff !important;
               
               .menu-arrow {
                 color: var(--el-color-primary);

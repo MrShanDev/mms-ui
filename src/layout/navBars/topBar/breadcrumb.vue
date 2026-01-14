@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isShowBreadcrumb" class="layout-navbars-breadcrumb">
+  <div v-if="isShowBreadcrumb" class="layout-navbars-breadcrumb ml20">
     <SvgIcon
       class="layout-navbars-breadcrumb-icon m-4"
       :name="themeConfig.isCollapse ? 'ele-Expand' : 'ele-Fold'"
@@ -32,7 +32,7 @@
     </el-breadcrumb>
   </div>
   <!-- 欢迎信息 -->
-  <div v-if="!isShowBreadcrumb" class="welcome-section">
+  <div v-if="!isShowBreadcrumb" class="welcome-section ml20">
       <span class="welcome-icon">👏</span>
       <span class="welcome-text">欢迎回来，{{ userInfos.userName }}</span>
   </div>
@@ -179,7 +179,6 @@
     display: flex;
     align-items: center;
     gap: 8px;
-    margin-left: 10px;
 
     .welcome-icon {
       font-size: 20px;

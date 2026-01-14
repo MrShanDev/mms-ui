@@ -1,28 +1,27 @@
 <template>
   <div class="layout-search-dialog">
-    <el-dialog v-model="state.isShowSearch" destroy-on-close :show-close="false">
-      <template #footer>
-        <el-autocomplete
-          v-model="state.menuQuery"
-          :fetch-suggestions="menuSearch"
-          :placeholder="$t('message.user.searchPlaceholder')"
-          ref="layoutMenuAutocompleteRef"
-          @select="onHandleSelect"
-          :fit-input-width="true"
-        >
-          <template #prefix>
-            <el-icon class="el-input__icon">
-              <ele-Search />
-            </el-icon>
-          </template>
-          <template #default="{ item }">
-            <div>
-              <SvgIcon :name="item.meta.icon" class="mr5" />
-              {{ $t(item.meta.title) }}
-            </div>
-          </template>
-        </el-autocomplete>
-      </template>
+    <el-dialog v-model="state.isShowSearch" destroy-on-close :show-close="false" width="600px" center style="top: 15vh; height: 400px;">
+      <el-autocomplete
+        v-model="state.menuQuery"
+        :fetch-suggestions="menuSearch"
+        :placeholder="searchPlaceholder"
+        ref="layoutMenuAutocompleteRef"
+        @select="onHandleSelect"
+        :fit-input-width="true"
+        style="width: 100%;"
+      >
+        <template #prefix>
+          <el-icon class="el-input__icon">
+            <ele-Search />
+          </el-icon>
+        </template>
+        <template #default="{ item }">
+          <div class="layout-search-item">
+            <i :class="item.meta.icon" class="mr5" />
+            {{ translateTitle(item.meta.title) }}
+          </div>
+        </template>
+      </el-autocomplete>
     </el-dialog>
   </div>
 </template>
@@ -33,6 +32,7 @@
   import { useI18n } from 'vue-i18n';
   import { storeToRefs } from 'pinia';
   import { useTagsViewRoutes } from '/@/stores/tagsViewRoutes';
+  import { RouteItem } from '/@/types/global';
 
   // 定义变量内容
   const storesTagsViewRoutes = useTagsViewRoutes();
@@ -94,6 +94,12 @@
     closeSearch();
   };
 
+  // 翻译函数
+  const searchPlaceholder = t('message.user.searchPlaceholder');
+  const translateTitle = (title: string) => {
+    return t(title);
+  };
+
   // 暴露变量
   defineExpose({
     openSearch,
@@ -104,24 +110,24 @@
   .layout-search-dialog {
     position: relative;
     :deep(.el-dialog) {
-      .el-dialog__header,
-      .el-dialog__body {
+      .el-dialog__header {
         display: none;
       }
-      .el-dialog__footer {
-        width: 100%;
-        position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
-        top: -53vh;
+      .el-dialog__body {
+        padding: 20px;
       }
     }
-    :deep(.el-autocomplete) {
-      width: 560px;
-      position: absolute;
-      top: 150px;
-      left: 50%;
-      transform: translateX(-50%);
+    :deep(.el-overlay){
+      background: rgb(255, 255, 255, 0.8) !important;
+
     }
+    :deep(.el-autocomplete) {
+      .layout-search-item {
+        display: flex;
+        align-items: center;
+      }
+    }
+    
   }
+
 </style>

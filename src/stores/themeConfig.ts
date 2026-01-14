@@ -8,7 +8,9 @@ import { defineStore } from 'pinia';
  */
 export const useThemeConfig = defineStore('themeConfig', {
   state: (): ThemeConfigState => ({
+
     themeConfig: {
+
       // 是否开启布局配置抽屉
       isDrawer: false,
 
@@ -16,7 +18,7 @@ export const useThemeConfig = defineStore('themeConfig', {
        * 全局主题
        */
       // 默认 primary 主题颜色
-      primary: '#00adb5',
+      primary: '#4487EC',
       // 是否开启深色模式
       isIsDark: false,
 
@@ -24,7 +26,7 @@ export const useThemeConfig = defineStore('themeConfig', {
        * 顶栏设置
        */
       // 默认顶栏导航背景颜色
-      topBar: '#f9f7f7',
+      topBar: '#ffffff',
       // 默认顶栏导航字体颜色
       topBarColor: '#606266',
       // 是否开启顶栏背景颜色渐变
@@ -80,9 +82,9 @@ export const useThemeConfig = defineStore('themeConfig', {
       // 初始化变量，用于 el-scrollbar 的高度更新，请勿删除
       isShowLogoChange: false,
       // 是否开启 Breadcrumb，强制经典、横向布局不显示
-      isBreadcrumb: true,
+      isBreadcrumb: false,
       // 是否开启 Tagsview
-      isTagsview: true,
+      isTagsview: false,
       // 是否开启 Breadcrumb 图标
       isBreadcrumbIcon: false,
       // 是否开启 Tagsview 图标
@@ -109,7 +111,7 @@ export const useThemeConfig = defineStore('themeConfig', {
        */
       // Tagsview 风格：可选值"<tags-style-one|tags-style-four|tags-style-five>"，默认 tags-style-five
       // 定义的值与 `/src/layout/navBars/tagsView/tagsView.vue` 中的 class 同名
-      tagsStyle: 'tags-style-one',
+      tagsStyle: 'tags-style-four',
       // 主页面切换动画：可选值"<slide-right|slide-left|opacitys>"，默认 slide-right
       animation: 'slide-right',
       // 分栏高亮风格：可选值"<columns-round|columns-card>"，默认 columns-round
@@ -152,3 +154,5 @@ export const useThemeConfig = defineStore('themeConfig', {
     },
   },
 });
+
+
