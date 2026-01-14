@@ -1,5 +1,6 @@
 <template>
   <div class="personal layout-pd">
+<<<<<<< HEAD
     <el-row>
       <!-- 个人信息 -->
       <el-col :xs="24" :sm="16">
@@ -21,145 +22,259 @@
                     userInfos.photo || 'https://sxpcwlkj.oss-cn-beijing.aliyuncs.com/defimg.png'
                   "
                   alt=""
+=======
+    <!-- 消息通知区域 -->
+    <div class="notice-section">
+      <div class="notice-header">
+        <span class="notice-title">消息通知</span>
+      </div>
+      <div class="notice-list">
+        <div
+          v-for="(v, k) in stateNews.newsList"
+          :key="k"
+          class="notice-item"
+          @click="openNews(v)"
+        >
+          <span class="notice-item-title">{{ k + 1 }}、{{ v.title }}</span>
+          <span class="notice-item-date">{{ v.createTime || '2026-01-09' }}</span>
+        </div>
+        <div v-if="stateNews.newsList.length === 0" class="notice-empty">
+          暂无消息通知
+        </div>
+      </div>
+    </div>
+
+    <!-- 主内容区域 -->
+    <el-row :gutter="20" class="main-content">
+      <!-- 左侧用户卡片 -->
+      <el-col :xs="24" :sm="24" :md="10" :lg="8" :xl="8">
+        <div class="user-card">
+          <!-- 头像区域 -->
+          <div class="user-avatar-section">
+            <el-dropdown trigger="click" @command="handleAvatarCommand">
+              <div class="avatar-wrapper">
+                <el-upload
+                  class="avatar-upload"
+                  :id="uuid"
+                  action="#"
+                  :http-request="handleHttpUpload"
+                  :auto-upload="true"
+                  :show-file-list="false"
+                  :limit="1"
+                >
+                  <img
+                    class="user-avatar"
+                    :src="userInfos.photo || 'https://sxpcwlkj.oss-cn-beijing.aliyuncs.com/defimg.png'"
+                    alt="avatar"
+                  />
+                  <div class="avatar-camera">
+                    <el-icon><ele-Camera /></el-icon>
+                  </div>
+                </el-upload>
+              </div>
+            </el-dropdown>
+          </div>
+          <!-- 用户信息 -->
+          <div class="user-info">
+            <div class="user-name">{{ userInfos.nickName || userInfos.userName }}</div>
+            <div class="user-detail">
+              <span class="detail-label">身份：</span>
+              <span class="detail-value">{{ userInfos.roleName }}</span>
+            </div>
+            <div class="user-detail">
+              <span class="detail-label">登录ip：</span>
+              <span class="detail-value">{{ userInfos.loginIp }}</span>
+            </div>
+            <div class="user-detail">
+              <span class="detail-label">登录时间：</span>
+              <span class="detail-value">{{ userInfos.loginDate }}</span>
+            </div>
+          </div>
+          <!-- 功能菜单 -->
+          <div class="menu-list">
+            <div
+              class="menu-item"
+              :class="{ active: activeMenu === 'password' }"
+              @click="handleMenuClick('password')"
+            >
+              <div class="menu-item-left">
+                <div class="menu-icon">
+                  <el-icon><ele-User /></el-icon>
+                </div>
+                <span class="menu-text">账号密码</span>
+              </div>
+              <el-icon class="menu-arrow"><ele-ArrowRight /></el-icon>
+            </div>
+            <div
+              class="menu-item"
+              :class="{ active: activeMenu === 'phone' }"
+              @click="handleMenuClick('phone')"
+            >
+              <div class="menu-item-left">
+                <div class="menu-icon">
+                  <el-icon><ele-Iphone /></el-icon>
+                </div>
+                <span class="menu-text">密保手机</span>
+              </div>
+              <el-icon class="menu-arrow"><ele-ArrowRight /></el-icon>
+            </div>
+            <div
+              class="menu-item"
+              :class="{ active: activeMenu === 'email' }"
+              @click="handleMenuClick('email')"
+            >
+              <div class="menu-item-left">
+                <div class="menu-icon">
+                  <el-icon><ele-Message /></el-icon>
+                </div>
+                <span class="menu-text">绑定邮箱</span>
+              </div>
+              <el-icon class="menu-arrow"><ele-ArrowRight /></el-icon>
+            </div>
+            <div
+              class="menu-item"
+              :class="{ active: activeMenu === 'wechat' }"
+              @click="handleMenuClick('wechat')"
+            >
+              <div class="menu-item-left">
+                <div class="menu-icon">
+                  <el-icon><ele-ChatDotRound /></el-icon>
+                </div>
+                <span class="menu-text">绑定微信</span>
+              </div>
+              <el-icon class="menu-arrow"><ele-ArrowRight /></el-icon>
+            </div>
+          </div>
+        </div>
+      </el-col>
+
+      <!-- 右侧设置区域 -->
+      <el-col :xs="24" :sm="24" :md="14" :lg="16" :xl="16">
+        <div class="setting-card">
+          <!-- 账号密码设置 -->
+          <div v-show="activeMenu === 'password'" class="setting-content">
+            <div class="setting-title">账号密码</div>
+            <div class="setting-form">
+              <div class="form-item">
+                <label class="form-label">当前id：</label>
+                <el-input v-model="userInfos.loginIp" disabled placeholder="当前IP" />
+              </div>
+              <div class="form-item">
+                <label class="form-label">当前密码：</label>
+                <el-input
+                  v-model="displayPassword"
+                  :type="showPassword ? 'text' : 'password'"
+                  disabled
+                  placeholder="************"
+                >
+                  <template #suffix>
+                    <el-icon class="password-eye" @click="showPassword = !showPassword">
+                      <ele-View v-if="showPassword" />
+                      <ele-Hide v-else />
+                    </el-icon>
+                  </template>
+                </el-input>
+              </div>
+              <div class="form-item">
+                <label class="form-label">密码强度：</label>
+                <span class="password-strength" :class="passwordStrengthClass">
+                  {{ userInfos.passwordStrength || '中级' }}
+                </span>
+              </div>
+              <div class="form-item form-btn">
+                <el-button type="primary" class="reset-btn" @click="openDialog">重置密码</el-button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 密保手机设置 -->
+          <div v-show="activeMenu === 'phone'" class="setting-content">
+            <div class="setting-title">密保手机</div>
+            <div class="setting-form">
+              <div class="form-item">
+                <label class="form-label">当前手机：</label>
+                <el-input
+                  :value="userInfos.phoneNumber || '未绑定'"
+                  disabled
+                  placeholder="未绑定手机"
+>>>>>>> eadc6d673a4b0e53f3c3decb20c14aae2f3768c5
                 />
-              </el-upload>
-            </div>
-            <div class="personal-user-right">
-              <el-row>
-                <el-col :span="24" class="personal-title mb18">
-                  {{ currentTime }}，{{ userInfos.userName }}，生活变的再糟糕，也不妨碍我变得更好！
-                </el-col>
-                <el-col :span="24">
-                  <el-row>
-                    <el-col :xs="24" :sm="8" class="personal-item mb6">
-                      <div class="personal-item-label">昵称：</div>
-                      <div class="personal-item-value">{{ userInfos.nickName }}</div>
-                    </el-col>
-                    <el-col :xs="24" :sm="16" class="personal-item mb6">
-                      <div class="personal-item-label">身份：</div>
-                      <div class="personal-item-value">{{ userInfos.roleName }}</div>
-                    </el-col>
-                  </el-row>
-                </el-col>
-                <el-col :span="24">
-                  <el-row>
-                    <el-col :xs="24" :sm="8" class="personal-item mb6">
-                      <div class="personal-item-label">登录IP：</div>
-                      <div class="personal-item-value">{{ userInfos.loginIp }}</div>
-                    </el-col>
-                    <el-col :xs="24" :sm="16" class="personal-item mb6">
-                      <div class="personal-item-label">登录时间：</div>
-                      <div class="personal-item-value">{{ userInfos.loginDate }}</div>
-                    </el-col>
-                  </el-row>
-                </el-col>
-              </el-row>
+              </div>
+              <div class="form-item form-btn">
+                <el-button type="primary" class="reset-btn" @click="state.dialog = true">
+                  {{ userInfos.phoneNumber && userInfos.phoneNumber.length > 0 ? '修改手机' : '绑定手机' }}
+                </el-button>
+                <el-popconfirm
+                  v-if="userInfos.phoneNumber && userInfos.phoneNumber.length > 0"
+                  title="是否继续要解除绑定手机号?"
+                  @confirm="confirmEvent(1)"
+                >
+                  <template #reference>
+                    <el-button type="danger">解除绑定</el-button>
+                  </template>
+                </el-popconfirm>
+              </div>
             </div>
           </div>
-        </el-card>
-      </el-col>
 
-      <!-- 消息通知 -->
-      <el-col :xs="24" :sm="8" class="pl15 personal-info">
-        <el-card shadow="hover">
-          <template #header>
-            <span>消息通知</span>
-            <span class="personal-info-more">更多</span>
-          </template>
-          <div class="personal-info-box">
-            <ul class="personal-info-ul">
-              <li v-for="(v, k) in stateNews.newsList" :key="k" class="personal-info-li">
-                <p @click="openNews(v)" target="_block" class="personal-info-li-title">
-                  {{ v.title }}
-                </p>
-              </li>
-            </ul>
+          <!-- 绑定邮箱设置 -->
+          <div v-show="activeMenu === 'email'" class="setting-content">
+            <div class="setting-title">绑定邮箱</div>
+            <div class="setting-form">
+              <div class="form-item">
+                <label class="form-label">当前邮箱：</label>
+                <el-input
+                  :value="userInfos.email || '未绑定'"
+                  disabled
+                  placeholder="未绑定邮箱"
+                />
+              </div>
+              <div class="form-item form-btn">
+                <el-button type="primary" class="reset-btn" @click="stateEmail.dialog = true">
+                  {{ userInfos.email && userInfos.email.length > 0 ? '修改邮箱' : '绑定邮箱' }}
+                </el-button>
+                <el-popconfirm
+                  v-if="userInfos.email && userInfos.email.length > 0"
+                  title="是否继续要解除绑定邮箱?"
+                  @confirm="confirmEvent(2)"
+                >
+                  <template #reference>
+                    <el-button type="danger">解除绑定</el-button>
+                  </template>
+                </el-popconfirm>
+              </div>
+            </div>
           </div>
-        </el-card>
-      </el-col>
 
-      <!-- 更新信息 -->
-      <el-col :span="24">
-        <el-card shadow="hover" class="mt15 personal-edit" header="账号安全">
-          <div class="personal-edit-safe-box">
-            <div class="personal-edit-safe-item">
-              <div class="personal-edit-safe-item-left">
-                <div class="personal-edit-safe-item-left-label">账户密码</div>
-                <div class="personal-edit-safe-item-left-value">
-                  当前密码强度：{{ userInfos.passwordStrength }}
-                </div>
+          <!-- 绑定微信设置 -->
+          <div v-show="activeMenu === 'wechat'" class="setting-content">
+            <div class="setting-title">绑定微信</div>
+            <div class="setting-form">
+              <div class="form-item">
+                <label class="form-label">当前微信：</label>
+                <el-input
+                  :value="userInfos.wxOpenid || '未绑定'"
+                  disabled
+                  placeholder="未绑定微信"
+                />
               </div>
-              <div class="personal-edit-safe-item-right">
-                <el-button text type="primary" @click="openDialog">立即修改</el-button>
-              </div>
-            </div>
-          </div>
-          <div class="personal-edit-safe-box">
-            <div class="personal-edit-safe-item">
-              <div class="personal-edit-safe-item-left">
-                <div class="personal-edit-safe-item-left-label">密保手机</div>
-                <div class="personal-edit-safe-item-left-value">
-                  <span v-if="userInfos.phoneNumber.length === 0">未绑定手机</span>
-                  <span v-else>已绑定手机：{{ userInfos.phoneNumber }}</span>
-                  <el-popconfirm title="是否继续要解除绑定手机号?" @confirm="confirmEvent(1)">
-                    <template #reference>
-                      <span class="unbind" v-show="userInfos.phoneNumber.length > 0">解绑</span>
-                    </template>
-                  </el-popconfirm>
-                </div>
-              </div>
-              <div class="personal-edit-safe-item-right">
-                <el-button text type="primary" @click="state.dialog = true">
-                  {{ userInfos.phoneNumber.length > 0 ? '立即修改' : '立即绑定' }}
+              <div class="form-item form-btn">
+                <el-button type="primary" class="reset-btn" @click="openWxCode">
+                  {{ userInfos.wxOpenid && userInfos.wxOpenid.length > 0 ? '修改微信' : '绑定微信' }}
                 </el-button>
+                <el-popconfirm
+                  v-if="userInfos.wxOpenid && userInfos.wxOpenid.length > 0"
+                  title="是否继续要解除绑定微信?"
+                  @confirm="confirmEvent(3)"
+                >
+                  <template #reference>
+                    <el-button type="danger">解除绑定</el-button>
+                  </template>
+                </el-popconfirm>
               </div>
             </div>
           </div>
-          <div class="personal-edit-safe-box">
-            <div class="personal-edit-safe-item">
-              <div class="personal-edit-safe-item-left">
-                <div class="personal-edit-safe-item-left-label">绑定邮箱</div>
-                <div class="personal-edit-safe-item-left-value">
-                  <span v-if="userInfos.email.length === 0">设置邮箱，接收系统消息通知</span>
-                  <span v-else>已设置邮箱：{{ userInfos.email }}</span>
-                  <el-popconfirm title="是否继续要解除绑定邮箱?" @confirm="confirmEvent(2)">
-                    <template #reference>
-                      <span class="unbind" v-show="userInfos.email.length > 0">解绑</span>
-                    </template>
-                  </el-popconfirm>
-                </div>
-              </div>
-              <div class="personal-edit-safe-item-right">
-                <el-button @click="stateEmail.dialog = true" text type="primary">
-                  {{ userInfos.email.length > 0 ? '立即修改' : '立即设置' }}
-                </el-button>
-              </div>
-            </div>
-          </div>
-          <div class="personal-edit-safe-box">
-            <div class="personal-edit-safe-item">
-              <div class="personal-edit-safe-item-left">
-                <div class="personal-edit-safe-item-left-label">绑定微信</div>
-                <div class="personal-edit-safe-item-left-value">
-                  <span v-if="userInfos.wxOpenid.length === 0">
-                    绑定微信账号后，可以使用微信登录
-                  </span>
-                  <span v-else>已设置微信：{{ userInfos.wxOpenid }}</span>
-                  <el-popconfirm title="是否继续要解除绑定微信?" @confirm="confirmEvent(3)">
-                    <template #reference>
-                      <span class="unbind" v-show="userInfos.wxOpenid.length > 0">解绑</span>
-                    </template>
-                  </el-popconfirm>
-                </div>
-              </div>
-              <div class="personal-edit-safe-item-right">
-                <el-button @click="openWxCode" text type="primary">
-                  {{ userInfos.wxOpenid.length > 0 ? '立即修改' : '立即绑定' }}
-                </el-button>
-              </div>
-            </div>
-          </div>
-        </el-card>
+        </div>
       </el-col>
     </el-row>
     <!--修改密码-->
@@ -346,7 +461,11 @@
   const baseUserApi = userApi();
   // 倒计时
   const exitTime = ref(60);
+<<<<<<< HEAD
   let intervalId: NodeJS.Timeout;
+=======
+  let intervalId: ReturnType<typeof setInterval> | undefined;
+>>>>>>> eadc6d673a4b0e53f3c3decb20c14aae2f3768c5
   // 生成组件唯一id
   const uuid = ref('id-' + generateUUID());
   const dialogFormVisible = ref(false);
@@ -355,6 +474,30 @@
     passwordTwo: '',
     oldPassword: '',
   });
+
+  // 新增：当前激活的菜单
+  const activeMenu = ref('password');
+  // 新增：是否显示密码
+  const showPassword = ref(false);
+  // 新增：显示的密码占位符
+  const displayPassword = ref('************');
+  // 新增：密码强度对应的类名
+  const passwordStrengthClass = computed(() => {
+    const strength = userInfos.value.passwordStrength || '中级';
+    if (strength === '高级' || strength === '强') return 'strength-high';
+    if (strength === '中级' || strength === '中') return 'strength-medium';
+    return 'strength-low';
+  });
+  // 新增：菜单点击处理
+  const handleMenuClick = (menu: string) => {
+    activeMenu.value = menu;
+  };
+  // 新增：头像命令处理
+  const handleAvatarCommand = (command: string) => {
+    if (command === 'upload') {
+      // 触发上传
+    }
+  };
 
   // 绑定手机号码
   const ruleFormRef = ref<FormInstance>();
@@ -504,7 +647,7 @@
   // 公告列表
   const getListData = () => {
     baseSysNoticeApi
-      .list({ pageNum: 1, pageSize: 2 })
+      .list({ pageNum: 1, pageSize: 20 })
       .then((res) => {
         stateNews.newsList = res.rows;
       })
@@ -512,11 +655,16 @@
       .finally(() => {});
   };
   // 定义变量内容
-  const stateNews = reactive({
+  interface NewsItem {
+    title: string;
+    content?: string;
+    createTime?: string;
+  }
+  const stateNews = reactive<{ newsList: NewsItem[] }>({
     newsList: [],
   });
-  const openNews = (v?: { content: string; title: string }) => {
-    ElMessageBox.alert(v?.content, v?.title, {
+  const openNews = (v?: { content?: string; title?: string }) => {
+    ElMessageBox.alert(v?.content || '', v?.title || '消息详情', {
       dangerouslyUseHTMLString: true,
       confirmButtonText: 'OK',
       callback: (action: Action) => {},
@@ -649,7 +797,11 @@
     },
     rules: {},
   });
+<<<<<<< HEAD
   let intervalIdWxState: NodeJS.Timeout;
+=======
+  let intervalIdWxState: ReturnType<typeof setInterval> | undefined;
+>>>>>>> eadc6d673a4b0e53f3c3decb20c14aae2f3768c5
   // 查询二维码状态
   const queryWxCodeState = () => {
     intervalIdWxState = setInterval(() => {
@@ -693,202 +845,385 @@
   @use '/src/theme/mixins/index.scss' as v;
 
   .personal {
-    .personal-user {
-      height: 130px;
-      display: flex;
-      align-items: center;
+    padding: 20px;
+    
+    // 消息通知区域
+    .notice-section {
+      height: 400px;
+      background: var(--el-color-white);
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
 
-      .personal-user-left {
-        width: 130px;
-        height: 130px;
-        border-radius: 3px;
 
-        :deep(.el-upload) {
-          height: 100%;
+      .notice-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+
+        .notice-title {
+          font-size: 16px;
+          font-weight: 600;
+          color: #333;
         }
 
-        .personal-user-left-upload {
-          img {
-            width: 100%;
-            height: 100%;
-            border-radius: 3px;
-            min-height: 130px;
-            min-width: 130px;
-          }
-
-          &:hover {
-            img {
-              animation: logoAnimation 0.3s ease-in-out;
-            }
-          }
-        }
-      }
-
-      .personal-user-right {
-        flex: 1;
-        padding: 0 15px;
-
-        .personal-title {
-          font-size: 18px;
-          @include v.text-ellipsis(1);
-        }
-
-        .personal-item {
+        .notice-more {
+          font-size: 14px;
+          color: #999;
+          cursor: pointer;
           display: flex;
           align-items: center;
-          font-size: 13px;
-
-          .personal-item-label {
-            color: var(--el-text-color-secondary);
-            @include v.text-ellipsis(1);
-          }
-
-          .personal-item-value {
-            @include v.text-ellipsis(1);
-          }
-        }
-      }
-    }
-
-    .personal-info {
-      .personal-info-more {
-        float: right;
-        color: var(--el-text-color-secondary);
-        font-size: 13px;
-
-        &:hover {
-          color: var(--el-color-primary);
-          cursor: pointer;
-        }
-      }
-
-      .personal-info-box {
-        height: 130px;
-        overflow: hidden;
-
-        .personal-info-ul {
-          list-style: none;
-
-          .personal-info-li {
-            font-size: 13px;
-            padding-bottom: 10px;
-
-            .personal-info-li-title {
-              display: inline-block;
-              @include v.text-ellipsis(1);
-              color: var(--el-text-color-secondary);
-              text-decoration: none;
-            }
-
-            & a:hover {
-              color: var(--el-color-primary);
-              cursor: pointer;
-            }
-          }
-        }
-      }
-    }
-
-    .personal-recommend-row {
-      .personal-recommend-col {
-        .personal-recommend {
-          position: relative;
-          height: 100px;
-          border-radius: 3px;
-          overflow: hidden;
-          cursor: pointer;
+          gap: 4px;
 
           &:hover {
-            i {
-              right: 0px !important;
-              bottom: 0px !important;
-              transition: all ease 0.3s;
-            }
-          }
-
-          i {
-            position: absolute;
-            right: -10px;
-            bottom: -10px;
-            font-size: 70px;
-            transform: rotate(-30deg);
-            transition: all ease 0.3s;
-          }
-
-          .personal-recommend-auto {
-            padding: 15px;
-            position: absolute;
-            left: 0;
-            top: 5%;
-            color: var(--next-color-white);
-
-            .personal-recommend-msg {
-              font-size: 12px;
-              margin-top: 10px;
-            }
+            color: var(--el-color-primary);
           }
         }
       }
-    }
 
-    .personal-edit {
-      .personal-edit-title {
-        position: relative;
-        padding-left: 10px;
-        color: var(--el-text-color-regular);
-
-        &::after {
-          content: '';
-          width: 2px;
-          height: 10px;
-          position: absolute;
-          left: 0;
-          top: 50%;
-          transform: translateY(-50%);
-          background: var(--el-color-primary);
-        }
-      }
-
-      .personal-edit-safe-box {
-        border-bottom: 1px solid var(--el-border-color-light, #ebeef5);
-        padding: 15px 0;
-
-        .personal-edit-safe-item {
-          width: 100%;
+      .notice-list {
+        height: calc(100% - 40px);
+        overflow-y: auto;
+      
+        .notice-item {
           display: flex;
-          align-items: center;
           justify-content: space-between;
+          align-items: center;
+          padding: 12px 0;
+          border-bottom: 1px solid #f5f5f5;
+          cursor: pointer;
+          transition: all 0.3s;
 
-          .personal-edit-safe-item-left {
+          &:last-child {
+            border-bottom: none;
+          }
+
+          &:hover {
+            background: #fafafa;
+            padding-left: 10px;
+            padding-right: 10px;
+            margin: 0 -10px;
+            border-radius: 4px;
+
+            .notice-item-title {
+              color: var(--el-color-primary);
+            }
+          }
+
+          .notice-item-title {
             flex: 1;
-            overflow: hidden;
+            font-size: 14px;
+            color: #333;
+            @include v.text-ellipsis(1);
+            margin-right: 20px;
+          }
 
-            .personal-edit-safe-item-left-label {
-              color: var(--el-text-color-regular);
-              margin-bottom: 5px;
-            }
-
-            .personal-edit-safe-item-left-value {
-              color: var(--el-text-color-secondary);
-              @include v.text-ellipsis(1);
-              margin-right: 15px;
-            }
+          .notice-item-date {
+            font-size: 14px;
+            color: #999;
+            flex-shrink: 0;
           }
         }
 
-        &:last-of-type {
-          padding-bottom: 0;
-          border-bottom: none;
+        .notice-empty {
+          text-align: center;
+          padding: 30px 0;
+          color: #999;
         }
       }
     }
 
-    .unbind {
-      color: #1e97f8;
-      font-size: 14px;
-      font-weight: 500;
-      margin-left: 10px;
-      cursor: pointer;
+    // 主内容区域
+    .main-content {
+      height: 600px;
+      // 左侧用户卡片
+      .user-card {
+        height: 100%;
+        background: var(--el-color-white);
+        border-radius: 8px;
+        padding: 30px 20px;
+        box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
+        text-align: center;
+
+        // 头像区域
+        .user-avatar-section {
+          position: relative;
+          display: inline-block;
+          margin-bottom: 15px;
+
+          .avatar-wrapper {
+            position: relative;
+            cursor: pointer;
+
+            .avatar-upload {
+              :deep(.el-upload) {
+                border-radius: 50%;
+              }
+            }
+
+            .user-avatar {
+              width: 100px;
+              height: 100px;
+              border-radius: 50%;
+              object-fit: cover;
+              border: 3px solid #f0f0f0;
+              transition: all 0.3s;
+
+              &:hover {
+                border-color: var(--el-color-primary);
+              }
+            }
+
+            .avatar-camera {
+              position: absolute;
+              right: 0;
+              bottom: 0;
+              width: 28px;
+              height: 28px;
+              background: var(--el-color-white);
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: #858EBD;
+              font-size: 14px;
+              border: 2px solid #fff;
+            }
+          }
+        }
+
+        // 用户信息
+        .user-info {
+          margin-bottom: 25px;
+
+          .user-name {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 8px;
+          }
+
+          .user-detail {
+            font-size: 14px;
+            color: #999;
+            margin-bottom: 5px;
+
+            .detail-label {
+              color: #999;
+            }
+
+            .detail-value {
+              color: #666;
+            }
+          }
+        }
+
+        // 功能菜单
+        .menu-list {
+          .menu-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #fafafa;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+
+            &:last-child {
+              margin-bottom: 0;
+            }
+
+            &:hover,
+            &.active {
+              background: #f0f7ff;
+              
+              .menu-arrow {
+                color: var(--el-color-primary);
+              }
+            }
+            .menu-item-left {
+              display: flex;
+              align-items: center;
+              gap: 12px;
+
+              .menu-icon {
+                width: 36px;
+                height: 36px;
+                border-radius: 8px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                color: #fff;
+                font-size: 18px;
+                font-weight: 600;
+                background: linear-gradient(135deg, #4F8AFF 0%, #4B5EFF 100%);
+              }
+
+              .menu-text {
+                font-size: 14px;
+                color: #333;
+              }
+            }
+
+            .menu-arrow {
+              color: #ccc;
+              transition: all 0.3s;
+            }
+          }
+        }
+      }
+
+      // 右侧设置卡片
+      .setting-card {
+        height: 100%;
+        background: var(--el-color-white);
+        border-radius: 8px;
+        padding: 30px;
+        box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
+        min-height: 400px;
+
+        @media screen and (max-width: 768px) {
+          margin-top: 20px;
+        }
+
+        .setting-content {
+          .setting-title {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #f0f0f0;
+          }
+
+          .setting-form {
+            max-width: 400px;
+
+            .form-item {
+              display: flex;
+              align-items: center;
+              margin-bottom: 60px;
+
+              .form-label {
+                width: 80px;
+                font-size: 14px;
+                color: #666;
+                flex-shrink: 0;
+              }
+
+              :deep(.el-input) {
+                flex: 1;
+              }
+
+              .password-eye {
+                cursor: pointer;
+                color: #999;
+                
+                &:hover {
+                  color: var(--el-color-primary);
+                }
+              }
+
+              .password-strength {
+                font-size: 14px;
+                font-weight: 500;
+
+                &.strength-high {
+                  color: #2dac34;
+                }
+
+                &.strength-medium {
+                  color: var(--el-color-primary);
+                }
+
+                &.strength-low {
+                  color: #f56c6c;
+                }
+              }
+
+              &.form-btn {
+                margin-top: 40px;
+                
+                .reset-btn {
+                  width: 160px;
+                  height: 40px;
+                  font-size: 14px;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // 弹窗样式
+    .fond16 {
+      font-size: 16px;
+      text-align: center;
+    }
+
+    .mt-10 {
+      margin-top: 10px;
+      margin-bottom: 20px;
+    }
+  }
+
+  // 响应式调整
+  @media screen and (max-width: 992px) {
+    .personal {
+      .main-content {
+        .user-card {
+          margin-bottom: 20px;
+        }
+      }
+    }
+  }
+
+  @media screen and (max-width: 576px) {
+    .personal {
+      padding: 10px;
+
+      .notice-section {
+        padding: 15px;
+
+        .notice-list {
+          .notice-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 5px;
+
+            .notice-item-date {
+              font-size: 12px;
+            }
+          }
+        }
+      }
+
+      .main-content {
+        .setting-card {
+          padding: 20px;
+
+          .setting-content {
+            .setting-form {
+              .form-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+
+                .form-label {
+                  width: auto;
+                }
+
+                :deep(.el-input) {
+                  width: 100%;
+                }
+              }
+            }
+          }
+        }
+      }
     }
   }
 </style>

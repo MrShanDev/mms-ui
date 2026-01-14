@@ -1,6 +1,7 @@
 <template>
   <el-form size="large" class="login-content-form">
     <el-form-item class="login-animation1">
+      <div class="login-content-title">用户名</div>
       <el-input
         text
         :placeholder="$t('message.account.accountPlaceholder1')"
@@ -14,6 +15,7 @@
       </el-input>
     </el-form-item>
     <el-form-item class="login-animation2">
+      <div class="login-content-title">密码</div>      
       <el-input
         :type="state.isShowPassword ? 'text' : 'password'"
         :placeholder="$t('message.account.accountPlaceholder2')"
@@ -58,13 +60,12 @@
     </el-form-item>
     <el-form-item class="login-animation4">
       <el-button
-        v-waves
-        type="primary"
-        class="login-content-submit"
-        round
-        @click="onSignIn"
-        @keydown.enter="keyDown"
-        :loading="state.loading.signIn"
+          v-waves
+          type="primary"
+          class="login-content-submit"
+          @click="onSignIn"
+          @keydown.enter="keyDown"
+          :loading="state.loading.signIn"
       >
         <span>{{ $t('message.account.accountBtnText') }}</span>
       </el-button>
@@ -258,41 +259,44 @@
 </script>
 
 <style scoped lang="scss">
-  .login-content-form {
-    margin-top: 20px;
-
-    @for $i from 1 through 4 {
-      .login-animation#{$i} {
-        opacity: 0;
-        animation-name: error-num;
-        animation-duration: 0.5s;
-        animation-fill-mode: forwards;
-        animation-delay: calc($i/10) + s;
-      }
-    }
-
-    .login-content-password {
-      display: inline-block;
-      width: 20px;
-      cursor: pointer;
-
-      &:hover {
-        color: #909399;
-      }
-    }
-
-    .login-content-code {
-      width: 100%;
-      padding: 0;
-      font-weight: bold;
-      letter-spacing: 5px;
-    }
-
-    .login-content-submit {
-      width: 100%;
-      letter-spacing: 2px;
-      font-weight: 300;
-      margin-top: 15px;
+.login-content-form {
+  margin-top: 20px;
+  .login-content-title{
+    color: #838383;
+  }
+  @for $i from 1 through 4 {
+    .login-animation#{$i} {
+      opacity: 0;
+      animation-name: error-num;
+      animation-duration: 0.5s;
+      animation-fill-mode: forwards;
+      animation-delay: calc($i/10) + s;
     }
   }
+
+  .login-content-password {
+    display: inline-block;
+    width: 20px;
+    cursor: pointer;
+
+    &:hover {
+      color: #909399;
+    }
+  }
+
+  .login-content-code {
+    width: 100%;
+    padding: 0;
+    font-weight: bold;
+    letter-spacing: 5px;
+  }
+
+  .login-content-submit {
+    width: 100%;
+    letter-spacing: 2px;
+    font-weight: 500;
+    margin-top: 15px;
+    font-size: 16px;
+  }
+}
 </style>
