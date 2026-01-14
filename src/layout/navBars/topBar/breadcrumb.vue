@@ -47,15 +47,11 @@
   import { storeToRefs } from 'pinia';
   import { useThemeConfig } from '/@/stores/themeConfig';
   import { useRoutesList } from '/@/stores/routesList';
-<<<<<<< HEAD
-  import type { RouteItem, RouteItems, RouteToFrom } from '/@/types/global';
-=======
   import { useUserInfo } from '/@/stores/userInfo';
 
 
   const storesUserInfo = useUserInfo();
   const { userInfos } = storeToRefs(storesUserInfo);
->>>>>>> eadc6d673a4b0e53f3c3decb20c14aae2f3768c5
 
   // 定义变量内容
   const { t } = useI18n();

@@ -28,12 +28,5 @@ export interface SystemBaseEntity {
    */
   tenantState: boolean;
 
-<<<<<<< HEAD
-    codeUrl: string;
-    demoMode: boolean;
-    demoAccount: string;
-    demoPassword: string;
-=======
   codeUrl: string;
->>>>>>> 846071d972f2dd7d27101b30674155b32d75cdff
 }

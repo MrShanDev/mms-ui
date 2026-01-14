@@ -1,28 +1,5 @@
 <template>
   <div class="personal layout-pd">
-<<<<<<< HEAD
-    <el-row>
-      <!-- 个人信息 -->
-      <el-col :xs="24" :sm="16">
-        <el-card shadow="hover" header="个人信息">
-          <div class="personal-user">
-            <div class="personal-user-left">
-              <el-upload
-                class="h100 personal-user-left-upload"
-                :id="uuid"
-                action="#"
-                :http-request="handleHttpUpload"
-                :auto-upload="true"
-                :show-file-list="false"
-                multiple
-                :limit="1"
-              >
-                <img
-                  :src="
-                    userInfos.photo || 'https://sxpcwlkj.oss-cn-beijing.aliyuncs.com/defimg.png'
-                  "
-                  alt=""
-=======
     <!-- 消息通知区域 -->
     <div class="notice-section">
       <div class="notice-header">
@@ -197,7 +174,6 @@
                   :value="userInfos.phoneNumber || '未绑定'"
                   disabled
                   placeholder="未绑定手机"
->>>>>>> eadc6d673a4b0e53f3c3decb20c14aae2f3768c5
                 />
               </div>
               <div class="form-item form-btn">
@@ -461,11 +437,7 @@
   const baseUserApi = userApi();
   // 倒计时
   const exitTime = ref(60);
-<<<<<<< HEAD
-  let intervalId: NodeJS.Timeout;
-=======
   let intervalId: ReturnType<typeof setInterval> | undefined;
->>>>>>> eadc6d673a4b0e53f3c3decb20c14aae2f3768c5
   // 生成组件唯一id
   const uuid = ref('id-' + generateUUID());
   const dialogFormVisible = ref(false);
@@ -797,11 +769,7 @@
     },
     rules: {},
   });
-<<<<<<< HEAD
-  let intervalIdWxState: NodeJS.Timeout;
-=======
   let intervalIdWxState: ReturnType<typeof setInterval> | undefined;
->>>>>>> eadc6d673a4b0e53f3c3decb20c14aae2f3768c5
   // 查询二维码状态
   const queryWxCodeState = () => {
     intervalIdWxState = setInterval(() => {

@@ -32,13 +32,8 @@
 
 <style scoped lang="scss">
   .layout-logo {
-<<<<<<< HEAD
-    width: 185px;
-    height: 50px;
-=======
     width: 200px;
     height: 130px;
->>>>>>> eadc6d673a4b0e53f3c3decb20c14aae2f3768c5
     display: flex;
     flex-direction: column;
     align-items: center;
