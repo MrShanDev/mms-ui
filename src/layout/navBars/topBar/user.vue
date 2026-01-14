@@ -1,7 +1,7 @@
 <template>
   <div class="layout-navbars-breadcrumb-user pr15" :style="{ flex: layoutUserFlexNum }">
     <!-- 搜索框 -->
-    <div class="search-section">
+    <div class="search-section hvr-backward">
       <el-input
         placeholder="搜索"
         :prefix-icon="eleSearchIcon"

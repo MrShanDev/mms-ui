@@ -56,6 +56,9 @@ importers:
       file-saver:
         specifier: ^2.0.5
         version: 2.0.5
+      hover.css:
+        specifier: ^2.3.2
+        version: 2.3.2
       iframe-resizer:
         specifier: ^4.4.0
         version: 4.4.5
@@ -2060,6 +2063,9 @@ packages:
 
   hooker@0.2.3:
     resolution: {integrity: sha512-t+UerCsQviSymAInD01Pw+Dn/usmz1sRO+3Zk1+lx8eg+WKpD2ulcwWqHHL0+aseRBr+3+vIhiG1K1JTwaIcTA==}
+
+  hover.css@2.3.2:
+    resolution: {integrity: sha512-eXch700vfcoSSAcEcU154lTHBYQy2cjGT+yJZtkKWxASBBiPVkqYOdMAa0sz4cYj2YIrl1FRE2s5O4EgOaIpig==}
 
   html-void-elements@2.0.1:
     resolution: {integrity: sha512-0quDb7s97CfemeJAnW9wC0hw78MtW7NU3hqtCD75g2vFlDLt36llsYD7uB7SUzojLMP24N5IatXf7ylGXiGG9A==}
@@ -5603,6 +5609,8 @@ snapshots:
   he@1.2.0: {}
 
   hooker@0.2.3: {}
+
+  hover.css@2.3.2: {}
 
   html-void-elements@2.0.1: {}
 

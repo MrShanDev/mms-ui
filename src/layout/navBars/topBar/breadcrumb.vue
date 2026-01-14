@@ -32,7 +32,7 @@
     </el-breadcrumb>
   </div>
   <!-- 欢迎信息 -->
-  <div v-if="!isShowBreadcrumb" class="welcome-section ml20">
+  <div v-if="!isShowBreadcrumb" class="welcome-section hvr-pulse ml20">
       <span class="welcome-icon">👏</span>
       <span class="welcome-text">欢迎回来，{{ userInfos.userName }}</span>
   </div>
@@ -178,6 +178,7 @@
   .welcome-section {
     display: flex;
     align-items: center;
+    cursor: pointer;
     gap: 8px;
 
     .welcome-icon {

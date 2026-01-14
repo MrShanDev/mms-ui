@@ -3,7 +3,7 @@
     <!-- 顶部统计卡片 -->
     <el-row :gutter="15" class="home-card-stats">
       <el-col :xs="24" :sm="12" :md="8" :lg="4" :xl="4">
-        <div class="stat-card stat-card-orange">
+        <div class="stat-card stat-card-orang">
           <div class="stat-card-header">
             <div class="stat-icon">
               <el-icon style="font-size: 2rem" color="#ff8c00"><ele-Memo /></el-icon>

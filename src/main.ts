@@ -21,6 +21,7 @@ import { VueUiRadar } from 'vue-data-ui';
 import '/@/theme/index.scss';
 import 'virtual:windi.css';
 import 'vue-data-ui/style.css';
+import 'hover.css/css/hover-min.css';
 
 // VXE Table
 // ... 纯表格
