@@ -8,6 +8,7 @@
           size="small"
           type="primary"
           @click="insert"
+          :loading="state.loading.insert"
           v-auth="modelName + ':' + functionName + ':insert'"
         >
           <SvgIcon name="iconfont icon-xinzeng" />
@@ -18,6 +19,7 @@
           size="small"
           type="danger"
           @click="deletes"
+          :loading="state.loading.delete"
           v-auth="modelName + ':' + functionName + ':delete'"
         >
           <SvgIcon name="iconfont icon-weibiaoti544" />
@@ -28,6 +30,7 @@
           size="small"
           type="success"
           @click="openDialog"
+          :loading="state.loading.import"
           v-auth="modelName + ':' + functionName + ':import'"
         >
           <SvgIcon name="iconfont icon-daoru" />
@@ -38,6 +41,7 @@
           size="small"
           type="warning"
           @click="exportExcel"
+          :loading="state.loading.export"
           v-auth="modelName + ':' + functionName + ':export'"
         >
           <SvgIcon name="iconfont icon-daochu" />
@@ -48,6 +52,7 @@
           size="small"
           type="info"
           @click="print"
+          :loading="state.loading.print"
           v-auth="modelName + ':' + functionName + ':print'"
         >
           <SvgIcon name="iconfont icon-weibiaoti--" />
@@ -146,6 +151,13 @@
       submitTxt: '',
     },
     importMsg: '',
+    loading: {
+      insert: false,
+      delete: false,
+      import: false,
+      export: false,
+      print: false,
+    },
   });
   // 获取 el-form 组件上下文
   const formContext = inject(formContextKey, void 0);
@@ -157,6 +169,7 @@
   };
   // 打开弹窗
   const openDialog = (type: string) => {
+    state.loading.import = false;
     state.dialog.isShowDialog = true;
   };
   // 关闭弹窗
@@ -165,15 +178,31 @@
     state.dialog.isShowDialog = false;
   };
   //新增
-  const insert = () => {
-    emit('insert', { type: CURDEnum.INSERT });
+  const insert = async () => {
+    state.loading.insert = true;
+    try {
+      emit('insert', { type: CURDEnum.INSERT });
+    } finally {
+      // 延迟重置 loading 状态，给父组件处理的时间
+      setTimeout(() => {
+        state.loading.insert = false;
+      }, 500);
+    }
   };
   //删除
-  const deletes = () => {
+  const deletes = async () => {
     if (isEmpty(props.param.selectIds)) {
       ElMessage.warning('请选择要删除的数据');
-    } else {
+      return;
+    }
+    state.loading.delete = true;
+    try {
       emit('deletes', { type: CURDEnum.DELETE, ids: props.param.selectIds });
+    } finally {
+      // 延迟重置 loading 状态，给父组件处理的时间
+      setTimeout(() => {
+        state.loading.delete = false;
+      }, 500);
     }
   };
   //保存
@@ -183,6 +212,7 @@
 
   //打印
   const print = () => {
+    state.loading.print = true;
     NextLoading.open();
     printData(props.param, props.modelName + '/' + props.functionName)
       .then((res) => {
@@ -193,21 +223,33 @@
       })
       .finally(() => {
         NextLoading.close();
+        state.loading.print = false;
       });
   };
   //下载模版
-  const getTemplate = () => {
-    downloadTemplate(props.modelName + '/' + props.functionName, props.tableComment);
+  const getTemplate = async () => {
+    state.loading.export = true;
+    try {
+      await downloadTemplate(props.modelName + '/' + props.functionName, props.tableComment);
+    } finally {
+      state.loading.export = false;
+    }
   };
   //导出数据
-  const exportExcel = () => {
-    exportData(props.modelName + '/' + props.functionName, props.tableComment, props.param);
+  const exportExcel = async () => {
+    state.loading.export = true;
+    try {
+      await exportData(props.modelName + '/' + props.functionName, props.tableComment, props.param);
+    } finally {
+      state.loading.export = false;
+    }
   };
   //上传导入数据
   const handleHttpUpload = async (options: UploadRequestOptions) => {
     let formData = new FormData();
     formData.append('file', options.file);
     try {
+      state.loading.import = true;
       NextLoading.open();
       await importData(formData, props.modelName + '/' + props.functionName).then((res) => {
         state.importMsg = res.msg;
@@ -219,6 +261,8 @@
     } catch (error) {
       NextLoading.close();
       options.onError(error as any);
+    } finally {
+      state.loading.import = false;
     }
   };
   // 打印数据

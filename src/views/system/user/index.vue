@@ -113,6 +113,7 @@
                     v-model="scope.row.status"
                     dict-type="SYS_STATE"
                     placeholder="用户状态"
+                    size="small"
                     :disabled="$ut.isSuperAdmin(scope.row.roleCodes)"
                     @change="updateStatus(scope.row, scope.row.status)"
                   ></fast-switch>
@@ -124,8 +125,7 @@
                 width="170"
                 label="创建时间"
                 show-overflow-tooltip
-              >
-              </el-table-column>
+              ></el-table-column>
               <el-table-column fixed="right" width="130" label="操作">
                 <template #default="scope">
                   <el-tooltip placement="top" :content="$t('message.form.edit')">

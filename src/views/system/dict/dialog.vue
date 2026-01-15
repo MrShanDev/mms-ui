@@ -154,7 +154,7 @@
   import { CURDEnum } from '/@/enums/CURDEnum';
   import { Eleme } from '@element-plus/icons-vue';
   import { SysEnum } from '/@/enums/SysEnum';
-  import { ListType } from '/@/views/system/dict/type';
+  import { ListType, RowDictType } from '/@/views/system/dict/type';
   // 定义子组件向父组件传值/事件
   const emit = defineEmits(['refresh']);
 

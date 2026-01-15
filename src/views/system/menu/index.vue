@@ -145,6 +145,7 @@
   import { isEmpty, tansParams } from '/@/utils/mms';
   import { CURDEnum } from '/@/enums/CURDEnum';
   import { NextLoading } from '/@/utils/loading';
+  import { FunctionType } from '/@/views/system/menu/type';
   // 引入组件
   const MenuDialog = defineAsyncComponent(() => import('/@/views/system/menu/dialog.vue'));
   // 引入 api 请求接口

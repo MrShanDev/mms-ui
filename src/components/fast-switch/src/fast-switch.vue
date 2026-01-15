@@ -9,6 +9,7 @@
     :active-text="dataList[0].dictLabel"
     :inactive-text="dataList[1].dictLabel"
     :disabled="disabled"
+    :size="size"
     @change="updateEvent"
   ></el-switch>
   <span v-if="dataList.length == 0">字典为空</span>
@@ -47,6 +48,11 @@
       type: Boolean,
       required: false,
       default: () => false,
+    },
+    size: {
+      type: String,
+      required: false,
+      default: () => 'default',
     },
   });
   const updateEvent = (value: any) => {

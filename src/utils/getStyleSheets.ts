@@ -91,7 +91,6 @@ const getAwesomeIconfont = () => {
             }
           } catch (e) {
             // 跨域访问限制，忽略此样式表
-            console.debug('无法访问样式表规则（可能的跨域限制）:', styles[i].href);
           }
         }
       }
@@ -120,13 +119,12 @@ const getAwesomeIconfont = () => {
             }
           }
         } catch (e) {
-          console.debug('解析样式表规则时出错:', e);
+          // 解析样式表规则时出错，忽略
         }
       }
       
       // 如果仍然没有找到图标，提供一些常用的 FontAwesome 图标作为备选
       if (sheetsIconList.length === 0) {
-        console.warn('未能从样式表中获取 FontAwesome 图标，使用预定义图标列表');
         sheetsIconList = [
           'fa-home', 'fa-user', 'fa-star', 'fa-heart', 'fa-search', 'fa-cog',
           'fa-edit', 'fa-trash', 'fa-plus', 'fa-minus', 'fa-check', 'fa-times',

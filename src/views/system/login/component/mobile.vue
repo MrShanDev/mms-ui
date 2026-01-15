@@ -53,6 +53,7 @@
   import Cookies from 'js-cookie';
   import { useThemeConfig } from '/@/stores/themeConfig';
   import { storeToRefs } from 'pinia';
+  import { useI18n } from 'vue-i18n';
   const storesThemeConfig = useThemeConfig();
   const { themeConfig } = storeToRefs(storesThemeConfig);
   import { initFrontEndControlRoutes } from '/@/router/frontEnd';
@@ -62,9 +63,10 @@
   import { SysEnum } from '/@/enums/SysEnum';
   const route = useRoute();
   const router = useRouter();
+  const { t } = useI18n();
   // 倒计时
   const exitTime = ref(60);
-  let intervalId: number;
+  let intervalId: ReturnType<typeof setInterval>;
   // 定义变量内容
   const state = reactive({
     ruleForm: {

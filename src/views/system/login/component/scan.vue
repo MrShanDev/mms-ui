@@ -56,8 +56,8 @@
   const unCodeMsg = ref('二维码已失效');
   const reqKey = ref(generateUUID());
   const codeUrl = ref('');
-  let intervalId: number | undefined;
-  let intervalIdQuery: number | undefined;
+  let intervalId: ReturnType<typeof setInterval> | undefined;
+  let intervalIdQuery: ReturnType<typeof setInterval> | undefined;
   const exitTime = ref(60);
   const emit = defineEmits<{
     update: [value: any];

@@ -128,6 +128,10 @@
     () => props.getHtml,
     (val) => {
       state.editorVal = val;
+      // 如果编辑器已经创建，直接设置编辑器内容
+      if (editorRef.value) {
+        editorRef.value.setHtml(val || '');
+      }
     },
     {
       deep: true,

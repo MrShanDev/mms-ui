@@ -151,6 +151,7 @@
   import FastSwitch from '/@/components/fast-switch/src/fast-switch.vue';
   import { CURDEnum } from '/@/enums/CURDEnum';
   import { isEmpty, generateUUID } from '/@/utils/mms';
+  import { SysConfigState, RowSysConfigType } from '/@/views/system/config/type';
   const baseApi = sysConfigApi();
   const SysConfigDialog = defineAsyncComponent(() => import('/@/views/system/config/dialog.vue'));
   const TableTool = defineAsyncComponent(() => import('/@/components/table-tool/index.vue'));

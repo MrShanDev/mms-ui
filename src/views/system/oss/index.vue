@@ -144,7 +144,7 @@
   import FastTableColumn from '/@/components/fast-table-column/src/fast-table-column.vue';
   import { Hide, Share, Tools, View } from '@element-plus/icons-vue';
   import useClipboard from 'vue-clipboard3';
-  import { SysOssState } from '/@/views/system/oss/type';
+  import { SysOssState, RowOssType } from '/@/views/system/oss/type';
 
   // 引入 api 请求接口
   const baseApi = ossApi();

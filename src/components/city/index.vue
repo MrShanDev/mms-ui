@@ -40,8 +40,8 @@
 
 <script lang="ts" setup>
   import { ref, computed, watch, onMounted } from 'vue';
-  import { sysAreaApi } from '/src/views/system/area';
-  import { SysAreaBo, SysAreaVo } from '/src/views/system/area/type';
+  import { sysAreaApi } from '/@/views/system/area';
+  import { SysAreaBo, SysAreaVo } from '/@/views/system/area/type';
 
   // 向父组件传递消息，可以传递任意类型的数据，需要 @ 符号 监听捕获
   const emit = defineEmits<{
@@ -75,7 +75,7 @@
   const handleProvinceChange = () => {
     selectedCity.value = '';
     selectedDistrict.value = '';
-    provinceList.value.forEach((p) => {
+    provinceList.value.forEach((p: SysAreaVo) => {
       if (p.code === selectedProvince.value) {
         cityList.value = p.children;
       }
@@ -84,7 +84,7 @@
   // 根据选择的城市，更新区县列表
   const handleCityChange = () => {
     selectedDistrict.value = '';
-    cityList.value.forEach((p) => {
+    cityList.value.forEach((p: SysAreaVo) => {
       if (p.code === selectedCity.value) {
         districtList.value = p.children;
       }
@@ -100,7 +100,7 @@
   });
   // 页面加载时
   onMounted(() => {
-    baseApi.list().then((res) => {
+    baseApi.list().then((res: any) => {
       provinceList.value = res.data;
       if (
         props.modelValue === null ||
@@ -114,7 +114,7 @@
       }
       if (props.modelValue.length > 1) {
         selectedCity.value = props.modelValue[1];
-        provinceList.value.forEach((p) => {
+        provinceList.value.forEach((p: SysAreaVo) => {
           if (p.code === selectedProvince.value) {
             cityList.value = p.children;
           }
@@ -122,7 +122,7 @@
       }
       if (props.modelValue.length > 2) {
         selectedDistrict.value = props.modelValue[2];
-        cityList.value.forEach((p) => {
+        cityList.value.forEach((p: SysAreaVo) => {
           if (p.code === selectedCity.value) {
             districtList.value = p.children;
           }

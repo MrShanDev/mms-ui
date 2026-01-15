@@ -16,7 +16,6 @@
 
   // 关闭当前全屏
   const onCloseFullscreen = () => {
-    console.log('关闭当前全屏');
     stores.setCurrenFullscreen(false);
   };
 </script>

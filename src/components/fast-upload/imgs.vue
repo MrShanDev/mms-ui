@@ -177,7 +177,6 @@ const formItemContext = inject(formItemContextKey, void 0);
 // 判断是否禁用上传和删除
 const self_disabled = computed(() => {
     const disabled = props.disabled || formContext?.disabled;
-    console.log('Self disabled:', disabled, 'props.disabled:', props.disabled, 'formContext?.disabled:', formContext?.disabled);
     return disabled;
 });
 
@@ -203,16 +202,13 @@ watch(
 
 // 在组件挂载后执行一些逻辑
 onMounted(() => {
-    console.log('Component mounted, modelValue:', props.modelValue);
     // 清空文件列表，确保不残留上次的数据
     _fileList.value = [];
 
     if (props.modelValue == null || props.modelValue.length == 0) {
-        console.log('No initial model value');
         return;
     }
     const arryIngs: Array<string> = props.modelValue.split(',');
-    console.log('Split model value:', arryIngs);
     if (arryIngs.length > 0) {
         arryIngs.map((item: string) => {
             if (item.length > 0) {
@@ -222,7 +218,6 @@ onMounted(() => {
             }
         });
     }
-    console.log('Initialized file list:', _fileList.value);
 });
 
 // 在组件卸载前清理数据
@@ -233,17 +228,14 @@ onUnmounted(() => {
 watch(
     () => props.modelValue,
     (n: string) => {
-        console.log('Model value changed:', n);
         // 只有当新的值与当前文件列表不匹配时才更新
         const currentUrls = _fileList.value.map((obj) => obj.url).join(',');
-        console.log('Current URLs:', currentUrls);
 
         // 如果新值为空，则清空文件列表
         if (n == null || n.length == 0) {
             _fileList.value = [];
             // 更新key以强制重新渲染组件
             uploadKey.value = Date.now();
-            console.log('New value is empty, cleared file list');
             return;
         }
 
@@ -252,10 +244,7 @@ watch(
             _fileList.value = [];
             // 更新key以强制重新渲染组件
             uploadKey.value = Date.now();
-            // eslint-disable-next-line no-console
-            console.log('update:modelValue', n);
             const arryIngs: Array<string> = n.split(',');
-            console.log('Split new value:', arryIngs);
             if (arryIngs.length > 0) {
                 arryIngs.map((item: string) => {
                     if (item.length > 0) {
@@ -266,7 +255,6 @@ watch(
                 });
             }
         }
-        console.log('Updated file list:', _fileList.value);
     },
     { flush: 'post' } // 确保在DOM更新后执行
 );
@@ -276,7 +264,6 @@ watch(
  * @param rawFile 选择的文件
  * */
 const beforeUpload: UploadProps['beforeUpload'] = (rawFile) => {
-    console.log('Before upload, file:', rawFile);
     const imgSize = rawFile.size / 1024 / 1024 < props.fileSize;
     const imgType = props.fileType.includes(rawFile.type);
     if (!imgType) {
@@ -285,7 +272,6 @@ const beforeUpload: UploadProps['beforeUpload'] = (rawFile) => {
             message: '上传图片不符合所需的格式！',
             type: 'warning',
         });
-        console.log('File type not allowed:', rawFile.type, 'Allowed types:', props.fileType);
     }
     if (!imgSize) {
         setTimeout(() => {
@@ -295,10 +281,8 @@ const beforeUpload: UploadProps['beforeUpload'] = (rawFile) => {
                 type: 'warning',
             });
         }, 0);
-        console.log('File size too large:', rawFile.size, 'Max size (MB):', props.fileSize);
     }
     const result = imgType && imgSize;
-    console.log('Before upload result:', result);
     return result;
 };
 
@@ -310,7 +294,6 @@ const beforeUpload: UploadProps['beforeUpload'] = (rawFile) => {
 const handleChange: UploadProps['onChange'] = (file, fileList) => {
     // 确保文件列表正确更新
     _fileList.value = [...fileList];
-    console.log('File changed:', file, 'File list:', fileList);
 };
 
 /**
@@ -318,15 +301,12 @@ const handleChange: UploadProps['onChange'] = (file, fileList) => {
  * @param options upload 所有配置项
  * */
 const handleHttpUpload = async (options: UploadRequestOptions) => {
-    console.log('Starting upload for file:', options.file);
     let formData = new FormData();
     formData.append('file', options.file);
     try {
         const { data } = await uploadImg(formData);
-        console.log('Upload success, response:', data);
         options.onSuccess(data);
     } catch (error) {
-        console.error('Upload error:', error);
         options.onError(error as any);
     }
 };
@@ -338,7 +318,6 @@ const handleHttpUpload = async (options: UploadRequestOptions) => {
  * */
 
 const uploadSuccess = (response: { url: string } | undefined, uploadFile: UploadFile) => {
-    console.log('Upload success callback, response:', response, 'uploadFile:', uploadFile);
     if (!response) {
         return;
     }
@@ -385,13 +364,11 @@ const uploadSuccess = (response: { url: string } | undefined, uploadFile: Upload
  * @param file 删除的文件
  * */
 const handleRemove = (file: UploadFile) => {
-    console.log('Removing file:', file);
     _fileList.value = _fileList.value.filter(
         (item) => item.uid !== file.uid
     );
     const imgs = _fileList.value.map((obj) => obj.url).join(',');
     emit('update:modelValue', imgs);
-    console.log('After removal, file list:', _fileList.value);
 
     // 如果删除后文件列表为空，更新key以确保组件正确更新
     if (_fileList.value.length === 0) {
@@ -403,7 +380,6 @@ const handleRemove = (file: UploadFile) => {
  * @description 图片上传错误
  * */
 const uploadError = (error: any, uploadFile: UploadFile, uploadFiles: UploadFile[]) => {
-    console.error('Upload error:', error, 'File:', uploadFile, 'All files:', uploadFiles);
     ElNotification({
         title: '温馨提示',
         message: '图片上传失败，请您重新上传！',
@@ -420,7 +396,6 @@ const handleExceed = () => {
         message: `当前最多只能上传 ${props.limit} 张图片，请移除后上传！`,
         type: 'warning',
     });
-    console.log('File limit exceeded, limit:', props.limit);
 };
 
 /**
@@ -430,7 +405,6 @@ const handleExceed = () => {
 const viewImageUrl = ref('');
 const imgViewVisible = ref(false);
 const handlePictureCardPreview: UploadProps['onPreview'] = (file) => {
-    console.log('Previewing file:', file);
     viewImageUrl.value = file.url!;
     imgViewVisible.value = true;
 };

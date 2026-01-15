@@ -294,6 +294,7 @@
   import { CURDEnum } from '/@/enums/CURDEnum';
   import { RouteItems } from '/@/types/global';
   import { Eleme } from '@element-plus/icons-vue';
+  import { FunctionType } from '/@/views/system/menu/type';
   // 引入组件
   const IconSelector = defineAsyncComponent(() => import('/@/components/iconSelector/index.vue'));
   // 引入 api 请求接口
