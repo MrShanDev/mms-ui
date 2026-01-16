@@ -182,8 +182,8 @@
     state.ruleForm = {
       name: '', // 字典名称
       fieldName: '', // 字段名
-      status: 0, // 字典状态
-      list: [{ id: '', label: '', value: '', dictType: '0', sort: 0, status: '0', colorType: '' }], // 子集字段 + 属性值
+      status: 1, // 字典状态
+      list: [{ id: '', label: '', value: '', dictType: '0', sort: 0, status: '1', colorType: '' }], // 子集字段 + 属性值
       remark: '', // 字典描述
     };
   };

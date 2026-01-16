@@ -69,18 +69,49 @@
             fixed="right"
             header-align="center"
             align="center"
-            width="280"
+            width="320"
           >
             <template #default="scope">
-              <el-button type="primary" link @click="previewHandle(scope.row.id)">预览</el-button>
-              <el-button type="primary" link @click="generatorHandle(scope.row.id)">
+              <el-button
+                type="primary"
+                link
+                :loading="loadingRows[scope.row.id]?.preview"
+                @click="previewHandle(scope.row.id)"
+              >
+                预览
+              </el-button>
+              <el-button
+                type="primary"
+                link
+                :loading="loadingRows[scope.row.id]?.generator"
+                @click="generatorHandle(scope.row.id)"
+              >
                 基础信息
               </el-button>
-              <el-button type="primary" link @click="editHandle(scope.row.id)">编辑</el-button>
-              <el-button type="primary" link @click="deleteBatchHandle(scope.row.id)">
+              <el-button
+                type="primary"
+                link
+                :loading="loadingRows[scope.row.id]?.edit"
+                @click="editHandle(scope.row.id)"
+              >
+                编辑
+              </el-button>
+              <el-button
+                type="primary"
+                link
+                :loading="loadingRows[scope.row.id]?.delete"
+                @click="deleteBatchHandle(scope.row.id)"
+              >
                 删除
               </el-button>
-              <el-button type="primary" link @click="syncHandle(scope.row)">同步</el-button>
+              <el-button
+                type="primary"
+                link
+                :loading="loadingRows[scope.row.id]?.sync"
+                @click="syncHandle(scope.row)"
+              >
+                同步
+              </el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -131,6 +162,20 @@
     },
   });
 
+  // 每行按钮的 loading 状态
+  const loadingRows = reactive<
+    Record<
+      number,
+      {
+        preview?: boolean;
+        generator?: boolean;
+        edit?: boolean;
+        delete?: boolean;
+        sync?: boolean;
+      }
+    >
+  >({});
+
   const importRef = ref();
   const previewRef = ref();
   const editRef = ref();
@@ -141,13 +186,31 @@
   };
 
   const editHandle = (id?: number) => {
+    if (!id) return;
+    if (!loadingRows[id]) loadingRows[id] = {};
+    loadingRows[id].edit = true;
     NextLoading.open();
     editRef.value.init(id);
+    // 延迟重置 loading 状态
+    setTimeout(() => {
+      if (loadingRows[id]) {
+        loadingRows[id].edit = false;
+      }
+    }, 500);
   };
 
   const generatorHandle = (id?: number) => {
+    if (!id) return;
+    if (!loadingRows[id]) loadingRows[id] = {};
+    loadingRows[id].generator = true;
     NextLoading.open();
     generatorRef.value.init(id);
+    // 延迟重置 loading 状态
+    setTimeout(() => {
+      if (loadingRows[id]) {
+        loadingRows[id].generator = false;
+      }
+    }, 500);
   };
 
   const downloadBatchHandle = () => {
@@ -164,6 +227,8 @@
     settingRef.value.init(id);
   };
   const syncHandle = (row: any) => {
+    if (!loadingRows[row.id]) loadingRows[row.id] = {};
+    loadingRows[row.id].sync = true;
     ElMessageBox.confirm(`确定同步数据表${row.tableName}吗?`, '提示', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
@@ -179,13 +244,25 @@
       })
       .finally(() => {
         NextLoading.close();
+        if (loadingRows[row.id]) {
+          loadingRows[row.id].sync = false;
+        }
       });
   };
 
   const previewHandle = (id: any) => {
-    usePreviewApi(id).then((res) => {
-      previewRef.value.init(res.data);
-    });
+    if (!loadingRows[id]) loadingRows[id] = {};
+    loadingRows[id].preview = true;
+    usePreviewApi(id)
+      .then((res) => {
+        // 传递 tableId 给预览组件
+        previewRef.value.init(res.data, id);
+      })
+      .finally(() => {
+        if (loadingRows[id]) {
+          loadingRows[id].preview = false;
+        }
+      });
   };
 
   const {
