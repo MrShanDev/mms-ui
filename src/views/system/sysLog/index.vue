@@ -87,14 +87,14 @@
               ></el-table-column>
               <el-table-column fixed="right" label="操作" width=" 100 ">
                 <template #default="scope">
-                  <el-tooltip placement="top" :content="$t('message.form.edit')">
+                  <el-tooltip placement="top" content="预览">
                     <el-icon
                       class="mr10"
                       color="blue"
                       v-auths="['system:sysLog:query', 'system:sysLog:edit']"
                       @click="onCURD({ type: curdEnum.EDIT, ids: scope.row.operId })"
                     >
-                      <ele-Edit />
+                      <ele-View />
                     </el-icon>
                   </el-tooltip>
                 </template>

@@ -164,7 +164,7 @@
     ruleForm: {
       name: '', // 字典名称
       fieldName: '', // 字段名
-      status: 0, // 字典状态
+      status: 1, // 字典状态
       list: [] as ListType[], // 子集字段 + 属性值
       remark: '', // 字典描述
     },
@@ -183,7 +183,7 @@
       name: '', // 字典名称
       fieldName: '', // 字段名
       status: 1, // 字典状态
-      list: [{ id: '', label: '', value: '', dictType: '0', sort: 0, status: '1', colorType: '' }], // 子集字段 + 属性值
+      list: [{ id: '', label: '', value: '', dictType: '0', sort: 0, status: 1, colorType: '' }], // 子集字段 + 属性值
       remark: '', // 字典描述
     };
   };
@@ -195,7 +195,7 @@
       state.ruleForm = row;
       if (row.list === null || row.list.length === 0) {
         state.ruleForm.list = [
-          { id: '', label: '', value: '', dictType: '0', sort: 0, status: '0', colorType: '' },
+          { id: '', label: '', value: '', dictType: '0', sort: 0, status: 1, colorType: '' },
         ];
       }
       state.dialog.title = '修改字典';
@@ -223,13 +223,19 @@
   };
   // 新增行
   const onAddRow = () => {
+    // 计算下一个排序值，取当前列表中最大排序值+1，如果没有则从1开始
+    const maxSort = state.ruleForm.list.length > 0 
+      ? Math.max(...state.ruleForm.list.map(item => item.sort)) 
+      : 0;
+    const nextSort = maxSort + 1;
+    
     state.ruleForm.list.push({
       id: '',
       label: '',
       value: '',
       dictType: '0',
-      sort: 0,
-      status: '0',
+      sort: nextSort,
+      status: 1,
       colorType: '',
     });
   };

@@ -73,6 +73,8 @@
                     v-model="scope.row.status"
                     dict-type="SYS_STATE"
                     placeholder="角色状态"
+                    size="small"
+                    @change="updateStatus(scope.row, scope.row.status)"
                   ></fast-switch>
                 </template>
               </el-table-column>
@@ -232,6 +234,24 @@
         .catch(() => {});
     }
   };
+  // 更新状态
+  const updateStatus = (row: RowRoleType, status: number) => {
+    row.status = status;
+    baseApi
+      .edit(row)
+      .then((res) => {
+        ElMessage.success('更新状态成功');
+      })
+      .catch(async (err) => {
+        ElMessage.warning(err);
+      })
+      .finally(() => {
+        setTimeout(() => {
+          getTableData();
+        }, 1000);
+      });
+  };
+
   // 接受子组件传值
   const formSubmit = (row: RowRoleType) => {
     if (isEmpty(row.id)) {
