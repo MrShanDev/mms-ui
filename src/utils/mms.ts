@@ -157,7 +157,7 @@ export const substring = (str: string, len: number, start?: number, bot?: boolea
  * @returns {string}
  */
 export const getFingerprint = (): string => {
-  let appid = Cookie.get('App-Id');
+  let appid = normalizeCookieValue(Cookie.get('App-Id'));
   if (appid != null && appid.length == 16) {
     return appid;
   }
@@ -302,9 +302,9 @@ export async function imageToBase64(options: { el: string }): Promise<string> {
  */
 export const encrypt = (obj: EmptyObjectType | string): string => {
   //设置偏移量:（由浏览器生成,一个浏览器多起访问值固定）
-  const SECRET_IV = enc.Utf8.parse(<string>Cookie.get('App-Id'));
+  const SECRET_IV = enc.Utf8.parse(<string>normalizeCookieValue(Cookie.get('App-Id')));
   //设置秘钥: 由服务端返回，自动放到Cookie中
-  const SECRET_KEY = enc.Utf8.parse(<string>Cookie.get('Secret-Key'));
+  const SECRET_KEY = enc.Utf8.parse(<string>normalizeCookieValue(Cookie.get('Secret-Key')));
   if (typeof obj === 'object') {
     obj = tansParams(obj);
   } else {
@@ -326,9 +326,9 @@ export const encrypt = (obj: EmptyObjectType | string): string => {
  */
 export const decrypt = (word: string): EmptyObjectType | string => {
   //设置偏移量:（由浏览器生成,一个浏览器多起访问值固定）
-  const SECRET_IV = enc.Utf8.parse(<string>Cookie.get('App-Id'));
+  const SECRET_IV = enc.Utf8.parse(<string>normalizeCookieValue(Cookie.get('App-Id')));
   //设置秘钥: 由服务端返回，自动放到Cookie中
-  const SECRET_KEY = enc.Utf8.parse(<string>Cookie.get('Secret-Key'));
+  const SECRET_KEY = enc.Utf8.parse(<string>normalizeCookieValue(Cookie.get('Secret-Key')));
   let base64 = enc.Base64.parse(word);
   let message = enc.Base64.stringify(base64);
   const decrypt = AES.decrypt(message, SECRET_KEY, {
@@ -477,3 +477,17 @@ export function getDictDataList(dictList: any[], dictType: string) {
     return [];
   }
 }
+
+const normalizeCookieValue = (value?: string) => {
+  if (!value) {
+    return value;
+  }
+  const trimmed = value.trim();
+  if (
+    (trimmed.startsWith('"') && trimmed.endsWith('"')) ||
+    (trimmed.startsWith("'") && trimmed.endsWith("'"))
+  ) {
+    return trimmed.substring(1, trimmed.length - 1);
+  }
+  return trimmed;
+};
