@@ -204,7 +204,7 @@
   const chatMsgList = ref<ChatRoom[]>([]);
   //聊天室消息
   const msgInfoList = ref<MsgInfo[]>([]);
-  const scrollbarRef = ref(null);
+  const scrollbarRef = ref<{ setScrollTop: (n: number) => void } | null>(null);
   const innerRef = ref();
   //滚动到最底部
   const scrollToBottom = () => {

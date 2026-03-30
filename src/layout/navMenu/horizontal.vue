@@ -45,7 +45,6 @@
   import { useThemeConfig } from '/@/stores/themeConfig';
   import other from '/@/utils/other';
   import mittBus from '/@/utils/mitt';
-  import { RouteItem, RouteItems, RouteToFrom } from '/@/types/global';
 
   // 引入组件
   const SubItem = defineAsyncComponent(() => import('/@/layout/navMenu/subItem.vue'));

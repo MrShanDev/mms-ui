@@ -3,7 +3,6 @@ import { Cookie } from '/@/utils/storage';
 import type { App, MethodOptions, Plugin, Component } from 'vue';
 import { useAppStore } from '/@/stores/app';
 import { ComputedOptions } from 'vue-demi';
-import { EmptyObjectType } from '/@/types/global';
 import { SysEnum } from '/@/enums/SysEnum';
 
 /**

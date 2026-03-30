@@ -719,7 +719,8 @@
   };
   // 2、菜单 / 顶栏
   const onBgColorPickerChange = (bg: string) => {
-    document.documentElement.style.setProperty(`--next-bg-${bg}`, themeConfig.value[bg]);
+    const tc = themeConfig.value as unknown as Record<string, string>;
+    document.documentElement.style.setProperty(`--next-bg-${bg}`, tc[bg]);
     if (bg === 'menuBar') {
       document.documentElement.style.setProperty(
         `--next-bg-menuBar-light-1`,

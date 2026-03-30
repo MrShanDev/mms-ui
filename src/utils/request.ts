@@ -8,7 +8,6 @@ import { HttpStatus } from '/@/enums/RespEnum';
 import { encrypt, decrypt, tansParams, getFingerprint } from '/@/utils/mms';
 import { getEnv } from '/@/utils/mms';
 import { SysEnum } from '/@/enums/SysEnum';
-import { ApiSecurityParam } from '/@/types/global';
 import { logout } from '/@/views/system/login';
 import { NextLoading } from '/@/utils/loading';
 axios.defaults.headers['Content-Type'] = 'application/json;charset=utf-8';

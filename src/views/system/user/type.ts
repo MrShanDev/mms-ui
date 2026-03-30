@@ -1,5 +1,4 @@
 // user
-import { BaseEntity, TableType } from '/@/types/global';
 
 export declare interface SysUserState {
   tableData: SysUserTableType;

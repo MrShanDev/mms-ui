@@ -1,4 +1,3 @@
-import {BaseEntity} from "/@/types/global";
 
 /**
 * 对象实体Vo

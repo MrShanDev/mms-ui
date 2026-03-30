@@ -1,4 +1,4 @@
 import { withInstall } from '/@/utils/mms';
-import FastRadioGroup from './src/fast-radio-group.vue';
+import FastRadioGroup from './src/fast-radio-checkbox.vue';
 
 export default withInstall(FastRadioGroup);

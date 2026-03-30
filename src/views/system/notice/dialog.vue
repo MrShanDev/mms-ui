@@ -18,7 +18,7 @@
               <div class="editor-container">
                 <fast-editor
                   v-model:get-html="state.ruleForm.content"
-                  v-bind:content="state.ruleForm.content"
+                  :content="String(state.ruleForm.content ?? '')"
                 />
               </div>
             </el-form-item>

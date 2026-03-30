@@ -3,7 +3,7 @@ import { getEnv } from '/@/utils/mms';
 import { AxiosPromise } from 'axios';
 import { SysEnum } from '/@/enums/SysEnum';
 import { EncryptTypeEnum } from '/@/enums/EncryptTypeEnum';
-import { DocUserBo, DocUserVo } from '/@/views/docAdmin/docUser/type';
+import type { DocDocUserEntity } from '/@/views/doc/docUser/type';
 
 /**
  * 控制台
@@ -12,9 +12,9 @@ import { DocUserBo, DocUserVo } from '/@/views/docAdmin/docUser/type';
  */
 export function homeApi() {
   return {
-    list: (params?: object): AxiosPromise<DocUserVo[]> => {
+    list: (params?: object): AxiosPromise<{ rows: DocDocUserEntity[]; total: number }> => {
       return request({
-        url: getEnv() + '/docAdmin/docUser/list',
+        url: getEnv() + '/doc/docUser/list',
         method: 'post',
         data: params,
         headers: {

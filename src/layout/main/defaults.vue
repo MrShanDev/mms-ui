@@ -16,7 +16,6 @@
   import { storeToRefs } from 'pinia';
   import { useThemeConfig } from '/@/stores/themeConfig';
   import { NextLoading } from '/@/utils/loading';
-  import { RefType } from '/@/types/global';
 
   // 引入组件
   const LayoutAside = defineAsyncComponent(() => import('/@/layout/component/aside.vue'));

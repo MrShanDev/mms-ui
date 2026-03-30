@@ -28,8 +28,9 @@
   import { ElMessage } from 'element-plus';
   const baseApi = noticeApi();
   // 定义变量内容
+  type NewsRow = { title: string; content: string; createdTime?: string };
   const state = reactive({
-    newsList: [],
+    newsList: [] as NewsRow[],
   });
 
   // 全部已读点击
@@ -44,7 +45,7 @@
     baseApi
       .list({ pageNum: 1, pageSize: 2 })
       .then((res) => {
-        state.newsList = res.rows;
+        state.newsList = (res.rows || []) as NewsRow[];
       })
       .catch(async (err) => {})
       .finally(() => {});

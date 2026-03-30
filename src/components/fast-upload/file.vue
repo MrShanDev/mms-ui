@@ -17,7 +17,7 @@
     <template v-if="isShowMsg" #tip>
       <div class="el-upload__tip">all files with a size less than 100M.</div>
     </template>
-    <VideoPlayer :url="videoUrl" ref="videoPlayer"></VideoPlayer>
+    <VideoPlayer :url="videoUrl" type="video/mp4" ref="videoPlayer"></VideoPlayer>
   </el-upload>
 </template>
 <script lang="ts" setup>
