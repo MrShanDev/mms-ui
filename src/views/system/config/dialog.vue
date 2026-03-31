@@ -120,7 +120,7 @@
     resetForm();
     state.dialog.isShowDialog = true;
     if (type === CURDEnum.EDIT) {
-      state.ruleForm = row;
+      state.ruleForm = Object.assign({}, row);
       state.dialog.title = '修改';
       state.dialog.submitTxt = '修 改';
       state.dialog.type = CURDEnum.EDIT;

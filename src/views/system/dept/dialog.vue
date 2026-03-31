@@ -3,12 +3,12 @@
     <el-dialog :title="state.dialog.title" v-model="state.dialog.isShowDialog" :width="dialogWidth">
       <el-form ref="dialogFormRef" :model="state.ruleForm" size="default" label-width="100px">
         <el-row>
-          <el-col v-show="false" class="mt-5" :span="12">
+          <el-col v-show="false" class="mt-15" :span="12">
             <el-form-item v-show="false" label="部门编号" prop="deptId">
               <el-input v-model="state.ruleForm.deptId" placeholder="部门编号"></el-input>
             </el-form-item>
           </el-col>
-          <el-col class="mt-5" :span="12">
+          <el-col class="mt-15" :span="12">
             <el-form-item label="选择上级">
               <el-cascader
                 :options="state.threeData"
@@ -26,27 +26,27 @@
               </el-cascader>
             </el-form-item>
           </el-col>
-          <el-col class="mt-5" :span="12">
+          <el-col class="mt-15" :span="12">
             <el-form-item label="部门名称" prop="deptName">
               <el-input v-model="state.ruleForm.deptName" placeholder="部门名称"></el-input>
             </el-form-item>
           </el-col>
-          <el-col class="mt-5" :span="12">
+          <el-col class="mt-15" :span="12">
             <el-form-item label="负责人" prop="leader">
               <el-input v-model="state.ruleForm.leader" placeholder="负责人"></el-input>
             </el-form-item>
           </el-col>
-          <el-col class="mt-5" :span="12">
+          <el-col class="mt-15" :span="12">
             <el-form-item label="联系方式" prop="phone">
               <el-input v-model="state.ruleForm.phone" placeholder="联系方式"></el-input>
             </el-form-item>
           </el-col>
-          <el-col class="mt-5" :span="12">
+          <el-col class="mt-15" :span="12">
             <el-form-item label="邮箱" prop="email">
               <el-input v-model="state.ruleForm.email" placeholder="邮箱"></el-input>
             </el-form-item>
           </el-col>
-          <el-col class="mt-5" :span="12">
+          <el-col class="mt-15" :span="12">
             <el-form-item label="状态" prop="status">
               <fast-switch
                 v-model="state.ruleForm.status"
@@ -55,7 +55,7 @@
               ></fast-switch>
             </el-form-item>
           </el-col>
-          <el-col class="mt-5" :span="12">
+          <el-col class="mt-15" :span="12">
             <el-form-item label="排序" prop="sort">
               <el-input-number
                 v-model="state.ruleForm.sort"
@@ -138,7 +138,7 @@
   const openDialog = (type: string, row: DeptEntity) => {
     resetForm();
     if (type === CURDEnum.EDIT) {
-      state.ruleForm = row;
+      state.ruleForm = Object.assign({}, row);
       state.dialog.title = '修改';
       state.dialog.submitTxt = '修 改';
       state.dialog.type = CURDEnum.EDIT;
@@ -151,7 +151,7 @@
       state.ruleForm.deptIds = [...row.deptIds];
       // 清空表单，此项需加表单验证才能使用
       nextTick(() => {
-        dialogFormRef.value.resetFields();
+        dialogFormRef.value.clearValidate();
       });
     }
     getMenuData();

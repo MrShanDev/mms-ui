@@ -148,10 +148,6 @@ request.interceptors.response.use(
         }
         delete res.isSecurity;
       }
-      if (res.rows === undefined && res.data && res.data.hasOwnProperty('total')) {
-        res.total = Number(res.data.total);
-        res.rows = res.data.rows;
-      }
       if (response.headers['content-type'] === 'application/octet-stream;charset=UTF-8') {
         res.fileName = response.headers['content-disposition'].split('=')[1];
       }

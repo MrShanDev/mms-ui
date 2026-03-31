@@ -71,13 +71,14 @@
                 <template #default="scope">
                   <!-- <el-tag type="success" v-if="scope.row.status == 0">启用</el-tag>
                   <el-tag type="info" v-else>禁用</el-tag> -->
-                  <fast-switch
+                  <el-switch
                     v-model="scope.row.status"
-                    dict-type="SYS_STATE"
-                    placeholder="字典状态"
-                    size="small"
-                    @change="updateStatus(scope.row, scope.row.status)"
-                  ></fast-switch>
+                    inline-prompt
+                    :active-value="SysEnum.SYS_COMMON_STATE_OPEN"
+                    :inactive-value="SysEnum.SYS_COMMON_STATE_CLOSE"
+                    active-text="启"
+                    inactive-text="禁"
+                  ></el-switch>
                 </template>
               </el-table-column>
               <el-table-column
@@ -151,7 +152,6 @@
   import { RowDictType, SysDictState } from '/@/views/system/dict/type';
   import { NextLoading } from '/@/utils/loading';
   import { Eleme } from '@element-plus/icons-vue';
-  import FastSwitch from '/@/components/fast-switch/src/fast-switch.vue';
   // 引入组件
   const DicDialog = defineAsyncComponent(() => import('/@/views/system/dict/dialog.vue'));
   const TableTool = defineAsyncComponent(() => import('/@/components/table-tool/index.vue'));
@@ -175,24 +175,6 @@
       },
     },
   });
-  // 更新状态
-  const updateStatus = (row: RowDictType, status: number) => {
-    row.status = status;
-    baseApi
-      .edit(row)
-      .then((res) => {
-        ElMessage.success('更新状态成功');
-      })
-      .catch(async (err) => {
-        ElMessage.warning(err);
-      })
-      .finally(() => {
-        setTimeout(() => {
-          getTableData();
-        }, 1000);
-      });
-  };
-
   // 接受子组件传值
   const formSubmit = (row: RowDictType) => {
     if (isEmpty(row.id)) {

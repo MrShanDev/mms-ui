@@ -2,123 +2,29 @@
   <div class="home-container layout-pd">
     <!-- 顶部统计卡片 -->
     <el-row :gutter="15" class="home-card-stats">
-      <el-col :xs="24" :sm="12" :md="8" :lg="4" :xl="4">
-        <div class="stat-card stat-card-orang">
+      <el-col :xs="24" :sm="12" :md="6" :lg="6" :xl="6" v-for="(item, index) in state.homeInfoData" :key="index">
+        <div class="stat-card" :style="{ borderLeft: `4px solid ${item.color1}` }">
           <div class="stat-card-header">
-            <div class="stat-icon">
-              <el-icon style="font-size: 2rem" color="#ff8c00"><ele-Memo /></el-icon>
+            <div class="stat-icon" :style="{ background: item.color2 }">
+              <el-icon style="font-size: 2rem" :style="{ color: item.color1 }">
+                <component :is="item.num4" />
+              </el-icon>
             </div>
             <div>
-              <div class="stat-label">今日订单</div>
-              <div class="stat-subtitle">Today's orders</div>
+              <div class="stat-label">{{ item.num3 }}</div>
+              <div class="stat-subtitle">Total {{ item.num3 }}</div>
             </div>
           </div>
-          
+
           <div class="stat-content flex mt10 ml10">
-            <div class="stat-value">{{ state.statsData.todayOrders }}</div>
-            <div class="stat-trend ml20" :class="state.statsData.ordersChange >= 0 ? 'trend-up' : 'trend-down'">
-              <span>{{ state.statsData.ordersChange >= 0 ? '+' : '' }}{{ state.statsData.ordersChange }}</span>
-              <el-icon><ele-Top v-if="state.statsData.ordersChange >= 0" /><ele-Bottom v-else /></el-icon>
+            <div class="stat-value">{{ item.num1 }}</div>
+            <div class="stat-trend ml20" v-if="item.num2 > 0">
+              <span class="trend-up">+{{ item.num2 }}</span>
+              <el-icon class="trend-up"><ele-Top /></el-icon>
+              <span class="ml5 f-12 color-999">今日新增</span>
             </div>
-          </div>
-        </div>
-      </el-col>
-      <el-col :xs="24" :sm="12" :md="8" :lg="4" :xl="4">
-        <div class="stat-card stat-card-green">
-          <div class="stat-card-header">
-            <div class="stat-icon">
-              <el-icon style="font-size: 2rem" color="#2dac34"><ele-User /></el-icon>
-            </div>
-            <div>
-              <div class="stat-label">今日用户</div>
-              <div class="stat-subtitle">today's users</div>
-            </div>
-          </div>
-          <div class="stat-content flex mt10 ml10">
-            <div class="stat-value">{{ state.statsData.todayUsers }}</div>
-            <div class="stat-trend ml20" :class="state.statsData.usersChange >= 0 ? 'trend-up' : 'trend-down'">
-              <span>{{ state.statsData.usersChange >= 0 ? '+' : '' }}{{ state.statsData.usersChange }}</span>
-              <el-icon><ele-Top v-if="state.statsData.usersChange >= 0" /><ele-Bottom v-else /></el-icon>
-            </div>
-          </div>
-        </div>
-      </el-col>
-      <el-col :xs="24" :sm="12" :md="8" :lg="4" :xl="4">
-        <div class="stat-card stat-card-blue">
-          <div class="stat-card-header">
-            <div class="stat-icon">
-              <el-icon style="font-size: 2rem" color="#409eff"><ele-Tickets /></el-icon>
-            </div>
-            <div>
-              <div class="stat-label">今日售后</div>
-              <div class="stat-subtitle">After-sales service</div>
-            </div>
-          </div>
-          <div class="stat-content flex mt10 ml10">
-            <div class="stat-value">{{ state.statsData.todayAfterSales }}</div>
-            <div class="stat-trend ml20" :class="state.statsData.afterSalesChange >= 0 ? 'trend-up' : 'trend-down'">
-              <span>{{ state.statsData.afterSalesChange >= 0 ? '+' : '' }}{{ state.statsData.afterSalesChange }}</span>
-              <el-icon><ele-Top v-if="state.statsData.afterSalesChange >= 0" /><ele-Bottom v-else /></el-icon>
-            </div>
-          </div>
-        </div>
-      </el-col>
-      <el-col :xs="24" :sm="12" :md="8" :lg="4" :xl="4">
-        <div class="stat-card stat-card-purple">
-          <div class="stat-card-header">
-            <div class="stat-icon">
-              <el-icon style="font-size: 2rem" color="#9c27b0"><ele-TrendCharts /></el-icon>
-            </div>
-            <div>
-              <div class="stat-label">今日销售额</div>
-              <div class="stat-subtitle">Today's sales</div>
-            </div>
-          </div>
-          <div class="stat-content flex mt10 ml10">
-            <div class="stat-value">{{ state.statsData.todaySales }}</div>
-            <div class="stat-trend ml20" :class="state.statsData.salesChange >= 0 ? 'trend-up' : 'trend-down'">
-              <span>{{ state.statsData.salesChange >= 0 ? '+' : '' }}{{ state.statsData.salesChange }}</span>
-              <el-icon><ele-Top v-if="state.statsData.salesChange >= 0" /><ele-Bottom v-else /></el-icon>
-            </div>
-          </div>
-        </div>
-      </el-col>
-      <el-col :xs="24" :sm="12" :md="8" :lg="4" :xl="4">
-        <div class="stat-card stat-card-gray">
-          <div class="stat-card-header">
-            <div class="stat-icon">
-              <el-icon style="font-size: 2rem" color="#606266"><ele-User /></el-icon>
-            </div>
-            <div>
-              <div class="stat-label">总用户</div>
-              <div class="stat-subtitle">Total Users</div>
-            </div>
-          </div>
-          <div class="stat-content flex mt10 ml10">
-            <div class="stat-value">{{ state.statsData.totalUsers }}</div>
-            <div class="stat-trend ml20" :class="state.statsData.totalUsersChange >= 0 ? 'trend-up' : 'trend-down'">
-              <span>{{ state.statsData.totalUsersChange >= 0 ? '+' : '' }}{{ state.statsData.totalUsersChange }}</span>
-              <el-icon><ele-Top v-if="state.statsData.totalUsersChange >= 0" /><ele-Bottom v-else /></el-icon>
-            </div>
-          </div>
-        </div>
-      </el-col>
-      <el-col :xs="24" :sm="12" :md="8" :lg="4" :xl="4">
-        <div class="stat-card stat-card-red">
-          <div class="stat-card-header">
-            <div class="stat-icon">
-              <el-icon style="font-size: 2rem" color="#f56c6c"><ele-Wallet /></el-icon>
-            </div>
-            <div>
-              <div class="stat-label">总收入</div>
-              <div class="stat-subtitle">Total Revenue</div>
-            </div>
-          </div>
-          <div class="stat-content flex mt10 ml10">
-            <div class="stat-value">{{ state.statsData.totalRevenue }}</div>
-            <div class="stat-trend ml20" :class="state.statsData.revenueChange >= 0 ? 'trend-up' : 'trend-down'">
-              <span>{{ state.statsData.revenueChange >= 0 ? '+' : '' }}{{ state.statsData.revenueChange }}</span>
-              <el-icon><ele-Top v-if="state.statsData.revenueChange >= 0" /><ele-Bottom v-else /></el-icon>
+            <div class="stat-trend ml20" v-else>
+              <span class="color-999 f-12">今日暂无新增</span>
             </div>
           </div>
         </div>
@@ -161,39 +67,64 @@
         </div>
       </el-col>
     </el-row>
-    <el-row :gutter="15" class="home-card-three">
+<!--    <el-row :gutter="15" class="home-card-three">-->
+<!--      <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">-->
+<!--        <div class="home-card-item mb15">-->
+<!--          <div class="home-card-item-title">月收入</div>-->
+<!--          <div class="home-card-item-content" style="padding: 20px">-->
+<!--            <div ref="incomeChartRef" style="width: 100%; height: 400px"></div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </el-col>-->
+<!--    </el-row>-->
+    <el-row :gutter="15" class="home-card-four">
+<!--      <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">-->
+<!--        <div class="home-card-item mb15">-->
+<!--          <div class="home-card-item-title">支付方式</div>-->
+<!--          <div class="home-card-item-content" style="padding: 20px">-->
+<!--            <div ref="paymentChartRef" style="width: 100%; height: 400px"></div>-->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </el-col>-->
       <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
         <div class="home-card-item mb15">
-          <div class="home-card-item-title">月收入</div>
-          <div class="home-card-item-content" style="padding: 20px">
-            <div ref="incomeChartRef" style="width: 100%; height: 400px"></div>
-          </div>
-        </div>
-      </el-col>
-    </el-row>
-    <el-row :gutter="15" class="home-card-four">
-      <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">
-        <div class="home-card-item mb15">
-          <div class="home-card-item-title">支付方式</div>
-          <div class="home-card-item-content" style="padding: 20px">
-            <div ref="paymentChartRef" style="width: 100%; height: 400px"></div>
-          </div>
-        </div>
-      </el-col>
-      <el-col :xs="24" :sm="24" :md="16" :lg="16" :xl="16">
-        <div class="home-card-item mb15">
-          <div class="home-card-item-title">待售后</div>
+          <div class="home-card-item-title">最新会员</div>
           <div class="home-card-item-content">
-            <el-table :data="state.afterSalesData" style="width: 100%">
-              <el-table-column prop="orderNo" label="订单id" width="120" />
-              <el-table-column prop="phone" label="购买方式" />
-              <el-table-column prop="area" label="购买游戏" />
-              <el-table-column prop="price" label="购买价格" />
-              <el-table-column prop="freight" label="保险价格" />
-              <el-table-column prop="paymentTime" label="购买时间" />
-              <el-table-column label="是否理赔">
-                <template #default>
-                  <el-button type="primary" link>待理赔</el-button>
+            <el-table :data="state.latestMembers" style="width: 100%" height="400px">
+                <el-table-column prop="nickname" label="昵称" show-overflow-tooltip>
+                    <template #default="scope">
+                        {{ scope.row.nickname==null||scope.row.nickname==''?'未设置':scope.row.nickname }}
+                    </template>
+                </el-table-column>
+                <el-table-column prop="headPortrait" label="头像" header-align="center" align="center" show-overflow-tooltip>
+                    <template #default="scope">
+                        <el-image
+                            style="height: 50px"
+                            :src="scope.row.headPortrait"
+                            :zoom-rate="1.2"
+                            :max-scale="7"
+                            :min-scale="0.2"
+                            :preview-src-list="[scope.row.headPortrait]"
+                            :initial-index="1"
+                            preview-teleported
+                            fit="cover"
+                        />
+                    </template>
+                </el-table-column>
+                <fast-table-column prop="sex" label="性别" dict-type="SYS_SEX"></fast-table-column>
+              <el-table-column prop="phone" label="手机号" width="220" />
+            <el-table-column prop="account" label="邮箱" show-overflow-tooltip >
+                <template #default="scope">
+                    {{ scope.row.account==null||scope.row.account==''?'未设置':scope.row.account }}
+                </template>
+            </el-table-column>
+              <el-table-column prop="createdTime" label="注册时间" width="180" />
+
+              <el-table-column prop="tags" label="签名" show-overflow-tooltip />
+              <el-table-column prop="city" label="城市" show-overflow-tooltip />
+              <el-table-column label="操作" width="100">
+                <template #default="scope">
+                  <el-button type="primary" link @click="router.push('/member/storeMember')">详情</el-button>
                 </template>
               </el-table-column>
             </el-table>
@@ -213,8 +144,10 @@
   import { ElMessage } from 'element-plus';
   import { noticeApi } from '/@/views/system/notice';
   import { homeApi } from '/@/views/system/home';
+  import { storeMemberApi } from '/@/views/member/storeMember';
   import * as echarts from 'echarts';
   import type { EChartsOption } from 'echarts';
+  import FastTableColumn from "/@/components/fast-table-column/src/fast-table-column.vue";
 
   const stores = useUserInfo();
   const { userInfos } = storeToRefs(stores);
@@ -222,6 +155,7 @@
   const router = useRouter();
   const baseApi = homeApi();
   const baseApiNotice = noticeApi();
+  const memberApi = storeMemberApi();
 
   const incomeChartRef = ref<HTMLDivElement>();
   const paymentChartRef = ref<HTMLDivElement>();
@@ -267,75 +201,40 @@
 
   const state = reactive({
     // 统计数据
-    statsData: {
-      todayOrders: 12138,
-      ordersChange: 25,
-      todayUsers: 12138,
-      usersChange: 46,
-      todayAfterSales: 112138,
-      afterSalesChange: 0,
-      todaySales: 121388,
-      salesChange: 4023,
-      totalRevenue: 1213888,
-      revenueChange: 1,
-      totalUsers: 256388,
-      totalUsersChange: 12,
-    } as StatsData,
+    homeInfoData: [] as any[],
     // 快捷菜单
     quickMenuData: [
-      { name: '角色列表', icon: 'ele-Menu', path: '/system/role', color: '#409eff' },
-      { name: '生成代码', icon: 'ele-Picture', path: '/system/generate', color: '#2dac34' },
-      { name: '系统设置', icon: 'ele-Setting', path: '/system/config', color: '#ff8c00' },
-      { name: '系统部门', icon: 'ele-OfficeBuilding', path: '/system/dept', color: '#9c27b0' },
-      { name: '系统公告', icon: 'ele-ChatDotSquare', path: '/system/notice', color: '#00bcd4' },
+      { name: '会员管理', icon: 'ele-User', path: '/sxpcwlkj/storeMember', color: '#FF6462' },
+      { name: '话题管理', icon: 'ele-ChatDotSquare', path: '/sxpcwlkj/bbsTopic', color: '#6690F9' },
+      { name: '文章管理', icon: 'ele-Document', path: '/sxpcwlkj/storeArticle', color: '#88D565' },
+      { name: '系统用户', icon: 'ele-UserFilled', path: '/system/user', color: '#409eff' },
+      { name: '系统公告', icon: 'ele-Bell', path: '/system/notice', color: '#ff8c00' },
     ] as QuickMenu[],
     // 系统公告
     sysNoticeData: [] as NoticeEntity[],
-    // 待售后数据
-    afterSalesData: [
-      {
-        orderNo: '王大豪',
-        phone: '15100001234',
-        area: '王者荣耀地区',
-        price: '￥699.00',
-        freight: '￥35.00',
-        paymentTime: '2026-01-08'
-      },
-      {
-        orderNo: '王大豪',
-        phone: '15100001234',
-        area: '王者荣耀地区',
-        price: '￥699.00',
-        freight: '￥35.00',
-        paymentTime: '2026-01-08'
-      },
-      {
-        orderNo: '王大豪',
-        phone: '15100001234',
-        area: '王者荣耀地区',
-        price: '￥699.00',
-        freight: '￥35.00',
-        paymentTime: '2026-01-08'
-      },
-      {
-        orderNo: '王大豪',
-        phone: '15100001234',
-        area: '王者荣耀地区',
-        price: '￥699.00',
-        freight: '￥35.00',
-        paymentTime: '2026-01-08'
-      },
-    ] as AfterSalesData[],
+    // 最新会员
+    latestMembers: [] as any[],
   });
 
   // 页面加载时
   onMounted(() => {
+    getHomeInfo();
     getNoticeList();
+    getLatestMembers();
     nextTick(() => {
       initIncomeChart();
       initPaymentChart();
     });
   });
+
+  /**
+   * 获取首页统计数据
+   */
+  const getHomeInfo = () => {
+    baseApi.info().then((res) => {
+      state.homeInfoData = res.data;
+    });
+  };
 
   /**
    * 初始化月收入曲线图
@@ -344,118 +243,125 @@
     if (!incomeChartRef.value) return;
 
     const chart = echarts.init(incomeChartRef.value);
-    const option: EChartsOption = {
-      tooltip: {
-        trigger: 'axis',
-        axisPointer: {
-          type: 'cross',
-        },
-      },
-      legend: {
-        data: ['订单总数', '订单数量'],
-        right: '5%',
-        top: '0',
-      },
-      grid: {
-        left: '3%',
-        right: '4%',
-        bottom: '3%',
-        containLabel: true,
-      },
-      xAxis: {
-        type: 'category',
-        boundaryGap: false,
-        data: ['01/01', '01/02', '01/03', '01/04', '01/05', '01/06', '01/07', '01/08', '01/09', '01/10', '01/11', '01/12', '01/13', '01/14', '01/15'],
-        axisLine: {
-          lineStyle: {
-            color: '#e0e0e0',
+
+    baseApi.orderNum().then((res: any) => {
+      const months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'];
+      const list1 = res.data.list1 || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+      const list2 = res.data.list2 || [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+      const option: EChartsOption = {
+        tooltip: {
+          trigger: 'axis',
+          axisPointer: {
+            type: 'cross',
           },
         },
-        axisLabel: {
-          color: '#666',
+        legend: {
+          data: ['订单金额', '订单数量'],
+          right: '5%',
+          top: '0',
         },
-      },
-      yAxis: [
-        {
-          type: 'value',
-          name: '100(万元)',
-          position: 'left',
+        grid: {
+          left: '3%',
+          right: '4%',
+          bottom: '3%',
+          containLabel: true,
+        },
+        xAxis: {
+          type: 'category',
+          boundaryGap: false,
+          data: months,
           axisLine: {
+            lineStyle: {
+              color: '#e0e0e0',
+            },
+          },
+          axisLabel: {
+            color: '#666',
+          },
+        },
+        yAxis: [
+          {
+            type: 'value',
+            name: '金额(元)',
+            position: 'left',
+            axisLine: {
+              lineStyle: {
+                color: '#409eff',
+              },
+            },
+            axisLabel: {
+              color: '#666',
+            },
+            splitLine: {
+              lineStyle: {
+                color: '#f5f5f5',
+              },
+            },
+          },
+          {
+            type: 'value',
+            name: '数量(笔)',
+            position: 'right',
+            axisLine: {
+              lineStyle: {
+                color: '#2dac34',
+              },
+            },
+            axisLabel: {
+              color: '#666',
+            },
+            splitLine: {
+              show: false,
+            },
+          },
+        ],
+        series: [
+          {
+            name: '订单金额',
+            type: 'line',
+            smooth: true,
+            yAxisIndex: 0,
+            data: list1,
             lineStyle: {
               color: '#409eff',
+              width: 2,
+            },
+            itemStyle: {
+              color: '#409eff',
+            },
+            areaStyle: {
+              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                { offset: 0, color: 'rgba(64, 158, 255, 0.3)' },
+                { offset: 1, color: 'rgba(64, 158, 255, 0.05)' },
+              ]),
             },
           },
-          axisLabel: {
-            color: '#666',
-          },
-          splitLine: {
-            lineStyle: {
-              color: '#f5f5f5',
-            },
-          },
-        },
-        {
-          type: 'value',
-          name: '(笔)100',
-          position: 'right',
-          axisLine: {
+          {
+            name: '订单数量',
+            type: 'line',
+            smooth: true,
+            yAxisIndex: 1,
+            data: list2,
             lineStyle: {
               color: '#2dac34',
+              width: 2,
+            },
+            itemStyle: {
+              color: '#2dac34',
+            },
+            areaStyle: {
+              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                { offset: 0, color: 'rgba(45, 172, 52, 0.3)' },
+                { offset: 1, color: 'rgba(45, 172, 52, 0.05)' },
+              ]),
             },
           },
-          axisLabel: {
-            color: '#666',
-          },
-          splitLine: {
-            show: false,
-          },
-        },
-      ],
-      series: [
-        {
-          name: '订单总数',
-          type: 'line',
-          smooth: true,
-          yAxisIndex: 0,
-          data: [40, 50, 60, 50, 69, 50, 40, 50, 30, 50, 60, 50, 60, 70, 60],
-          lineStyle: {
-            color: '#409eff',
-            width: 2,
-          },
-          itemStyle: {
-            color: '#409eff',
-          },
-          areaStyle: {
-            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-              { offset: 0, color: 'rgba(64, 158, 255, 0.3)' },
-              { offset: 1, color: 'rgba(64, 158, 255, 0.05)' },
-            ]),
-          },
-        },
-        {
-          name: '订单数量',
-          type: 'line',
-          smooth: true,
-          yAxisIndex: 1,
-          data: [60, 40, 30, 40, 20, 40, 50, 60, 70, 60, 50, 60, 40, 30, 40],
-          lineStyle: {
-            color: '#2dac34',
-            width: 2,
-          },
-          itemStyle: {
-            color: '#2dac34',
-          },
-          areaStyle: {
-            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-              { offset: 0, color: 'rgba(45, 172, 52, 0.3)' },
-              { offset: 1, color: 'rgba(45, 172, 52, 0.05)' },
-            ]),
-          },
-        },
-      ],
-    };
+        ],
+      };
 
-    chart.setOption(option);
+      chart.setOption(option);
+    });
 
     // 响应式
     window.addEventListener('resize', () => {
@@ -526,6 +432,17 @@
     // 响应式
     window.addEventListener('resize', () => {
       chart.resize();
+    });
+  };
+  /**
+   * 获取最新会员列表
+   */
+  const getLatestMembers = () => {
+    memberApi.list({
+      pageNum: 1,
+      pageSize: 10,
+    }).then(res => {
+      state.latestMembers = res.rows;
     });
   };
   /**
@@ -619,32 +536,12 @@
             }
           }
         }
-
-        &.stat-card-orange .stat-icon {
-          background: rgba(255, 140, 0, 0.1);
-        }
-
-        &.stat-card-green .stat-icon {
-          background: rgba(45, 172, 52, 0.1);
-        }
-
-        &.stat-card-blue .stat-icon {
-          background: rgba(64, 158, 255, 0.1);
-        }
-
-        &.stat-card-purple .stat-icon {
-          background: rgba(156, 39, 176, 0.1);
-        }
-
-        &.stat-card-red .stat-icon {
-          background: rgba(245, 108, 108, 0.1);
-        }
-
-        &.stat-card-gray .stat-icon {
-          background: rgba(96, 98, 102, 0.1);
-        }
       }
     }
+
+    .color-999 { color: #999; }
+    .f-12 { font-size: 12px; }
+    .ml5 { margin-left: 5px; }
 
     // 卡片通用样式
     .home-card-item {
@@ -673,7 +570,7 @@
     // 快捷菜单
     .home-card-two {
       .home-card-item {
-        height: 245px; 
+        height: 245px;
         display: flex;
         flex-direction: column;
 
@@ -722,7 +619,7 @@
             color: #fff;
           }
 
-          
+
           .quick-menu-text {
             font-size: 14px;
             color: #333;

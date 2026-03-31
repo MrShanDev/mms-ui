@@ -1,32 +1,32 @@
 <template>
   <el-form ref="dialogFormRef" :model="configRuleForm" size="default" label-width="100px">
     <el-row style="width: 60%">
-      <el-col class="mt-5" :span="24">
+      <el-col class="mt-15" :span="24">
         <el-form-item label="网站标题" prop="websiteTitle">
           <el-input v-model="configRuleForm[0].configValue" placeholder="网站标题"></el-input>
         </el-form-item>
       </el-col>
-      <el-col class="mt-5" :span="24">
+      <el-col class="mt-15" :span="24">
         <el-form-item label="网站副标题" prop="websiteSubheading">
           <el-input v-model="configRuleForm[1].configValue" placeholder="网站副标题"></el-input>
         </el-form-item>
       </el-col>
-      <el-col class="mt-5" :span="24">
+      <el-col class="mt-15" :span="24">
         <el-form-item label="网站域名" prop="websiteUrl">
           <el-input v-model="configRuleForm[2].configValue" placeholder="网站域名"></el-input>
         </el-form-item>
       </el-col>
-      <el-col class="mt-5" :span="24">
+      <el-col class="mt-15" :span="24">
         <el-form-item label="网站关键词" prop="websiteKeywords">
           <el-input type="textarea" v-model="configRuleForm[3].configValue"></el-input>
         </el-form-item>
       </el-col>
-      <el-col class="mt-5" :span="24">
+      <el-col class="mt-15" :span="24">
         <el-form-item label="网站描述" prop="websiteDescription">
           <el-input type="textarea" v-model="configRuleForm[4].configValue"></el-input>
         </el-form-item>
       </el-col>
-      <el-col class="mt-5" :span="24">
+      <el-col class="mt-15" :span="24">
         <el-form-item label="网站LOGO" prop="websiteLogo">
           <fast-img
             v-model="configRuleForm[5].configValue"
@@ -35,18 +35,18 @@
           />
         </el-form-item>
       </el-col>
-      <el-col class="mt-5" :span="24">
+      <el-col class="mt-15" :span="24">
         <el-form-item label="网站版权" prop="websiteCopyright">
           <el-input type="textarea" v-model="configRuleForm[6].configValue"></el-input>
         </el-form-item>
       </el-col>
-      <el-col class="mt-5" :span="24">
+      <el-col class="mt-15" :span="24">
         <el-form-item label="备案号" prop="websiteRecord">
           <el-input v-model="configRuleForm[7].configValue"></el-input>
         </el-form-item>
       </el-col>
 
-      <el-col class="mt-5" :span="24">
+      <el-col class="mt-15" :span="24">
         <el-form-item>
           <el-button type="primary" @click="onSubmitConfig">保存</el-button>
         </el-form-item>

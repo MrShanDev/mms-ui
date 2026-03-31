@@ -16,7 +16,7 @@
       </div> -->
       <div class="login-left-img">
         <Animate class="flex flex-center">
-        <img src="https://sxpcwlkj-test.oss-accelerate.aliyuncs.com/mmsMall/upload/69649624f176d6c9a798a18d.png" alt="loginMain" />
+        <img :src="loginBg" alt="loginMain" />
         </Animate>
       </div>
       <!-- <img :src="loginBg" class="login-left-waves " alt="bg" /> -->
@@ -29,25 +29,25 @@
               <img :src="getThemeConfig.logo" alt="logo" />
             </Animate>
             <Animate>
-              <span class="ml10 shou">mmsAdmin</span>
+              <span class="ml10 shou">{{ getThemeConfig.globalTitle }}</span>
             </Animate>
           </div>
           <div class="login-right-warp-main-form" v-if="getThemeConfig.loginType.length>0" >
             <!-- 显示当前选中的登录表单 -->
-            <component :is="currentLoginFormComponent" 
-                      :captchaState="getThemeConfig.captchaState" 
-                      :demoMode="getThemeConfig.demoMode" 
-                      :demoAccount="getThemeConfig.demoAccount" 
-                      :demoPassword="getThemeConfig.demoPassword" 
+            <component :is="currentLoginFormComponent"
+                      :captchaState="getThemeConfig.captchaState"
+                      :demoMode="getThemeConfig.demoMode"
+                      :demoAccount="getThemeConfig.demoAccount"
+                      :demoPassword="getThemeConfig.demoPassword"
                       class="login-form-component"/>
 
             <div class="other-login">
               <div class="other-login-title">其他登录方式</div>
               <div class="other-login-content flex">
                 <!-- 渲染非当前选中的其他两种登录方式 -->
-                <div v-for="loginMethod in availableLoginMethods.filter(method => method.key !== state.currentLoginMethod && getThemeConfig.loginType.includes(method.key))" 
-                     :key="loginMethod.key" 
-                     class="other-login-content-item w-50" 
+                <div v-for="loginMethod in availableLoginMethods.filter(method => method.key !== state.currentLoginMethod && getThemeConfig.loginType.includes(method.key))"
+                     :key="loginMethod.key"
+                     class="other-login-content-item w-50"
                      @click="switchLoginMethod(loginMethod.key)">
                   <div class="other-login-content-item-icon">
                     <i :class="loginMethod.icon"></i>
@@ -73,7 +73,7 @@
   import { NextLoading } from '/@/utils/loading';
   import logoMini from '/@/assets/image.svg';
   import loginMain from '/@/assets/login_main01.svg';
-  import loginBg from '/@/assets/login-bg.svg';
+  import loginBg from '/@/assets/loginbg.png';
   import { startBase } from '/@/views/system/init';
 
   // 引入组件
@@ -106,7 +106,7 @@ const currentLoginFormComponent = computed(() => {
   // 根据数值匹配登录方式
   const currentMethod = availableLoginMethods.find(method => method.key === state.currentLoginMethod);
   if (!currentMethod) return null;
-  
+
   // 返回对应的组件
   switch(currentMethod.value) {
     case 'account':
@@ -350,11 +350,11 @@ const getThemeConfig = reactive({
           justify-content: center;
           cursor: pointer;
           transition: all 0.3s ease;
-          
+
           &:hover {
             transform: translateY(-5px);
           }
-          
+
           .other-login-content-item-icon{
             padding: 10px 50px;
             border-radius: 20px;
@@ -363,7 +363,7 @@ const getThemeConfig = reactive({
             align-items: center;
             justify-content: center;
             transition: all 0.3s ease;
-            
+
             &:hover {
               background-color: #f0f9ff;
               border-color: #409eff;
@@ -373,7 +373,7 @@ const getThemeConfig = reactive({
             font-size: 14px;
             color: #838383;
             transition: all 0.3s ease;
-            
+
             &:hover {
               color: #409eff;
             }
@@ -392,7 +392,7 @@ const getThemeConfig = reactive({
     font-size: 30px;
     margin-right: 10px;
   }
-  
+
   .login-form-component {
     min-height: 300px;
     height: auto;

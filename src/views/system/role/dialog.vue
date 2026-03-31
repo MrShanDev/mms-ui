@@ -155,7 +155,7 @@
   const openDialog = (type: string, row: RowRoleType) => {
     resetForm();
     if (type === CURDEnum.EDIT) {
-      state.ruleForm = row;
+      state.ruleForm = Object.assign({}, row);
       state.dialog.title = '修改角色';
       state.dialog.submitTxt = '修 改';
       state.dialog.type = CURDEnum.EDIT;
@@ -166,7 +166,7 @@
       state.dialog.type = CURDEnum.INSERT;
       // 清空表单，此项需加表单验证才能使用
       nextTick(() => {
-        roleDialogFormRef.value.resetFields();
+        roleDialogFormRef.value.clearValidate();
       });
       getMenuData([]);
     }

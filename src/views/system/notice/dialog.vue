@@ -3,17 +3,17 @@
     <el-dialog :title="state.dialog.title" v-model="state.dialog.isShowDialog" :width="dialogWidth">
       <el-form ref="dialogFormRef" :model="state.ruleForm" size="default" label-width="100px">
         <el-row>
-          <el-col v-show="false" class="mt-5" :span="24">
+          <el-col v-show="false" class="mt-15" :span="24">
             <el-form-item v-show="false" label="公告ID" prop="id">
               <el-input v-model="state.ruleForm.id" placeholder="公告ID"></el-input>
             </el-form-item>
           </el-col>
-          <el-col class="mt-5" :span="24">
+          <el-col class="mt-15" :span="24">
             <el-form-item label="公告标题" prop="title">
               <el-input v-model="state.ruleForm.title" placeholder="公告标题"></el-input>
             </el-form-item>
           </el-col>
-          <el-col class="mt-5" :span="24">
+          <el-col class="mt-15" :span="24">
             <el-form-item label="公告内容" prop="content">
               <div class="editor-container">
                 <fast-editor
@@ -23,7 +23,7 @@
               </div>
             </el-form-item>
           </el-col>
-          <el-col class="mt-5" :span="24">
+          <el-col class="mt-15" :span="24">
             <el-form-item label="公告类型" prop="type">
               <fast-select
                 v-model="state.ruleForm.type"
@@ -32,7 +32,7 @@
               ></fast-select>
             </el-form-item>
           </el-col>
-          <el-col class="mt-5" :span="24">
+          <el-col class="mt-15" :span="24">
             <el-form-item label="公告状态" prop="status">
               <fast-switch
                 v-model="state.ruleForm.status"
@@ -41,12 +41,12 @@
               ></fast-switch>
             </el-form-item>
           </el-col>
-          <el-col class="mt-5" :span="24">
+          <el-col class="mt-15" :span="24">
             <el-form-item label="备注" prop="remark">
               <fast-file v-model="state.ruleForm.remark" />
             </el-form-item>
           </el-col>
-          <el-col class="mt-5" :span="24">
+          <el-col class="mt-15" :span="24">
             <el-form-item label="排序" prop="sort">
               <el-input-number
                 v-model="state.ruleForm.sort"
@@ -126,7 +126,7 @@
   const openDialog = (type: string, row: NoticeEntity) => {
     resetForm();
     if (type === CURDEnum.EDIT) {
-      state.ruleForm = row;
+      state.ruleForm = Object.assign({}, row);
       state.dialog.title = '修改';
       state.dialog.submitTxt = '修 改';
       state.dialog.type = CURDEnum.EDIT;
@@ -137,7 +137,7 @@
       state.dialog.type = CURDEnum.INSERT;
       // 清空表单，此项需加表单验证才能使用
       nextTick(() => {
-        dialogFormRef.value.resetFields();
+        dialogFormRef.value.clearValidate();
       });
     }
     getMenuData();

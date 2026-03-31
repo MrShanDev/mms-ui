@@ -202,7 +202,7 @@
     state.dialog.isShowDialog = true; // 确保使用响应式赋值
     resetForm();
     if (type === CURDEnum.EDIT) {
-      state.ruleForm = row;
+      state.ruleForm = Object.assign({}, row);
       state.dialog.title = '修改用户';
       state.dialog.submitTxt = '修 改';
       state.dialog.type = CURDEnum.EDIT;
@@ -212,7 +212,7 @@
       state.dialog.type = CURDEnum.INSERT;
       // 清空表单，此项需加表单验证才能使用
       nextTick(() => {
-        defDialogFormRef.value.resetFields();
+        defDialogFormRef.value.clearValidate();
       });
     }
     getMenuData();

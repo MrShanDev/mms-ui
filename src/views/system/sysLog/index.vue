@@ -1,7 +1,7 @@
 <template>
   <div class="block">
     <!-- Table  -->
-    <div class="system-sysLog-container layout-padding mt-5 p-t-0">
+    <div class="system-sysLog-container layout-padding mt-15 p-t-0">
       <el-card shadow="hover" class="layout-padding-auto">
         <el-container>
           <el-main>
@@ -87,14 +87,14 @@
               ></el-table-column>
               <el-table-column fixed="right" label="操作" width=" 100 ">
                 <template #default="scope">
-                  <el-tooltip placement="top" content="预览">
+                  <el-tooltip placement="top" :content="$t('message.form.edit')">
                     <el-icon
                       class="mr10"
                       color="blue"
                       v-auths="['system:sysLog:query', 'system:sysLog:edit']"
                       @click="onCURD({ type: curdEnum.EDIT, ids: scope.row.operId })"
                     >
-                      <ele-View />
+                      <ele-Edit />
                     </el-icon>
                   </el-tooltip>
                 </template>

@@ -1,7 +1,7 @@
 <template>
   <div class="block">
     <div class="system-menu-container layout-padding ">
-      <el-card shadow="hover" class="layout-padding-auto mt-5">
+      <el-card shadow="hover" class="layout-padding-auto mt-15">
         <div class="system-menu-search">
           <el-button size="small" type="primary" @click="clickExpand">
             <el-icon><ele-Sort /></el-icon>
