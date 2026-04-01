@@ -1,4 +1,3 @@
-import { BaseEntity, TableType } from '/@/types/global';
 
 export declare interface SysOssState {
   tableData: SysOssTableType;

@@ -32,7 +32,6 @@
   import { useI18n } from 'vue-i18n';
   import { storeToRefs } from 'pinia';
   import { useTagsViewRoutes } from '/@/stores/tagsViewRoutes';
-  import { RouteItem } from '/@/types/global';
 
   // 定义变量内容
   const storesTagsViewRoutes = useTagsViewRoutes();

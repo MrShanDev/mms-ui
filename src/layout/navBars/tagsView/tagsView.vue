@@ -85,7 +85,6 @@
   import { isObjectValueEqual } from '/@/utils/arrayOperation';
   import other from '/@/utils/other';
   import mittBus from '/@/utils/mitt';
-  import { RefType, RouteItem, RouteItems, RouteToFrom, WheelEventType } from '/@/types/global';
 
   // 引入组件
   const Contextmenu = defineAsyncComponent(

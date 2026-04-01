@@ -1,5 +1,4 @@
 // role
-import { BaseEntity, TableType } from '/@/types/global';
 
 export declare interface SysRoleState {
   tableData: SysRoleTableType;

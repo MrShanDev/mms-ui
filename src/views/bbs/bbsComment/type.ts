@@ -1,30 +1,13 @@
-import {BaseEntity} from "/@/types/global";
 
-/**
-* 对象实体Vo
-* @extends {BaseEntity}
-*/
-export declare interface BbsCommentVo extends BaseEntity {
-      id: string;
-      fatherId: string;
-      bbsId: string;
-      level: number;
-      memberId: string;
-      comment: string;
-      memberNickName?: string;
-      memberHeadImg?: string;
-      likeCount?: number;
+export declare interface BbsBbsCommentState {
+  tableData: BbsBbsCommentTableData;
 }
 
-/**
-* 对象实体Bo
-* @extends {BaseEntity}
-*/
-export declare interface BbsCommentBo extends BaseEntity {
-        id: string;
-        fatherId: string;
-        bbsId: string;
-        level: number;
-        memberId: string;
-        comment: string;
+declare interface BbsBbsCommentTableData extends TableType {
+  data: BbsBbsCommentEntity[];
+}
+
+/** 话题评论 */
+export declare interface BbsBbsCommentEntity extends BaseEntity {
+  [key: string]: any;
 }

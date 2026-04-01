@@ -1,4 +1,3 @@
-import { BaseEntity, TableType } from '/@/types/global';
 
 /**
  * moduleName: 系统公告
@@ -26,6 +25,7 @@ declare interface NoticeTableData extends TableType {
 export declare interface NoticeEntity extends BaseEntity {
   id: string | number;
   title: string | number;
-  content: string | number;
+  /** 富文本 HTML，与 fast-editor 的 string 绑定一致 */
+  content: string;
   type: string | number;
 }

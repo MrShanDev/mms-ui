@@ -1,33 +1,13 @@
-import {BaseEntity} from "/@/types/global";
 
-/**
-* 对象实体Vo
-* @extends {BaseEntity}
-*/
-export declare interface BbsTopicVo extends BaseEntity {
-      id: string;
-      memberId: string;
-      cateId: string;
-      title: string;
-      contentHtml: string;
-      memberNickName?: string;
-      memberHeadImg?: string;
-      commentCount?: number;
-      likeCount?: number;
-      favoriteCount?: number;
-      attentionCount?: number;
-      files?: any[];
+export declare interface BbsBbsTopicState {
+  tableData: BbsBbsTopicTableData;
 }
 
-/**
-* 对象实体Bo
-* @extends {BaseEntity}
-*/
-export declare interface BbsTopicBo extends BaseEntity {
-        id: string;
-        memberId: string;
-        cateId: string;
-        title: string;
-        contentHtml: string;
-        files?: any[];
+declare interface BbsBbsTopicTableData extends TableType {
+  data: BbsBbsTopicEntity[];
+}
+
+/** 话题 */
+export declare interface BbsBbsTopicEntity extends BaseEntity {
+  [key: string]: any;
 }

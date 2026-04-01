@@ -185,7 +185,6 @@
     useTableSubmitApi,
   } from '/@/views/system/generate';
   import { useMenuApi } from '/@/views/system/menu';
-  import { RouteItems } from '/@/types/global';
   import { NextLoading } from '/@/utils/loading';
   const emit = defineEmits(['refreshDataList']);
 

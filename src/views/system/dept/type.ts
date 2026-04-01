@@ -1,4 +1,3 @@
-import { BaseEntity, TableType } from '/@/types/global';
 
 /**
  * moduleName: 系统部门

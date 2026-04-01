@@ -1,49 +1,13 @@
-import {BaseEntity} from "/@/types/global";
 
-/**
-* 对象实体Vo
-* @extends {BaseEntity}
-*/
-export declare interface AppVersionVo extends BaseEntity {
-      id: string;
-      appCode: string;
-      appName: string;
-      platform: string;
-      versionCode: string;
-      versionName: string;
-      buildNumber: string;
-      downloadUrl: string;
-      fileSize: string;
-      fileMd5: string;
-      releaseNotes: string;
-      isForceUpdate: number;
-      minRequiredVersion: string;
-      publishType: string;
-      publishStatus: string;
-      publishTime: string;
-      publishUser: string;
+export declare interface AppAppVersionState {
+  tableData: AppAppVersionTableData;
 }
 
-/**
-* 对象实体Bo
-* @extends {BaseEntity}
-*/
-export declare interface AppVersionBo extends BaseEntity {
-        id: string;
-        appCode: string;
-        appName: string;
-        platform: string;
-        versionCode: string;
-        versionName: string;
-        buildNumber: string;
-        downloadUrl: string;
-        fileSize: string;
-        fileMd5: string;
-        releaseNotes: string;
-        isForceUpdate: number;
-        minRequiredVersion: string;
-        publishType: string;
-        publishStatus: string;
-        publishTime: string;
-        publishUser: string;
+declare interface AppAppVersionTableData extends TableType {
+  data: AppAppVersionEntity[];
+}
+
+/** App版本发布表 */
+export declare interface AppAppVersionEntity extends BaseEntity {
+  [key: string]: any;
 }

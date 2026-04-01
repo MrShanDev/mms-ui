@@ -175,7 +175,6 @@ import 'cropperjs/dist/cropper.css';
 import {Delete, Plus, UploadFilled, ZoomIn, Edit, Crop} from '@element-plus/icons-vue';
 import { uploadImg } from '/@/views/system/upload';
 import { generateUUID } from '/@/utils/mms';
-import { RefType } from '/@/types/global';
 import { Session } from '/@/utils/storage';
 const httpFileHeaders = ref({
     Authorization: `${Session.get('token')}`,

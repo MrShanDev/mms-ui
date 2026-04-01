@@ -1,67 +1,66 @@
 import request from '/@/utils/request';
-import {getEnv} from "/@/utils/mms";
-import {AxiosPromise} from "axios";
-import {SysEnum} from "/@/enums/SysEnum";
-import {EncryptTypeEnum} from "/@/enums/EncryptTypeEnum";
-import {BbsLeveBo,BbsLeveVo} from '/@/views/bbs/bbsLeve/type';
+import { getEnv } from '/@/utils/mms';
+import { AxiosPromise } from 'axios';
+import { SysEnum } from '/@/enums/SysEnum';
+import { EncryptTypeEnum } from '/@/enums/EncryptTypeEnum';
+
 /**
-* 话题操作-Api
-* BbsLeve
-*/
-export function bbsLeveApi() {
-    return {
-        list: (params?: object): AxiosPromise<Array<BbsLeveVo>> => {
-            return request({
-                url: getEnv()+'/bbs/bbsLeve/list',
-                method: 'post',
-                data: params,
-                headers: {
-                    'Encrypt-State':SysEnum.SYS_COMMON_STATE_CLOSE,
-                    'Encrypt-Type': EncryptTypeEnum.AES
-                },
-            });
+ * 话题操作 — Api（bbs/bbsLeve）
+ */
+export function bbsBbsLeveApi() {
+  return {
+    list: <T = any>(params?: object): AxiosPromise<T> => {
+      return request({
+        url: getEnv() + '/bbs/bbsLeve/list',
+        method: 'post',
+        data: params,
+        headers: {
+          'Encrypt-State': SysEnum.SYS_COMMON_STATE_CLOSE,
+          'Encrypt-Type': EncryptTypeEnum.AES,
         },
-        edit: (params?: BbsLeveBo): AxiosPromise<boolean> => {
-            return request({
-                url: getEnv()+'/bbs/bbsLeve',
-                method: 'put',
-                data: params,
-                headers: {
-                    'Encrypt-State':SysEnum.SYS_COMMON_STATE_CLOSE,
-                    'Encrypt-Type': EncryptTypeEnum.AES
-                },
-            });
+      });
+    },
+    edit: <T = any>(params?: object): AxiosPromise<T> => {
+      return request({
+        url: getEnv() + '/bbs/bbsLeve',
+        method: 'put',
+        data: params,
+        headers: {
+          'Encrypt-State': SysEnum.SYS_COMMON_STATE_CLOSE,
+          'Encrypt-Type': EncryptTypeEnum.AES,
         },
-        query: (id?: number | string): AxiosPromise<BbsLeveVo> => {
-            return request({
-                url: getEnv()+'/bbs/bbsLeve/'+id,
-                method: 'get',
-                headers: {
-                    'Encrypt-State':SysEnum.SYS_COMMON_STATE_CLOSE,
-                    'Encrypt-Type': EncryptTypeEnum.AES
-                },
-            });
+      });
+    },
+    query: <T = any>(id?: number | string): AxiosPromise<T> => {
+      return request({
+        url: getEnv() + '/bbs/bbsLeve/' + id,
+        method: 'get',
+        headers: {
+          'Encrypt-State': SysEnum.SYS_COMMON_STATE_CLOSE,
+          'Encrypt-Type': EncryptTypeEnum.AES,
         },
-        insert: (params?: BbsLeveBo): AxiosPromise<boolean> => {
-            return request({
-                url: getEnv()+'/bbs/bbsLeve',
-                method: 'post',
-                data: params,
-                headers: {
-                    'Encrypt-State':SysEnum.SYS_COMMON_STATE_CLOSE,
-                    'Encrypt-Type': EncryptTypeEnum.AES
-                },
-            });
+      });
+    },
+    insert: <T = any>(params?: object): AxiosPromise<T> => {
+      return request({
+        url: getEnv() + '/bbs/bbsLeve',
+        method: 'post',
+        data: params,
+        headers: {
+          'Encrypt-State': SysEnum.SYS_COMMON_STATE_CLOSE,
+          'Encrypt-Type': EncryptTypeEnum.AES,
         },
-        delete: (id?: number | string): AxiosPromise<boolean> => {
-            return request({
-                url: getEnv()+'/bbs/bbsLeve/' + id,
-                method: 'delete',
-                headers: {
-                    'Encrypt-State':SysEnum.SYS_COMMON_STATE_CLOSE,
-                    'Encrypt-Type': EncryptTypeEnum.AES
-                },
-            });
+      });
+    },
+    delete: <T = any>(id?: number | string): AxiosPromise<T> => {
+      return request({
+        url: getEnv() + '/bbs/bbsLeve/' + id,
+        method: 'delete',
+        headers: {
+          'Encrypt-State': SysEnum.SYS_COMMON_STATE_CLOSE,
+          'Encrypt-Type': EncryptTypeEnum.AES,
         },
-    };
+      });
+    },
+  };
 }

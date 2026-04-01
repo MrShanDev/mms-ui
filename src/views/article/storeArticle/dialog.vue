@@ -1,233 +1,119 @@
 <template>
-    <div class="article-storeArticle-dialog-container">
-        <el-dialog
-            :title="state.dialog.title"
-            v-model="state.dialog.isShowDialog"
-            :width="dialogWidth" draggable>
-            <el-form ref="dialogFormRef" :model="state.ruleForm" size="default" label-width="100px">
-                <el-row :gutter="20">
-                    <el-col v-show="false" class="mt-15" :span="24">
-                        <el-form-item v-show="false" label="ID" prop="id">
-                            <el-input v-model="state.ruleForm.id" placeholder="ID"></el-input>
-                        </el-form-item>
-                    </el-col>
-                    <el-col class="mt-15" :span="24">
-                        <el-form-item label="文章标题" prop="title">
-                            <el-input v-model="state.ruleForm.title" placeholder="请输入文章标题"></el-input>
-                        </el-form-item>
-                    </el-col>
-                    <el-col class="mt-15" :span="12">
-                        <el-form-item label="文章分类" prop="articleCateId">
-                            <el-tree-select
-                                v-model="state.ruleForm.articleCateId"
-                                :data="state.threeData"
-                                :props="{ label: 'cateName', children: 'children', value: 'id' }"
-                                node-key="id"
-                                placeholder="请选择文章分类"
-                                check-strictly
-                                default-expand-all
-                                class="w100"
-                            />
-                        </el-form-item>
-                    </el-col>
-                    <el-col class="mt-15" :span="12">
-                        <el-form-item label="作者" prop="author">
-                            <el-input v-model="state.ruleForm.author" placeholder="请输入作者"></el-input>
-                        </el-form-item>
-                    </el-col>
-                    <el-col class="mt-15" :span="12">
-                        <el-form-item label="文章标签" prop="tag">
-                            <div class="flex-warp w100 p-5">
-                                <el-tag
-                                    v-for="tag in state.dynamicTags"
-                                    :key="tag"
-                                    class="mr5 mb5"
-                                    closable
-                                    :disable-transitions="false"
-                                    @close="handleTagClose(tag)"
-                                >
-                                    {{ tag }}
-                                </el-tag>
-                                <el-input
-                                    v-if="state.inputVisible"
-                                    ref="saveTagInput"
-                                    v-model="state.inputValue"
-                                    class="input-new-tag mb5"
-                                    size="small"
-                                    style="width: 100px"
-                                    @keyup.enter="handleInputConfirm"
-                                    @blur="handleInputConfirm"
-                                />
-                                <el-button v-else class="button-new-tag mb5" size="small" @click="showTagInput">
-                                    + 新增标签
-                                </el-button>
-                            </div>
-                        </el-form-item>
-                    </el-col>
-                    <el-col class="mt-15" :span="12">
-                        <el-form-item label="排序" prop="sort">
-                            <el-input-number v-model="state.ruleForm.sort" :min="1" class="w100" />
-                        </el-form-item>
-                    </el-col>
-                    <el-col class="mt-15" :span="12">
-                        <el-form-item label="封面图片" prop="coverImg">
-                            <fast-img v-model="state.ruleForm.coverImg" :fileUrl="state.ruleForm.coverImg" />
-                        </el-form-item>
-                    </el-col>
-                    <el-col class="mt-15" :span="12">
-                        <el-form-item label="状态" prop="status">
-                            <fast-switch v-model="state.ruleForm.status" dict-type="SYS_STATE"></fast-switch>
-                        </el-form-item>
-                    </el-col>
-                    <el-col class="mt-15" :span="24">
-                        <el-form-item label="内容" prop="content">
-                            <div class="editor-container" style="width: 100%">
-                                <fast-editor v-model:get-html="state.ruleForm.content" v-bind:content="state.ruleForm.content"/>
-                            </div>
-                        </el-form-item>
-                    </el-col>
-                </el-row>
-            </el-form>
-            <template #footer>
-                <span class="dialog-footer">
-                <el-button @click="closeDialog" size="default">取 消</el-button>
-                <el-button type="primary" @click="onSubmit" size="default">{{ state.dialog.submitTxt }}</el-button>
-                </span>
-            </template>
-        </el-dialog>
-    </div>
+  <div class="article-storeArticle-dialog-container">
+    <el-dialog :title="state.dialog.title" v-model="state.dialog.isShowDialog" width="769px">
+      <el-form ref="dialogFormRef" :model="state.ruleForm" size="default" label-width="120px">
+        <el-row>
+          <el-col v-show="false" class="mt-5" :span="24">
+            <el-form-item v-show="false" label="id" prop="id">
+              <el-input v-model="state.ruleForm.id" />
+            </el-form-item>
+          </el-col>
+          <el-col class="mt-5" :span="24">
+            <el-form-item label="ID" prop="id">
+              <el-input v-model="state.ruleForm.id" placeholder="ID" clearable />
+            </el-form-item>
+          </el-col>
+          <el-col class="mt-5" :span="24">
+            <el-form-item label="文章标题" prop="title">
+              <el-input v-model="state.ruleForm.title" placeholder="文章标题" clearable />
+            </el-form-item>
+          </el-col>
+          <el-col class="mt-5" :span="24">
+            <el-form-item label="封面图片" prop="coverImg">
+              <el-input v-model="state.ruleForm.coverImg" placeholder="封面图片" clearable />
+            </el-form-item>
+          </el-col>
+          <el-col class="mt-5" :span="24">
+            <el-form-item label="标签" prop="tag">
+              <el-input v-model="state.ruleForm.tag" placeholder="标签" clearable />
+            </el-form-item>
+          </el-col>
+          <el-col class="mt-5" :span="24">
+            <el-form-item label="作者" prop="author">
+              <el-input v-model="state.ruleForm.author" placeholder="作者" clearable />
+            </el-form-item>
+          </el-col>
+          <el-col class="mt-5" :span="24">
+            <el-form-item label="分类ID" prop="articleCateId">
+              <el-input v-model="state.ruleForm.articleCateId" placeholder="分类ID" clearable />
+            </el-form-item>
+          </el-col>
+          <el-col class="mt-5" :span="24">
+            <el-form-item label="分类名称" prop="articleCateName">
+              <el-input v-model="state.ruleForm.articleCateName" placeholder="分类名称" clearable />
+            </el-form-item>
+          </el-col>
+          <el-col class="mt-5" :span="24">
+            <el-form-item label="内容" prop="content">
+              <el-input v-model="state.ruleForm.content" type="textarea" :rows="6" placeholder="内容" />
+            </el-form-item>
+          </el-col>
+          <el-col class="mt-5" :span="24">
+            <el-form-item label="会员ID" prop="memberId">
+              <el-input v-model="state.ruleForm.memberId" placeholder="会员ID" clearable />
+            </el-form-item>
+          </el-col>
+
+        </el-row>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="closeDialog" size="default">取 消</el-button>
+          <el-button
+            type="primary"
+            :disabled="state.dialog.loading"
+            :loading-icon="Eleme"
+            :loading="state.dialog.loading"
+            @click="onSubmit"
+            size="default"
+          >{{ state.dialog.submitTxt }}</el-button>
+        </span>
+      </template>
+    </el-dialog>
+  </div>
 </template>
-//ModuleName 店铺文章
 <script setup lang="ts" name="articleStoreArticleDialog">
-import {nextTick, reactive, ref} from "vue";
-import {CURDEnum} from '/@/enums/CURDEnum';
-import {ElMessage} from "element-plus";
-import {StoreArticleBo, StoreArticleVo} from '/@/views/article/storeArticle/type';
-import {storeArticleCateApi} from '/@/views/article/storeArticleCate';
-import {StoreArticleCateVo} from '/@/views/article/storeArticleCate/type';
-import { useUserInfo } from '/@/stores/userInfo';
-const cateApi = storeArticleCateApi();
-const userStore = useUserInfo();
-
-const dialogWidth = ref('50vw');
-import FastImg from "/@/components/fast-upload/img.vue"
-import FastSelect from '/@/components/fast-select/src/fast-select.vue';
-dialogWidth.value = '75vw';
-import FastEditor from '/@/components/fast-editor/src/fast-editor.vue';
-import FastSwitch from "/@/components/fast-switch/src/fast-switch.vue";
-
-
-
-// 定义子组件向父组件传值/事件
-const emit = defineEmits(['refresh']);
-const dialogFormRef = ref();
-const state = reactive({
-    ruleForm: {} as StoreArticleBo ,
-    threeData: [] as StoreArticleVo[] ,
-    dynamicTags: [] as string[],
-    inputVisible: false,
-    inputValue: '',
+  import { reactive, ref, nextTick } from 'vue';
+  import { CURDEnum } from '/@/enums/CURDEnum';
+  import { ArticleStoreArticleEntity } from './type';
+  import { Eleme } from '@element-plus/icons-vue';
+  const emit = defineEmits(['refresh']);
+  const dialogFormRef = ref();
+  const state = reactive({
+    ruleForm: {} as ArticleStoreArticleEntity,
     dialog: {
-        loading: false,
-        isShowDialog: false,
-        type: "",
-        title: "",
-        submitTxt: "",
+      loading: false,
+      isShowDialog: false,
+      type: '',
+      title: '',
+      submitTxt: '',
     },
-});
-
-// 重置
-const resetForm = () => {
-    state.dynamicTags = [];
-    state.inputVisible = false;
-    state.inputValue = '';
+  });
+  const resetForm = () => {
     state.dialog.loading = false;
-    state.ruleForm = {
-        id: '',
-        title: '',
-        coverImg: '',
-        tag: '',
-        author: '',
-        articleCateId: '',
-        content: '',
-        status: 1,
-        sort: 1,
-        remark: '',
-        memberId: ''
-    }as StoreArticleBo;
-}
-// 打开弹窗
-const openDialog = (type: string, row: StoreArticleVo) => {
+    state.ruleForm = {} as ArticleStoreArticleEntity;
+  };
+  const openDialog = (type: string, row?: ArticleStoreArticleEntity) => {
     resetForm();
-    if (type === CURDEnum.EDIT) {
-        state.ruleForm = Object.assign({}, row);
-        if (state.ruleForm.tag) {
-            state.dynamicTags = state.ruleForm.tag.split(',').filter(v => v);
-        }
+    nextTick(() => {
+      if (type === CURDEnum.EDIT && row) {
+        state.ruleForm = { ...row } as ArticleStoreArticleEntity;
         state.dialog.title = '修改';
-        state.dialog.submitTxt = '修 改';
-        state.dialog.type = CURDEnum.EDIT;
-    }
-    if (type === CURDEnum.INSERT) {
+      } else {
         state.dialog.title = '新增';
-        state.dialog.submitTxt = '新 增';
-        state.dialog.type = CURDEnum.INSERT;
-        // 自动填充当前登录用户为作者
-        state.ruleForm.author = userStore.userInfos.userName;
-        // 清空表单，此项需加表单验证才能使用
-        nextTick(() => {
-            dialogFormRef.value.clearValidate();
-        });
-    }
-    getMenuData();
-    state.dialog.isShowDialog = true;
-};
-// 关闭弹窗
-const closeDialog = () => {
-    state.dialog.loading = false;
+      }
+      state.dialog.submitTxt = type === CURDEnum.INSERT ? '新 增' : '修 改';
+      state.dialog.isShowDialog = true;
+      state.dialog.type = type;
+    });
+  };
+  const closeDialog = () => {
     state.dialog.isShowDialog = false;
-};
-// 重置Loading
-const resetLoading = () => {
-    state.dialog.loading = false;
-};
-// 提交
-const onSubmit = () => {
-    state.ruleForm.tag = state.dynamicTags.join(',');
+  };
+  const onSubmit = () => {
     state.dialog.loading = true;
     emit('refresh', state.ruleForm);
-};
-
-const saveTagInput = ref();
-const handleTagClose = (tag: string) => {
-    state.dynamicTags.splice(state.dynamicTags.indexOf(tag), 1);
-};
-
-const showTagInput = () => {
-    state.inputVisible = true;
-    nextTick(() => {
-        saveTagInput.value.focus();
-    });
-};
-
-const handleInputConfirm = () => {
-    if (state.inputValue) {
-        const val = state.inputValue.trim();
-        if (val && !state.dynamicTags.includes(val)) {
-            state.dynamicTags.push(val);
-        }
-    }
-    state.inputVisible = false;
-    state.inputValue = '';
-};
-// 初始化菜单数据
-const getMenuData = () => {
-    cateApi.list({ isAll: true }).then(res => {
-        state.threeData = res.data;
-    })
-}
-// 暴露变量
-defineExpose({
-    openDialog, closeDialog, resetLoading
-});
+  };
+  const resetLoading = () => { state.dialog.loading = false; };
+  defineExpose({ openDialog, closeDialog, resetLoading });
 </script>

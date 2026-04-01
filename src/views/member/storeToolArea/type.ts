@@ -1,25 +1,13 @@
-import {BaseEntity} from "/@/types/global";
 
-/**
-* 对象实体Vo
-* @extends {BaseEntity}
-*/
-export declare interface StoreToolAreaVo extends BaseEntity {
-      id: string;
-      name: string;
-      code: string;
-      parentCode: string;
-      level: string;
+export declare interface MemberStoreToolAreaState {
+  tableData: MemberStoreToolAreaTableData;
 }
 
-/**
-* 对象实体Bo
-* @extends {BaseEntity}
-*/
-export declare interface StoreToolAreaBo extends BaseEntity {
-        id: string;
-        name: string;
-        code: string;
-        parentCode: string;
-        level: string;
+declare interface MemberStoreToolAreaTableData extends TableType {
+  data: MemberStoreToolAreaEntity[];
+}
+
+/** 行政区域 */
+export declare interface MemberStoreToolAreaEntity extends BaseEntity {
+  [key: string]: any;
 }

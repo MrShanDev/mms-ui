@@ -77,7 +77,7 @@
     selectedDistrict.value = '';
     provinceList.value.forEach((p: SysAreaVo) => {
       if (p.code === selectedProvince.value) {
-        cityList.value = p.children;
+        cityList.value = p.children ?? [];
       }
     });
   };
@@ -86,7 +86,7 @@
     selectedDistrict.value = '';
     cityList.value.forEach((p: SysAreaVo) => {
       if (p.code === selectedCity.value) {
-        districtList.value = p.children;
+        districtList.value = p.children ?? [];
       }
     });
   };
@@ -116,7 +116,7 @@
         selectedCity.value = props.modelValue[1];
         provinceList.value.forEach((p: SysAreaVo) => {
           if (p.code === selectedProvince.value) {
-            cityList.value = p.children;
+            cityList.value = p.children ?? [];
           }
         });
       }
@@ -124,7 +124,7 @@
         selectedDistrict.value = props.modelValue[2];
         cityList.value.forEach((p: SysAreaVo) => {
           if (p.code === selectedCity.value) {
-            districtList.value = p.children;
+            districtList.value = p.children ?? [];
           }
         });
       }

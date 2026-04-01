@@ -1,37 +1,13 @@
-import {BaseEntity} from "/@/types/global";
 
-/**
-* 对象实体Vo
-* @extends {BaseEntity}
-*/
-export declare interface StoreMemberAuthenticationVo extends BaseEntity {
-      id: string;
-      memberId: string;
-      name: string;
-      number: string;
-      phone: string;
-      imageFront: string;
-      imageBack: string;
-      businessLicense: string;
-      sex: string;
-      address: string;
-      nationality: string;
+export declare interface MemberStoreMemberAuthenticationState {
+  tableData: MemberStoreMemberAuthenticationTableData;
 }
 
-/**
-* 对象实体Bo
-* @extends {BaseEntity}
-*/
-export declare interface StoreMemberAuthenticationBo extends BaseEntity {
-        id: string;
-        memberId: string;
-        name: string;
-        number: string;
-        phone: string;
-        imageFront: string;
-        imageBack: string;
-        businessLicense: string;
-        sex: string;
-        address: string;
-        nationality: string;
+declare interface MemberStoreMemberAuthenticationTableData extends TableType {
+  data: MemberStoreMemberAuthenticationEntity[];
+}
+
+/** 会员认证 */
+export declare interface MemberStoreMemberAuthenticationEntity extends BaseEntity {
+  [key: string]: any;
 }

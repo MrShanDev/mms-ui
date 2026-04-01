@@ -425,7 +425,6 @@
   import { Session } from '/@/utils/storage';
   import { elEmail, elPhone, email, phone } from '/@/utils/toolsValidate';
   import type { ComponentSize, FormInstance, FormRules } from 'element-plus';
-  import { VerifyType } from '/@/types/global';
   import { Message } from '@element-plus/icons-vue';
   const succeed = ref(false);
   const unCode = ref(false);

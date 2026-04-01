@@ -1,29 +1,13 @@
-import {BaseEntity} from "/@/types/global";
 
-/**
-* 对象实体Vo
-* @extends {BaseEntity}
-*/
-export declare interface StoreArticleCateVo extends BaseEntity {
-      id: string;
-      parentId: string;
-      cateName: string;
-      level: number;
-      icon: string;
-      ids:string;
-      children: StoreArticleCateVo[];
+export declare interface ArticleStoreArticleCateState {
+  tableData: ArticleStoreArticleCateTableData;
 }
 
-/**
-* 对象实体Bo
-* @extends {BaseEntity}
-*/
-export declare interface StoreArticleCateBo extends BaseEntity {
-        id: string;
-        parentId: string;
-        cateName: string;
-        level: number;
-        icon: string;
-    ids:string;
-    children: StoreArticleCateVo[];
+declare interface ArticleStoreArticleCateTableData extends TableType {
+  data: ArticleStoreArticleCateEntity[];
+}
+
+/** 店铺文章分类 */
+export declare interface ArticleStoreArticleCateEntity extends BaseEntity {
+  [key: string]: any;
 }

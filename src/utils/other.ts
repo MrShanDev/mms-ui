@@ -8,7 +8,6 @@ import { useThemeConfig } from '/@/stores/themeConfig';
 import { i18n } from '/@/i18n';
 import { Local } from '/@/utils/storage';
 import { url } from '/@/utils/toolsValidate';
-import { EmptyArrayType, EmptyObjectType, RouteItem, RouteToFrom } from '/@/types/global';
 
 // 引入组件
 const SvgIcon = defineAsyncComponent(() => import('/@/components/svg-icon/index'));
@@ -68,7 +67,8 @@ export function setTagsViewNameI18n(item: any) {
     }
   } else {
     // 非自定义 tagsView 名称
-    tagsViewName = i18n.global.t(meta.title);
+    // vue-i18n 在 strict 下对动态 key 推导会触发 TS2589，此处仅做运行时翻译
+    tagsViewName = (i18n.global as any).t(String(meta?.title ?? ''));
   }
   return tagsViewName;
 }

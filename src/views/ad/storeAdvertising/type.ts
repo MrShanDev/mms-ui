@@ -1,41 +1,13 @@
-import {BaseEntity} from "/@/types/global";
 
-/**
-* 对象实体Vo
-* @extends {BaseEntity}
-*/
-export declare interface StoreAdvertisingVo extends BaseEntity {
-      id: string;
-      advertisingId: string;
-      startTime: string;
-      endTime: string;
-      routeUrl: string;
-      routeParameter: string;
-      imageUrl: string;
-      extendedParameterOne: string;
-      extendedParameterTwo: string;
-      extendedParameterThree: string;
-      extendedParameterFour: string;
-      extendedParameterFive: string;
-      pushIndex: number;
+export declare interface AdStoreAdvertisingState {
+  tableData: AdStoreAdvertisingTableData;
 }
 
-/**
-* 对象实体Bo
-* @extends {BaseEntity}
-*/
-export declare interface StoreAdvertisingBo extends BaseEntity {
-        id: string;
-        advertisingId: string;
-        startTime: string;
-        endTime: string;
-        routeUrl: string;
-        routeParameter: string;
-        imageUrl: string;
-        extendedParameterOne: string;
-        extendedParameterTwo: string;
-        extendedParameterThree: string;
-        extendedParameterFour: string;
-        extendedParameterFive: string;
-        pushIndex: number;
+declare interface AdStoreAdvertisingTableData extends TableType {
+  data: AdStoreAdvertisingEntity[];
+}
+
+/** 广告 */
+export declare interface AdStoreAdvertisingEntity extends BaseEntity {
+  [key: string]: any;
 }

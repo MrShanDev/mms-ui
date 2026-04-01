@@ -1,5 +1,4 @@
 // dict
-import { TableType } from '/@/types/global';
 
 export declare interface RowDictType {
   id: number;
@@ -26,6 +25,6 @@ export type ListType = {
   value: string;
   dictType: string;
   sort: number;
-  status: string;
+  status: number | string;
   colorType: string;
 };

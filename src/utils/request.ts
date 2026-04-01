@@ -8,7 +8,6 @@ import { HttpStatus } from '/@/enums/RespEnum';
 import { encrypt, decrypt, tansParams, getFingerprint } from '/@/utils/mms';
 import { getEnv } from '/@/utils/mms';
 import { SysEnum } from '/@/enums/SysEnum';
-import { ApiSecurityParam } from '/@/types/global';
 import { logout } from '/@/views/system/login';
 import { NextLoading } from '/@/utils/loading';
 axios.defaults.headers['Content-Type'] = 'application/json;charset=utf-8';
@@ -29,6 +28,9 @@ const request: AxiosInstance = axios.create({
 // 添加请求拦截器
 request.interceptors.request.use(
   (config) => {
+    // 每次请求同步最新 App-Id（登录后服务端可能会重置）
+    const appId = getFingerprint();
+    config.headers['App-Id'] = appId;
     // 对应国际化资源文件后缀
     config.headers['Content-Language'] = 'CN';
     // 是否需要防止数据重复提交
@@ -74,7 +76,7 @@ request.interceptors.request.use(
         // 	config.data[k]=encrypt(config.data[k])
         // }
         config.data = {
-          appId: config.headers['App-Id'],
+          appId,
           data: config.data,
           sign: encrypt(config.data),
           timestamp: new Date().getTime(),

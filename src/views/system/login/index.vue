@@ -144,19 +144,31 @@ const getThemeConfig = reactive({
     startBase()
       .then((res) => {
         if (res.code == 200) {
-          getThemeConfig.globalTitle = res.data.globalTitle;
-          getThemeConfig.globalDescription = res.data.globalDescription;
-          getThemeConfig.logo = res.data.logo;
-          getThemeConfig.loginType = res.data.loginType;
-          getThemeConfig.captchaState = res.data.captchaState;
-          getThemeConfig.demoMode = res.data.demoMode;
-          getThemeConfig.demoAccount = res.data.demoAccount;
-          getThemeConfig.demoPassword = res.data.demoPassword;
-          if (res.data.loginBg != null && res.data.loginBg.length > 0) {
-            getThemeConfig.loginBg = res.data.loginBg;
+          const d = res.data as {
+            globalTitle?: string;
+            globalDescription?: string;
+            logo?: string;
+            loginType?: string[];
+            captchaState?: boolean;
+            demoMode?: boolean;
+            demoAccount?: string;
+            demoPassword?: string;
+            loginBg?: string;
+            codeUrl?: string;
+          };
+          getThemeConfig.globalTitle = d.globalTitle ?? '';
+          getThemeConfig.globalDescription = d.globalDescription ?? '';
+          getThemeConfig.logo = d.logo ?? getThemeConfig.logo;
+          getThemeConfig.loginType = d.loginType ?? [];
+          getThemeConfig.captchaState = d.captchaState ?? false;
+          getThemeConfig.demoMode = d.demoMode ?? false;
+          getThemeConfig.demoAccount = d.demoAccount ?? '';
+          getThemeConfig.demoPassword = d.demoPassword ?? '';
+          if (d.loginBg != null && d.loginBg.length > 0) {
+            getThemeConfig.loginBg = d.loginBg;
           }
-          if (res.data.codeUrl != null && res.data.codeUrl.length > 0) {
-            getThemeConfig.codeUrl = res.data.codeUrl;
+          if (d.codeUrl != null && d.codeUrl.length > 0) {
+            getThemeConfig.codeUrl = d.codeUrl;
           }
         }
       })

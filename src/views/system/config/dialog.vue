@@ -30,7 +30,11 @@
           ></el-input>
         </el-form-item>
         <el-form-item v-if="state.ruleForm.type == 2" label="配置图" prop="configValue">
-          <fast-img v-model="state.ruleForm.configValue" :fileUrl="state.ruleForm.configValue" />
+          <fast-img
+            :model-value="String(state.ruleForm.configValue ?? '')"
+            :file-url="String(state.ruleForm.configValue ?? '')"
+            @update:model-value="(v: string) => (state.ruleForm.configValue = v)"
+          />
         </el-form-item>
         <el-form-item label="配置状态" prop="status">
           <fast-switch
