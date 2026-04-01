@@ -1,20 +1,31 @@
-# dependencies
+# 依赖
 node_modules/
 
-# build
+# 构建产出
 dist/
+**/dist/
 
-# local env (仓库内已有 .env / .env.development 等请勿提交本地覆盖)
+# Vite / 工具缓存
+.vite/
+.cache/
+*.tsbuildinfo
+.eslintcache
+
+# 本地环境（仓库内若已跟踪 .env.development 等，勿用本机密钥覆盖提交）
 .env.local
 .env.*.local
 
-# logs
+# 日志
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 
-# OS / editor
+# 测试覆盖率
+coverage/
+.nyc_output/
+
+# 操作系统
 .DS_Store
 Thumbs.db
