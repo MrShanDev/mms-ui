@@ -21,6 +21,32 @@ export function fetchPluginHostHealth<T = any>(): AxiosPromise<T> {
   return request({ url: hostBase() + '/health', method: 'get' });
 }
 
+/** 插件独立日志尾部（logs/plugins/{pluginId}@{version}.log），默认约 128KB */
+export function fetchPluginLogTail<T = any>(
+  pluginId: string,
+  version?: string | null,
+  maxBytes?: number
+): AxiosPromise<T> {
+  return request({
+    url: hostBase() + '/pluginLogTail',
+    method: 'get',
+    params: {
+      pluginId,
+      ...(version ? { version } : {}),
+      ...(maxBytes != null ? { maxBytes } : {}),
+    },
+  });
+}
+
+/** 截断清空 plugins 下该插件独立日志文件 */
+export function clearPluginLog<T = any>(pluginId: string, version?: string | null): AxiosPromise<T> {
+  return request({
+    url: hostBase() + '/pluginLogClear',
+    method: 'post',
+    data: { pluginId, version: version ?? null },
+  });
+}
+
 export function fetchPluginManifests<T = any>(): AxiosPromise<T> {
   return request({ url: hostBase() + '/manifests', method: 'get' });
 }
@@ -56,10 +82,28 @@ export function activatePluginVersion(pluginId: string, version: string): AxiosP
   });
 }
 
-/** 移除 sys_plugins / sys_plugin_version 中该插件的登记并重载；不删磁盘（与 uninstall 区分） */
+/** 仅移除库表登记并重载；不删磁盘 */
 export function removePluginCatalog(pluginId: string): AxiosPromise<any> {
   return request({
     url: marketBase() + '/removeCatalog',
+    method: 'post',
+    data: { pluginId },
+  });
+}
+
+/** 停用：清除库表激活标记并重载；不删磁盘与市场展示 */
+export function deactivatePlugin(pluginId: string): AxiosPromise<any> {
+  return request({
+    url: marketBase() + '/deactivate',
+    method: 'post',
+    data: { pluginId },
+  });
+}
+
+/** 删除：删磁盘安装目录 + 库表版本与市场行，并重载 */
+export function purgePlugin(pluginId: string): AxiosPromise<any> {
+  return request({
+    url: marketBase() + '/purge',
     method: 'post',
     data: { pluginId },
   });
