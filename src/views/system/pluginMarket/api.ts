@@ -44,7 +44,10 @@ export function uninstallPlugin(pluginId: string, version?: string | null): Axio
   });
 }
 
-/** 切换库表中的激活版本（磁盘上须已有该版本），成功后宿主全量重载 */
+/**
+ * 切换库表中的激活版本（磁盘上须已有该版本）。
+ * 重载范围由宿主 `mms.plugin.activate-version-reload-scope` 决定：`FULL` 全量，`SINGLE_TARGET` 仅目标插件（见 version/v2.0.5 §5）。
+ */
 export function activatePluginVersion(pluginId: string, version: string): AxiosPromise<any> {
   return request({
     url: hostBase() + '/activateVersion',

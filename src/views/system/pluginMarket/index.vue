@@ -18,6 +18,11 @@
           <template v-if="statusBody.resolvedPluginsRoot">
             · 解析路径：<code class="plugin-market__code">{{ statusBody.resolvedPluginsRoot }}</code>
           </template>
+          <template v-if="statusBody.activateVersionReloadScope === 'SINGLE_TARGET'">
+            · 激活版本重载：<b class="text-warning">仅目标插件</b>（多插件依赖请改
+            <code>mms.plugin.activate-version-reload-scope=FULL</code>
+            或页顶「全量重载」）
+          </template>
         </p>
       </div>
       <div class="plugin-market__actions">
@@ -84,6 +89,19 @@
               <span class="plugin-card__tag-l">健康</span>
               <el-tag :type="healthTagType(row.healthState)" size="small">
                 {{ healthLabel(row.healthState) }}
+              </el-tag>
+            </div>
+            <div
+              v-if="
+                row.runtimeState === 'LOADED' &&
+                row.subprocessLaunchEnabled &&
+                row.manifest?.runtimeMode === 'INDEPENDENT_PROCESS'
+              "
+              class="plugin-card__tags"
+            >
+              <span class="plugin-card__tag-l">子进程</span>
+              <el-tag type="warning" size="small" effect="plain">
+                {{ subprocessCardLabel(row) }}
               </el-tag>
             </div>
             <div v-else-if="row.runtimeState === 'ON_DISK'" class="plugin-card__tags plugin-card__tags--muted">
@@ -156,6 +174,37 @@
                   : '未安装（无）'
             }}
           </el-descriptions-item>
+          <el-descriptions-item
+            v-if="
+              detail.runtimeState === 'LOADED' &&
+              detail.subprocessLaunchEnabled &&
+              detail.manifest?.runtimeMode === 'INDEPENDENT_PROCESS'
+            "
+            label="独立子进程"
+          >
+            <span v-if="detail.subprocessPort != null">监听端口 {{ detail.subprocessPort }}</span>
+            <span v-else>监听端口 —</span>
+            <template v-if="detail.subprocessHostLeasedPort != null">
+              <span class="mx-1">·</span>
+              <span>租约登记 {{ detail.subprocessHostLeasedPort }}</span>
+            </template>
+            <template v-if="detail.subprocessTcpPortAppearsBound === true">
+              <span class="mx-1">·</span>
+              <span class="text-warning">端口已被占用(探测)</span>
+            </template>
+            <template v-else-if="detail.subprocessTcpPortAppearsBound === false && detail.subprocessPort != null">
+              <span class="mx-1">·</span>
+              <span class="text-gray">端口未监听(探测)</span>
+            </template>
+            <span class="mx-1">·</span>
+            <span v-if="detail.subprocessPid != null">PID {{ detail.subprocessPid }}</span>
+            <span v-else>PID —</span>
+            <span class="mx-1">·</span>
+            <span>{{ subprocessAliveLabel(detail) }}</span>
+            <div v-if="detail.subprocessLastError" class="text-warning mt-1">
+              {{ detail.subprocessLastError }}
+            </div>
+          </el-descriptions-item>
           <el-descriptions-item label="磁盘版本">{{ detail.diskVersionsLine }}</el-descriptions-item>
           <el-descriptions-item v-if="detail.diskLayoutWarning" label="磁盘布局">
             <el-tag :type="diskLayoutTagType(detail.diskLayoutWarning)" size="small">
@@ -164,6 +213,20 @@
           </el-descriptions-item>
           <el-descriptions-item label="宿主启用">{{ detail.hostEnabled ? '是' : '否' }}</el-descriptions-item>
         </el-descriptions>
+        <el-alert
+          v-if="statusBody.activateVersionReloadScope === 'SINGLE_TARGET'"
+          type="warning"
+          :closable="false"
+          show-icon
+          class="mb-2"
+          title="当前为「仅重载目标插件」模式"
+        >
+          切换激活版本<strong>不会</strong>按全局依赖拓扑重载其它插件；若插件之间存在 dependencies，可能出现未加载依赖。请改用配置
+          <code>FULL</code>
+          或使用页顶「全量重载」。说明见仓库
+          <code>version/v2.0.5-插件子进程Peer契约与激活重载边界.md</code>
+          §5。
+        </el-alert>
         <div
           v-if="detail.recordedVersions?.length > 0"
           class="plugin-detail__rollback"
@@ -309,6 +372,23 @@ function diskLayoutTagType(code: string): 'danger' | 'warning' | 'info' {
 function brief(text: string | null | undefined) {
   if (!text) return '';
   return text.length > 72 ? text.slice(0, 72) + '…' : text;
+}
+
+function subprocessAliveLabel(row: any) {
+  if (row.subprocessAlive === true) return '运行中';
+  if (row.subprocessPid != null) return '已退出';
+  return '未记录';
+}
+
+function subprocessCardLabel(row: any) {
+  const p = row.subprocessPort != null ? `:${row.subprocessPort}` : '';
+  const lease =
+    row.subprocessHostLeasedPort != null ? ` 租${row.subprocessHostLeasedPort}` : '';
+  const occ = row.subprocessTcpPortAppearsBound === true ? ' 占' : '';
+  if (row.subprocessLastError) return `异常${p}${lease}${occ}`;
+  if (row.subprocessAlive === true) return `运行中${p}${lease}${occ}`;
+  if (row.subprocessPid != null) return `已退出${p}${lease}${occ}`;
+  return `未起进程${p}${lease}${occ}`;
 }
 
 function openDetail(row: any) {
