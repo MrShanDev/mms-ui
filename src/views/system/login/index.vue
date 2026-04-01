@@ -1,30 +1,24 @@
 <template>
   <div class="login-container flex">
     <div class="login-left">
-      <!-- <div class="login-left-logo">
+      <div class="login-left-img">
+        <Animate class="flex flex-center">
+          <img :src="loginIllustrationSrc" alt="loginMain" />
+        </Animate>
+      </div>
+      <div class="login-left-brand flex">
         <Animate>
           <img :src="getThemeConfig.logo" alt="logo" />
         </Animate>
-        <div class="login-left-logo-text">
-          <Animate>
-            <span>{{ getThemeConfig.globalTitle }}</span>
-          </Animate>
-          <Animate>
-            <span class="login-left-logo-text-msg">{{ getThemeConfig.globalDescription }}</span>
-          </Animate>
-        </div>
-      </div> -->
-      <div class="login-left-img">
-        <Animate class="flex flex-center">
-        <img :src="loginBg" alt="loginMain" />
+        <Animate>
+          <span class="ml10 shou">{{ getThemeConfig.globalTitle }}</span>
         </Animate>
       </div>
-      <!-- <img :src="loginBg" class="login-left-waves " alt="bg" /> -->
     </div>
     <div class="login-right flex">
       <div class="login-right-warp flex-margin">
         <div class="login-right-warp-mian">
-          <div class="login-right-warp-main-title flex">
+          <div class="login-right-warp-main-title flex login-right-brand-mobile">
             <Animate>
               <img :src="getThemeConfig.logo" alt="logo" />
             </Animate>
@@ -72,8 +66,7 @@
   import { useThemeConfig } from '/@/stores/themeConfig';
   import { NextLoading } from '/@/utils/loading';
   import logoMini from '/@/assets/image.svg';
-  import loginMain from '/@/assets/login_main01.svg';
-  import loginBg from '/@/assets/loginbg.png';
+  import loginBgFallback from '/@/assets/loginbg.png';
   import { startBase } from '/@/views/system/init';
 
   // 引入组件
@@ -131,7 +124,7 @@ const getThemeConfig = reactive({
   globalDescription: themeConfig.value.globalViceTitleMsg,
   logo: logoMini,
   loginType: [] as Array<string>,
-  loginBg: loginMain,
+  loginBg: '' as string,
   captchaState: false,
   codeUrl: '',
   demoMode: false,
@@ -139,6 +132,11 @@ const getThemeConfig = reactive({
   demoPassword: ''
 });
 
+  const loginIllustrationSrc = computed(() => {
+    const u = getThemeConfig.loginBg;
+    if (u != null && String(u).trim().length > 0) return u;
+    return loginBgFallback;
+  });
 
   const baseStart = () => {
     startBase()
@@ -164,8 +162,8 @@ const getThemeConfig = reactive({
           getThemeConfig.demoMode = d.demoMode ?? false;
           getThemeConfig.demoAccount = d.demoAccount ?? '';
           getThemeConfig.demoPassword = d.demoPassword ?? '';
-          if (d.loginBg != null && d.loginBg.length > 0) {
-            getThemeConfig.loginBg = d.loginBg;
+          if (Object.prototype.hasOwnProperty.call(d, 'loginBg')) {
+            getThemeConfig.loginBg = d.loginBg != null && d.loginBg.length > 0 ? d.loginBg : '';
           }
           if (d.codeUrl != null && d.codeUrl.length > 0) {
             getThemeConfig.codeUrl = d.codeUrl;
@@ -202,45 +200,54 @@ const getThemeConfig = reactive({
   .login-left {
     flex: 1;
     position: relative;
-    .login-left-logo {
-      display: flex;
-      align-items: center;
+    .login-left-brand {
       position: absolute;
-      top: 50px;
-      left: 80px;
-      z-index: 1;
+      z-index: 2;
+      left: 50%;
+      bottom: 8%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
       animation: logoAnimation 0.3s ease;
+      animation-delay: 0.15s;
       img {
         width: 52px;
         height: 52px;
+        object-fit: contain;
       }
-      .login-left-logo-text {
-        display: flex;
-        flex-direction: column;
-        span {
-          margin-left: 10px;
-          font-size: 24px;
-          color: #26a59a;
-          margin-bottom: 5px;
-        }
-        .login-left-logo-text-msg {
-          font-size: 12px;
-          color: #32a99e;
-        }
+      .ml10 {
+        font-size: 27px;
+        letter-spacing: 3px;
+        color: #4487EC;
+        text-shadow: 0 0 12px rgba(255, 255, 255, 0.85);
       }
     }
     .login-left-img {
       position: absolute;
-      top: 30%;
-      left: 40%;
-      transform: translate(-50%, -50%);
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       width: 100%;
-      height: 52%;
+      height: 100%;
+      > :deep(div) {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        max-width: 100%;
+        max-height: 100%;
+      }
       img {
-        width: 50%;
-        height: 100%;
+        display: block;
+        width: auto;
+        max-width: 50%;
+        max-height: min(90vh, 100%);
+        height: auto;
+        object-fit: contain;
         animation: error-num 0.6s ease;
-        text-align: center;
       }
     }
     .login-left-waves {
@@ -272,22 +279,25 @@ const getThemeConfig = reactive({
         height: 100%;
         max-height: calc(100vh - 40px);
         overflow-y: auto;
-        .login-right-warp-main-title {
+        .login-right-warp-main-title.login-right-brand-mobile {
+          display: none;
           align-items: center;
-          padding: 50px 80px 20px;
+          justify-content: center;
+          width: 100%;
+          box-sizing: border-box;
           font-size: 27px;
           letter-spacing: 3px;
           animation: logoAnimation 0.3s ease;
           animation-delay: 0.3s;
           color: #4487EC;
-          img{
+          img {
             width: 60px;
             height: 60px;
           }
         }
         .login-right-warp-main-form {
           flex: 1;
-          padding: 0 80px 50px;
+          padding: 70px 80px 50px;
           .login-content-main-sacn {
             position: absolute;
             top: 0;
@@ -405,16 +415,8 @@ const getThemeConfig = reactive({
       .login-right-warp {
         width: 650px;
         .login-right-warp-mian {
-          .login-right-warp-main-title {
-            font-size: 32px;
-            padding: 60px 100px 30px;
-            img {
-              width: 70px;
-              height: 70px;
-            }
-          }
           .login-right-warp-main-form {
-            padding: 0 100px 60px;
+            padding: 90px 100px 60px;
           }
         }
       }
@@ -428,25 +430,16 @@ const getThemeConfig = reactive({
       .login-right-warp {
         width: 480px;
         .login-right-warp-mian {
-          .login-right-warp-main-title {
-            font-size: 24px;
-            padding: 40px 60px 20px;
-            img {
-              width: 50px;
-              height: 50px;
-            }
-          }
           .login-right-warp-main-form {
-            padding: 0 60px 40px;
+            padding: 60px 60px 40px;
           }
         }
       }
     }
     .login-left {
       .login-left-img {
-        left: 35%;
         img {
-          width: 55%;
+          max-width: 55%;
         }
       }
     }
@@ -459,16 +452,8 @@ const getThemeConfig = reactive({
       .login-right-warp {
         width: 420px;
         .login-right-warp-mian {
-          .login-right-warp-main-title {
-            font-size: 22px;
-            padding: 35px 50px 15px;
-            img {
-              width: 45px;
-              height: 45px;
-            }
-          }
           .login-right-warp-main-form {
-            padding: 0 50px 35px;
+            padding: 50px 50px 35px;
           }
         }
       }
@@ -493,6 +478,9 @@ const getThemeConfig = reactive({
     .login-left {
       display: none;
     }
+    .login-right-warp-main-title.login-right-brand-mobile {
+      display: flex !important;
+    }
     .login-right {
       width: 100%;
       max-width: 500px;
@@ -503,7 +491,7 @@ const getThemeConfig = reactive({
         max-height: calc(100vh - 30px);
         .login-right-warp-mian {
           max-height: calc(100vh - 30px);
-          .login-right-warp-main-title {
+          .login-right-warp-main-title.login-right-brand-mobile {
             font-size: 20px;
             padding: 30px 40px 15px;
             img {
@@ -548,7 +536,7 @@ const getThemeConfig = reactive({
         max-height: calc(100vh - 20px);
         .login-right-warp-mian {
           max-height: calc(100vh - 20px);
-          .login-right-warp-main-title {
+          .login-right-warp-main-title.login-right-brand-mobile {
             font-size: 18px;
             padding: 25px 30px 12px;
             img {
@@ -592,7 +580,7 @@ const getThemeConfig = reactive({
         max-height: calc(100vh - 20px);
         .login-right-warp-mian {
           max-height: calc(100vh - 20px);
-          .login-right-warp-main-title {
+          .login-right-warp-main-title.login-right-brand-mobile {
             font-size: 16px;
             padding: 20px 20px 10px;
             img {

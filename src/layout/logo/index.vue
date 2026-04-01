@@ -32,12 +32,17 @@
 
 <style scoped lang="scss">
   .layout-logo {
-    width: 200px;
-    height: 130px;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    min-height: 100px;
+    height: auto;
+    padding: 12px 10px;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
+    text-align: center;
     box-shadow: rgb(0 21 41 / 2%) 0px 1px 4px;
     background: #4487EC;
     color: var(--el-color-white);
@@ -45,6 +50,11 @@
     cursor: pointer;
     animation: logoAnimation 0.3s ease-in-out;
     border-bottom-right-radius: 10px;
+
+    > div {
+      line-height: 1.35;
+      word-break: break-word;
+    }
     
     span {
       white-space: nowrap;

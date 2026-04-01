@@ -1,6 +1,6 @@
 <template>
   <div class="layout-navbars-breadcrumb-user pr15" :style="{ flex: layoutUserFlexNum }">
-    <!-- 搜索框 -->
+    <!-- 与工具图标分开：小屏可仅隐藏 extras，保留搜索框 -->
     <div class="search-section hvr-backward">
       <el-input
         placeholder="搜索"
@@ -10,6 +10,8 @@
         @click="onSearchClick"
       />
     </div>
+    <Search ref="searchRef" class="topbar-search-host" />
+    <div class="layout-navbars-breadcrumb-user-extras">
     <el-dropdown
       :show-timeout="70"
       :hide-timeout="50"
@@ -93,6 +95,7 @@
         :class="!state.isScreenfull ? 'icon-quanping' : 'icon-quxiaoquanping'"
       ></i>
     </div>
+    </div>
     <el-dropdown :show-timeout="70" :hide-timeout="50" @command="onHandleCommandClick">
       <span class="layout-navbars-breadcrumb-user-link">
         <img
@@ -116,7 +119,6 @@
         </el-dropdown-menu>
       </template>
     </el-dropdown>
-    <Search ref="searchRef" />
   </div>
 </template>
 
@@ -306,6 +308,22 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
+
+    /* 打包隐藏的扩展区：自身需横向 flex，否则内部 icon/dropdown 会按块级竖排 */
+    .layout-navbars-breadcrumb-user-extras {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: nowrap;
+    }
+
+    /* 仅挂载搜索弹层，不在顶栏 flex 里占位（弹层 teleport 到 body） */
+    .topbar-search-host {
+      flex: 0 0 0;
+      width: 0;
+      height: 0;
+      overflow: hidden;
+    }
 
     &-link {
       height: 100%;

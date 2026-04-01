@@ -177,17 +177,29 @@ body,
     left: -1px;
   }
 
-  // 手机端左侧导航样式
-  .layout-aside-mobile {
+  // 手机端左侧导航样式（与垂直菜单、Logo 同宽，避免固定 200px 菜单被 aside overflow 裁切）
+  // 注意：left 只能写在 .layout-aside-mobile-close / -open 里，否则双类选择器会压过 -open 的 left:0，抽屉永远出不来
+  .layout-aside.layout-aside-mobile {
     position: fixed;
     top: 0;
-    left: -220px;
-    width: 220px;
+    width: 260px;
     z-index: 9999999;
+    overflow-x: visible !important;
+
+    .el-scrollbar__view {
+      overflow-x: visible;
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    .el-menu.el-menu--vertical {
+      width: 100% !important;
+      box-sizing: border-box;
+    }
   }
 
   .layout-aside-mobile-close {
-    left: -220px;
+    left: -260px;
     transition: all 0.3s cubic-bezier(0.39, 0.58, 0.57, 1);
   }
 

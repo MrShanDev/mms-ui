@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isShowBreadcrumb" class="layout-navbars-breadcrumb ml20">
+  <div v-if="isShowBreadcrumb && !isCompactTopBar" class="layout-navbars-breadcrumb ml20">
     <SvgIcon
       class="layout-navbars-breadcrumb-icon m-4"
       :name="themeConfig.isCollapse ? 'ele-Expand' : 'ele-Fold'"
@@ -31,15 +31,19 @@
       </transition-group>
     </el-breadcrumb>
   </div>
-  <!-- 欢迎信息 -->
-  <div v-if="!isShowBreadcrumb" class="welcome-section hvr-pulse ml20">
-      <span class="welcome-icon">👏</span>
-      <span class="welcome-text">欢迎回来，{{ userInfos.userName }}</span>
+  <!-- 欢迎信息：点击展开左侧菜单（若在收起状态） -->
+  <div
+    v-if="!isShowBreadcrumb || isCompactTopBar"
+    class="welcome-section hvr-pulse ml20"
+    @click="onWelcomeExpandMenu"
+  >
+    <span class="welcome-icon">👏</span>
+    <span class="welcome-text">欢迎回来，{{ userInfos.userName }}</span>
   </div>
 </template>
 
 <script setup lang="ts" name="layoutBreadcrumb">
-  import { reactive, computed, onMounted, watch } from 'vue';
+  import { reactive, computed, onMounted, onUnmounted, ref, watch } from 'vue';
   import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
   import { useI18n } from 'vue-i18n';
   import { Local } from '/@/utils/storage';
@@ -70,6 +74,15 @@
     routeSplitIndex: 1,
   });
 
+  /** 与 theme/media/index.scss 中 $sm(768px) 一致：顶栏仅保留欢迎语 + 用户区 */
+  const COMPACT_TOPBAR_MAX = 768;
+  const isCompactTopBar = ref(
+    typeof window !== 'undefined' && window.innerWidth <= COMPACT_TOPBAR_MAX
+  );
+  const onCompactTopBarResize = () => {
+    isCompactTopBar.value = window.innerWidth <= COMPACT_TOPBAR_MAX;
+  };
+
   // 动态设置经典、横向布局不显示
   const isShowBreadcrumb = computed(() => {
     const { layout, isBreadcrumb } = themeConfig.value;
@@ -86,6 +99,26 @@
   const onThemeConfigChange = () => {
     themeConfig.value.isCollapse = !themeConfig.value.isCollapse;
     setLocalThemeConfig();
+  };
+  /**
+   * 欢迎文案点击：展开左侧菜单（与 `aside` 共用 isCollapse）
+   * - 桌面（>1000px）：isCollapse=false 为展开侧栏
+   * - 移动端（≤1000px）：与桌面相反，isCollapse=true 为抽屉打开（参见 aside setCollapseStyle）
+   */
+  const onWelcomeExpandMenu = () => {
+    const { layout } = themeConfig.value;
+    if (layout === 'transverse') return;
+
+    const isMobile = document.body.clientWidth <= 1000;
+    if (isMobile) {
+      if (!themeConfig.value.isCollapse) {
+        themeConfig.value.isCollapse = true;
+        setLocalThemeConfig();
+      }
+    } else if (themeConfig.value.isCollapse) {
+      themeConfig.value.isCollapse = false;
+      setLocalThemeConfig();
+    }
   };
   // 存储布局配置
   const setLocalThemeConfig = () => {
@@ -122,9 +155,14 @@
   };
   // 页面加载时
   onMounted(() => {
+    onCompactTopBarResize();
+    window.addEventListener('resize', onCompactTopBarResize);
     initRouteSplit(route.path);
   });
-  
+  onUnmounted(() => {
+    window.removeEventListener('resize', onCompactTopBarResize);
+  });
+
   // 监听路由变化
   watch(() => route.path, (newPath) => {
     initRouteSplit(newPath);

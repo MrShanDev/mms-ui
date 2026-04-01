@@ -5,10 +5,8 @@
       <el-col :xs="24" :sm="12" :md="6" :lg="6" :xl="6" v-for="(item, index) in state.homeInfoData" :key="index">
         <div class="stat-card" :style="{ borderLeft: `4px solid ${item.color1}` }">
           <div class="stat-card-header">
-            <div class="stat-icon" :style="{ background: item.color2 }">
-              <el-icon style="font-size: 2rem" :style="{ color: item.color1 }">
-                <component :is="item.num4" />
-              </el-icon>
+            <div class="stat-icon" :style="statIconBgStyle(item.color2)">
+              <SvgIcon :name="homeStatIconName(item.num4)" :size="32" :color="item.color1" />
             </div>
             <div>
               <div class="stat-label">{{ item.num3 }}</div>
@@ -42,7 +40,7 @@
               class="quick-menu-item cursor-pointer"
             >
               <div class="quick-menu-icon">
-                <el-icon style="font-size: 3rem"><component :is="item.icon" /></el-icon>
+                <SvgIcon :name="item.icon" :size="48" :color="item.color" />
               </div>
               <div class="quick-menu-text">{{ item.name }}</div>
             </div>
@@ -56,36 +54,36 @@
             <div class="notice-list">
               <div
                 v-for="(item, index) in state.sysNoticeData"
-                :key="index"
+                :key="item.id ?? index"
                 class="notice-item flex row-between col-center cursor-pointer"
+                @click="openNoticeDetail(item)"
               >
                 <div class="flex-1 f-16">{{ index + 1 }}. {{ item.title }}</div>
-                <div class="f-14" style="color: #999">{{ item.createTime }}</div>
+                <div class="f-14" style="color: #999">{{ noticeRowTime(item) }}</div>
               </div>
             </div>
           </div>
-        </div>
+        </div>        
       </el-col>
     </el-row>
-<!--    <el-row :gutter="15" class="home-card-three">-->
-<!--      <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">-->
-<!--        <div class="home-card-item mb15">-->
-<!--          <div class="home-card-item-title">月收入</div>-->
-<!--          <div class="home-card-item-content" style="padding: 20px">-->
-<!--            <div ref="incomeChartRef" style="width: 100%; height: 400px"></div>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--      </el-col>-->
-<!--    </el-row>-->
+
+    <el-dialog
+      v-model="noticeDetailVisible"
+      :title="noticeDetail.title ? String(noticeDetail.title) : '公告详情'"
+      width="680px"
+      align-center
+      destroy-on-close
+      append-to-body
+      class="home-notice-detail-dialog"
+      @closed="onNoticeDetailClosed"
+    >
+      <div v-loading="noticeDetailLoading" class="home-notice-detail-wrap">
+        <div v-if="noticeDetailTime" class="home-notice-detail-meta">{{ noticeDetailTime }}</div>
+        <div class="home-notice-detail-html" v-html="noticeDetailHtml"></div>
+      </div>
+    </el-dialog>
+
     <el-row :gutter="15" class="home-card-four">
-<!--      <el-col :xs="24" :sm="24" :md="8" :lg="8" :xl="8">-->
-<!--        <div class="home-card-item mb15">-->
-<!--          <div class="home-card-item-title">支付方式</div>-->
-<!--          <div class="home-card-item-content" style="padding: 20px">-->
-<!--            <div ref="paymentChartRef" style="width: 100%; height: 400px"></div>-->
-<!--          </div>-->
-<!--        </div>-->
-<!--      </el-col>-->
       <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24">
         <div class="home-card-item mb15">
           <div class="home-card-item-title">最新会员</div>
@@ -136,15 +134,15 @@
 </template>
 
 <script setup lang="ts" name="homeinfo">
-  import { reactive, onMounted, ref, nextTick } from 'vue';
-  import { formatAxis } from '/@/utils/formatTime';
+  import { reactive, onMounted, ref, nextTick, computed } from 'vue';
   import { useUserInfo } from '/@/stores/userInfo';
   import { storeToRefs } from 'pinia';
   import { useRoute, useRouter } from 'vue-router';
   import { ElMessage } from 'element-plus';
   import { noticeApi } from '/@/views/system/notice';
+  import type { NoticeEntity } from '/@/views/system/notice/type';
   import { homeApi } from '/@/views/system/home';
-  import { storeMemberApi } from '/@/views/member/storeMember';
+  import { memberStoreMemberApi } from '/@/views/member/storeMember';
   import * as echarts from 'echarts';
   import type { EChartsOption } from 'echarts';
   import FastTableColumn from "/@/components/fast-table-column/src/fast-table-column.vue";
@@ -155,7 +153,7 @@
   const router = useRouter();
   const baseApi = homeApi();
   const baseApiNotice = noticeApi();
-  const memberApi = storeMemberApi();
+  const memberApi = memberStoreMemberApi();
 
   const incomeChartRef = ref<HTMLDivElement>();
   const paymentChartRef = ref<HTMLDivElement>();
@@ -180,13 +178,6 @@
     icon: string;
     path: string;
     color: string;
-  }
-
-  interface NoticeEntity {
-    id?: string;
-    title: string;
-    content?: string;
-    createTime?: string;
   }
 
   interface AfterSalesData {
@@ -215,6 +206,68 @@
     // 最新会员
     latestMembers: [] as any[],
   });
+
+  /** 首页统计卡片图标：后端传 SvgIcon 约定名（ele- / iconify: / iconfont 等），勿传裸字符串当组件名 */
+  const homeStatIconName = (num4: unknown): string => {
+    const s = num4 == null ? '' : String(num4).trim();
+    return s || 'ele-DataAnalysis';
+  };
+
+  const statIconBgStyle = (color2: unknown) => {
+    const v = color2 == null ? '' : String(color2).trim();
+    if (!v) return {};
+    if (v.startsWith('--')) return { background: `var(${v})` };
+    return { background: v };
+  };
+
+  const noticeDetailVisible = ref(false);
+  const noticeDetailLoading = ref(false);
+  const noticeDetail = ref<Partial<NoticeEntity>>({});
+
+  const noticeDetailTime = computed(() => {
+    const d = noticeDetail.value;
+    const t = d.createTime ?? (d as { createdTime?: string }).createdTime;
+    return t ? String(t) : '';
+  });
+
+  const noticeDetailHtml = computed(() => {
+    const c = noticeDetail.value.content;
+    if (c == null || String(c).trim() === '') {
+      return '<p class="home-notice-empty">暂无正文</p>';
+    }
+    return String(c);
+  });
+
+  const noticeRowTime = (item: NoticeEntity) => {
+    const t = item.createTime ?? (item as NoticeEntity & { createdTime?: string }).createdTime;
+    return t ? String(t) : '';
+  };
+
+  const openNoticeDetail = (row: NoticeEntity) => {
+    if (row.id === undefined || row.id === null || String(row.id) === '') {
+      ElMessage.warning('无法打开公告详情');
+      return;
+    }
+    noticeDetailVisible.value = true;
+    noticeDetailLoading.value = true;
+    noticeDetail.value = { id: row.id, title: row.title };
+    baseApiNotice
+      .query(row.id)
+      .then((res: any) => {
+        noticeDetail.value = { ...(res.data || {}) };
+      })
+      .catch((err) => {
+        ElMessage.warning(err);
+        noticeDetailVisible.value = false;
+      })
+      .finally(() => {
+        noticeDetailLoading.value = false;
+      });
+  };
+
+  const onNoticeDetailClosed = () => {
+    noticeDetail.value = {};
+  };
 
   // 页面加载时
   onMounted(() => {
@@ -674,6 +727,50 @@
           }
         }
       }
+    }
+  }
+</style>
+
+<!-- append-to-body 的弹层不在当前组件 DOM 内，需非 scoped 才能命中 -->
+<style lang="scss">
+  .home-notice-detail-dialog.el-dialog {
+    max-width: 92vw;
+    margin: 0 auto;
+  }
+
+  .home-notice-detail-dialog .el-dialog__body {
+    padding-top: 8px;
+  }
+
+  .home-notice-detail-wrap {
+    max-height: min(70vh, 560px);
+    overflow-y: auto;
+    overflow-x: hidden;
+    box-sizing: border-box;
+  }
+
+  .home-notice-detail-meta {
+    font-size: 13px;
+    color: var(--el-text-color-secondary);
+    margin-bottom: 12px;
+  }
+
+  .home-notice-detail-html {
+    line-height: 1.65;
+    word-break: break-word;
+
+    .home-notice-empty {
+      margin: 0;
+      color: var(--el-text-color-secondary);
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    p {
+      margin: 0 0 8px;
     }
   }
 </style>

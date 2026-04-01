@@ -6,10 +6,10 @@
   .login-container {
     .login-left {
       .login-left-img {
-        top: 90% !important;
-        left: 12% !important;
-        width: 30% !important;
-        height: 18% !important;
+        img {
+          max-width: 42% !important;
+          max-height: 70vh !important;
+        }
       }
     }
     .login-right {
