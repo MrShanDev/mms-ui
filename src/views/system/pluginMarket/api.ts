@@ -1,6 +1,6 @@
 import request from '/@/utils/request';
 import { getEnv } from '/@/utils/mms';
-import type { AxiosPromise } from 'axios';
+import type { AxiosPromise, AxiosProgressEvent } from 'axios';
 
 const hostBase = () => getEnv() + '/system/pluginHost';
 const marketBase = () => getEnv() + '/system/pluginMarket';
@@ -51,7 +51,10 @@ export function fetchPluginManifests<T = any>(): AxiosPromise<T> {
   return request({ url: hostBase() + '/manifests', method: 'get' });
 }
 
-export function installPluginJar(file: File): AxiosPromise<any> {
+export function installPluginJar(
+  file: File,
+  options?: { onUploadProgress?: (e: AxiosProgressEvent) => void }
+): AxiosPromise<any> {
   const fd = new FormData();
   fd.append('file', file);
   return request({
@@ -59,6 +62,9 @@ export function installPluginJar(file: File): AxiosPromise<any> {
     method: 'post',
     data: fd,
     headers: { 'Content-Type': 'multipart/form-data' },
+    onUploadProgress: options?.onUploadProgress,
+    // 大 JAR 上传 + 服务端解压校验可能较久，单独放宽（全局 request 默认 50s）
+    timeout: 600_000,
   });
 }
 

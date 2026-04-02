@@ -131,18 +131,14 @@
                 <span class="plugin-card__power-title">运行控制</span>
               </div>
               <div class="plugin-card__power-actions">
-                <div class="plugin-card__power-item">
-                  <el-tooltip
-                    placement="top"
-                    :disabled="!canPluginEnable(row)"
-                    content="恢复库表激活并重载（磁盘须已有该版本）"
-                  >
+                <div v-if="powerShowEnable(row)" class="plugin-card__power-item">
+                  <el-tooltip placement="top" content="恢复库表激活并重载（磁盘须已有该版本）">
                     <el-button
                       circle
                       size="small"
                       type="success"
                       plain
-                      :disabled="!canPluginEnable(row) || powerRowLocked(row)"
+                      :disabled="powerRowLocked(row)"
                       :loading="powerLoading(row, 'enable')"
                       @click="onEnable(row, false)"
                     >
@@ -151,18 +147,14 @@
                   </el-tooltip>
                   <span class="plugin-card__power-caption">启动</span>
                 </div>
-                <div class="plugin-card__power-item">
-                  <el-tooltip
-                    placement="top"
-                    :disabled="!hasCatalogActive(row)"
-                    content="取消库表激活并重载，不删磁盘"
-                  >
+                <div v-if="powerShowDeactivate(row)" class="plugin-card__power-item">
+                  <el-tooltip placement="top" content="取消库表激活并重载，不删磁盘">
                     <el-button
                       circle
                       size="small"
                       type="warning"
                       plain
-                      :disabled="!hasCatalogActive(row) || powerRowLocked(row)"
+                      :disabled="powerRowLocked(row)"
                       :loading="powerLoading(row, 'deactivate')"
                       @click="onDeactivate(row, false)"
                     >
@@ -171,18 +163,14 @@
                   </el-tooltip>
                   <span class="plugin-card__power-caption">停止</span>
                 </div>
-                <div class="plugin-card__power-item">
-                  <el-tooltip
-                    placement="top"
-                    :disabled="!canPluginRestart(row)"
-                    content="先停止再按当前版本重新激活（仅运行中）"
-                  >
+                <div v-if="powerShowRestart(row)" class="plugin-card__power-item">
+                  <el-tooltip placement="top" content="先停止再按当前版本重新激活（仅运行中）">
                     <el-button
                       circle
                       size="small"
                       type="primary"
                       plain
-                      :disabled="!canPluginRestart(row) || powerRowLocked(row)"
+                      :disabled="powerRowLocked(row)"
                       :loading="powerLoading(row, 'restart')"
                       @click="onRestart(row)"
                     >
@@ -434,7 +422,7 @@
 
 <script setup lang="ts" name="systemPluginMarket">
 import { Delete, Document, RefreshRight, SwitchButton, VideoPlay } from '@element-plus/icons-vue';
-import { ElMessage, ElMessageBox } from 'element-plus';
+import { ElLoading, ElMessage, ElMessageBox } from 'element-plus';
 import type { UploadRequestOptions } from 'element-plus';
 import { nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
 import {
@@ -591,6 +579,21 @@ function canPluginRestart(row: any): boolean {
   return row.runtimeState === 'LOADED' && hasCatalogActive(row);
 }
 
+/** 仅展示可点的「启动」：已激活/运行中则隐藏；请求进行中保留以防闪一下消失 */
+function powerShowEnable(row: any): boolean {
+  return canPluginEnable(row) || powerLoading(row, 'enable');
+}
+
+/** 仅展示可点的「停止」：库表无激活时隐藏 */
+function powerShowDeactivate(row: any): boolean {
+  return hasCatalogActive(row) || powerLoading(row, 'deactivate');
+}
+
+/** 仅展示可点的「重启」：非运行中或未激活时隐藏 */
+function powerShowRestart(row: any): boolean {
+  return canPluginRestart(row) || powerLoading(row, 'restart');
+}
+
 function powerLoading(row: any, op: 'enable' | 'deactivate' | 'restart' | 'purge'): boolean {
   return (
     row?.pluginId != null &&
@@ -726,6 +729,34 @@ async function onRollback(row: any) {
   }
 }
 
+/** 大文件上传：全屏 loading + 进度文案；结束后由调用方处理成功提示与刷新 */
+async function installJarWithProgress(file: File): Promise<void> {
+  const loading = ElLoading.service({
+    lock: true,
+    text: '准备上传…',
+    background: 'rgba(0, 0, 0, 0.35)',
+  });
+  try {
+    await installPluginJar(file, {
+      onUploadProgress: (evt) => {
+        const { loaded, total } = evt;
+        if (total && total > 0) {
+          const pct = Math.min(100, Math.round((loaded * 100) / total));
+          if (pct >= 100) {
+            loading.setText('上传已完成，正在等待服务器校验与安装…');
+          } else {
+            loading.setText(`正在上传 ${pct}%…`);
+          }
+        } else {
+          loading.setText('正在上传…');
+        }
+      },
+    });
+  } finally {
+    loading.close();
+  }
+}
+
 async function onUploadForRow(opt: UploadRequestOptions, row: any) {
   const pid = row?.pluginId;
   if (pid) {
@@ -740,7 +771,7 @@ async function onUploadForRow(opt: UploadRequestOptions, row: any) {
     }
   }
   try {
-    await installPluginJar(opt.file as File);
+    await installJarWithProgress(opt.file as File);
     ElMessage.success('已安装并重载');
     detailVisible.value = false;
     await loadAll();
@@ -776,7 +807,7 @@ async function onReloadAll() {
 
 async function onUpload(opt: UploadRequestOptions) {
   try {
-    await installPluginJar(opt.file as File);
+    await installJarWithProgress(opt.file as File);
     ElMessage.success('已安装并重载');
     await loadAll();
   } catch {
@@ -1108,8 +1139,9 @@ onMounted(() => loadAll());
 }
 .plugin-card__power-actions {
   display: flex;
+  flex-wrap: wrap;
   align-items: flex-start;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 8px;
 }
 .plugin-card__power-item {
