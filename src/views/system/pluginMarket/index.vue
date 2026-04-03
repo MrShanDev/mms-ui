@@ -6,7 +6,7 @@
         <p class="plugin-market__subtitle">
           <strong>安装</strong>：校验 JAR 内 <code>plugin.json</code> 与宿主版本；通过后写入磁盘并登记版本、激活，再全量重载。
           <strong>停用</strong>（运行中）：只取消库表中的<strong>激活</strong>标记并重载，插件不再加载；<em>不删磁盘</em>、不移除市场卡片，可在详情里切换版本再激活或覆盖上传。
-          <strong>删除</strong>：删除<strong>磁盘</strong>上该插件全部安装目录，并移除<strong>库表</strong>中的版本与市场登记（<code>sys_plugin_version</code> / <code>sys_plugins</code>）后重载；等同于彻底下架并清盘。
+          <strong>删除/强制删除</strong>：删除<strong>磁盘</strong>上该插件全部安装目录，并移除<strong>库表</strong>中的版本与市场登记（<code>sys_plugin_version</code> / <code>sys_plugins</code>）后重载；运行中也可使用（服务端先卸载再删盘）。等同于彻底下架并清盘。
           <strong>仅清库表</strong>（未安装磁盘时）：仍可用详情中的「删除库表登记」，只删登记、不动磁盘（若盘上无文件则与删除效果一致）。
           <strong>日志</strong>：运行控制区或详情中打开「日志」可查看独立日志文件尾部（默认 <code>logs/plugins/</code><em>插件ID@版本</em><code>.log</code>，仅含插件 MDC 下 INFO 及以上条目）。
           点击卡片<strong>封面图</strong>打开完整信息与回切版本。
@@ -195,10 +195,17 @@
                   </el-tooltip>
                   <span class="plugin-card__power-caption">日志</span>
                 </div>
-                <div v-if="row.runtimeState === 'ON_DISK'" class="plugin-card__power-item">
+                <div
+                  v-if="row.runtimeState === 'LOADED' || row.runtimeState === 'ON_DISK'"
+                  class="plugin-card__power-item"
+                >
                   <el-tooltip
                     placement="top"
-                    content="删除磁盘安装目录并清除库表与市场登记（不可撤销）；运行中请先在宿主停用"
+                    :content="
+                      row.runtimeState === 'LOADED'
+                        ? '强制删除：服务端先卸载内存中的插件再删磁盘与库表登记（不可撤销）；停不掉时用此操作'
+                        : '删除磁盘安装目录并清除库表与市场登记（不可撤销）'
+                    "
                   >
                     <el-button
                       circle
@@ -212,7 +219,9 @@
                       <el-icon><Delete /></el-icon>
                     </el-button>
                   </el-tooltip>
-                  <span class="plugin-card__power-caption">删除</span>
+                  <span class="plugin-card__power-caption">{{
+                    row.runtimeState === 'LOADED' ? '强制删除' : '删除'
+                  }}</span>
                 </div>
               </div>
             </div>
@@ -370,6 +379,20 @@
           <h4 class="mt-4 mb-2">健康检查详情</h4>
           <pre class="plugin-detail__pre">{{ detail.healthBody }}</pre>
         </template>
+      </template>
+      <template
+        v-if="detail && (detail.runtimeState === 'LOADED' || detail.runtimeState === 'ON_DISK')"
+        #footer
+      >
+        <el-button @click="detailVisible = false">关闭</el-button>
+        <el-button
+          type="danger"
+          :loading="powerLoading(detail, 'purge')"
+          :disabled="powerRowLocked(detail)"
+          @click="onPurge(detail, true)"
+        >
+          {{ detail.runtimeState === 'LOADED' ? '强制删除' : '删除' }}（磁盘+库表）
+        </el-button>
       </template>
     </el-dialog>
 
@@ -592,7 +615,8 @@ function resolveEnableVersion(row: any): string | null {
 
 function canPluginEnable(row: any): boolean {
   if (hasCatalogActive(row)) return false;
-  if (row.runtimeState !== 'LOADED' && row.runtimeState !== 'ON_DISK') return false;
+  // 仅「已安装未加载」可启动；LOADED 时即便库表未带回 catalogActiveVersion 也不应出现「启动」
+  if (row.runtimeState !== 'ON_DISK') return false;
   return resolveEnableVersion(row) != null;
 }
 
@@ -606,9 +630,13 @@ function powerShowEnable(row: any): boolean {
   return canPluginEnable(row) || powerLoading(row, 'enable');
 }
 
-/** 仅展示可点的「停止」：库表无激活时隐藏 */
+/** 仅展示可点的「停止」：库表有激活，或宿主已加载该插件（与 catalog 字段缺失时仍可停用） */
 function powerShowDeactivate(row: any): boolean {
-  return hasCatalogActive(row) || powerLoading(row, 'deactivate');
+  return (
+    hasCatalogActive(row) ||
+    row.runtimeState === 'LOADED' ||
+    powerLoading(row, 'deactivate')
+  );
 }
 
 /** 仅展示可点的「重启」：非运行中或未激活时隐藏 */
@@ -941,9 +969,13 @@ async function onRestart(row: any) {
 
 async function onPurge(row: any, closeDetail: boolean) {
   try {
+    const runningHint =
+      row.runtimeState === 'LOADED'
+        ? '当前为<strong>运行中</strong>：服务端将<strong>先卸载</strong>内存中的插件再删除磁盘。<br/><br/>'
+        : '';
     await ElMessageBox.confirm(
-      `将对「${row.name}」（${row.pluginId}）执行<strong>删除</strong>：<strong>删除磁盘</strong>上该插件全部安装目录，并<strong>清除库表</strong>中的版本与市场登记，然后全量重载。<br/><br/>此操作不可从界面撤销，请确认。<br/><br/>是否继续？`,
-      '删除插件（磁盘 + 库表）',
+      `将对「${row.name}」（${row.pluginId}）执行<strong>删除</strong>：${runningHint}<strong>删除磁盘</strong>上该插件全部安装目录，并<strong>清除库表</strong>中的版本与市场登记，然后全量重载。<br/><br/>此操作不可从界面撤销，请确认。<br/><br/>是否继续？`,
+      row.runtimeState === 'LOADED' ? '强制删除插件（磁盘 + 库表）' : '删除插件（磁盘 + 库表）',
       {
         type: 'error',
         dangerouslyUseHTMLString: true,
