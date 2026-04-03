@@ -261,7 +261,7 @@
     <el-dialog
       v-model="detailVisible"
       :title="detail?.name || '插件详情'"
-      width="640px"
+      width="720px"
       destroy-on-close
       class="plugin-detail-dialog"
     >
@@ -371,6 +371,43 @@
         </p>
         <h4 class="mt-4 mb-2">功能介绍</h4>
         <p class="plugin-detail__intro">{{ detail.description || '—' }}</p>
+        <h4 class="mt-4 mb-2">插件参数（sys_config）</h4>
+        <p class="plugin-detail__hint text-gray" style="margin-bottom: 8px; font-size: 13px">
+          持久化到库表 <code>sys_config</code>，完整键为
+          <code>mms.plugin.{{ detail.pluginId }}.&lt;后缀&gt;</code>，后缀须字母开头，仅字母数字
+          <code>._-</code>。按<strong>当前登录租户</strong>隔离；插件内通过
+          <code>HostServices#pluginSysConfigGet/Put</code>（契约版本 ≥3）读取。
+        </p>
+        <div v-loading="pluginSysConfigLoading" class="plugin-sys-config">
+          <el-table :data="pluginSysConfigItems" border size="small" class="mb-2">
+            <el-table-column label="后缀 keySuffix" min-width="140">
+              <template #default="{ row }">
+                <el-input v-model="row.keySuffix" placeholder="如 wechat.webhook" size="small" />
+              </template>
+            </el-table-column>
+            <el-table-column label="名称" min-width="120">
+              <template #default="{ row }">
+                <el-input v-model="row.configName" placeholder="展示名" size="small" />
+              </template>
+            </el-table-column>
+            <el-table-column label="值" min-width="200">
+              <template #default="{ row }">
+                <el-input v-model="row.configValue" type="textarea" :rows="2" placeholder="配置值" size="small" />
+              </template>
+            </el-table-column>
+            <el-table-column label="操作" width="72" align="center">
+              <template #default="{ $index }">
+                <el-button type="danger" link size="small" @click="removePluginSysConfigRow($index)">删</el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+          <div class="flex items-center gap-2 flex-wrap">
+            <el-button size="small" @click="addPluginSysConfigRow">增行</el-button>
+            <el-button type="primary" size="small" :loading="pluginSysConfigSaving" @click="savePluginSysConfig">
+              保存配置
+            </el-button>
+          </div>
+        </div>
         <template v-if="detail.manifest">
           <h4 class="mt-4 mb-2">Manifest（plugin.json）</h4>
           <pre class="plugin-detail__pre">{{ JSON.stringify(detail.manifest, null, 2) }}</pre>
@@ -477,6 +514,8 @@ import {
   purgePlugin,
   reloadPlugins,
   removePluginCatalog,
+  fetchPluginMarketSysConfig,
+  savePluginMarketSysConfig,
 } from './api';
 
 const loading = ref(false);
@@ -485,6 +524,11 @@ const statusBody = reactive<any>({});
 const cards = ref<any[]>([]);
 const detailVisible = ref(false);
 const detail = ref<any>(null);
+const pluginSysConfigItems = ref<
+  Array<{ keySuffix: string; configName: string; configValue: string; fullConfigKey?: string }>
+>([]);
+const pluginSysConfigLoading = ref(false);
+const pluginSysConfigSaving = ref(false);
 const rollbackVer = ref<string>('');
 const rollbacking = ref(false);
 const logVisible = ref(false);
@@ -578,10 +622,64 @@ function subprocessCardLabel(row: any) {
   return `未起进程${p}${lease}${occ}`;
 }
 
-function openDetail(row: any) {
+async function openDetail(row: any) {
   detail.value = row;
   rollbackVer.value = row.catalogActiveVersion || row.recordedVersions?.[0] || '';
   detailVisible.value = true;
+  await loadPluginSysConfig(row.pluginId);
+}
+
+async function loadPluginSysConfig(pluginId: string) {
+  if (!pluginId) {
+    pluginSysConfigItems.value = [];
+    return;
+  }
+  pluginSysConfigLoading.value = true;
+  try {
+    const res: any = await fetchPluginMarketSysConfig(pluginId);
+    const list = res?.data ?? [];
+    pluginSysConfigItems.value = list.map((r: any) => ({
+      keySuffix: r.keySuffix ?? '',
+      configName: r.configName ?? '',
+      configValue: r.configValue ?? '',
+      fullConfigKey: r.fullConfigKey,
+    }));
+  } catch {
+    pluginSysConfigItems.value = [];
+  } finally {
+    pluginSysConfigLoading.value = false;
+  }
+}
+
+function addPluginSysConfigRow() {
+  pluginSysConfigItems.value.push({ keySuffix: '', configName: '', configValue: '' });
+}
+
+function removePluginSysConfigRow(index: number) {
+  pluginSysConfigItems.value.splice(index, 1);
+}
+
+async function savePluginSysConfig() {
+  if (!detail.value?.pluginId) return;
+  pluginSysConfigSaving.value = true;
+  try {
+    await savePluginMarketSysConfig({
+      pluginId: detail.value.pluginId,
+      items: pluginSysConfigItems.value
+        .filter((r) => String(r.keySuffix ?? '').trim())
+        .map((r) => ({
+          keySuffix: String(r.keySuffix).trim(),
+          configName: r.configName?.trim() || undefined,
+          configValue: r.configValue ?? '',
+        })),
+    });
+    ElMessage.success('已保存');
+    await loadPluginSysConfig(detail.value.pluginId);
+  } catch {
+    /* 拦截器已提示 */
+  } finally {
+    pluginSysConfigSaving.value = false;
+  }
 }
 
 /** 用于解析 pluginLogTail 的版本（与磁盘日志文件名 pluginId@version 一致） */

@@ -124,3 +124,23 @@ export function purgePlugin(pluginId: string): AxiosPromise<any> {
     data: { pluginId },
   });
 }
+
+/** 插件专属 sys_config（键前缀 mms.plugin.{pluginId}.），按当前租户 */
+export function fetchPluginMarketSysConfig<T = any>(pluginId: string): AxiosPromise<T> {
+  return request({
+    url: marketBase() + '/pluginSysConfig',
+    method: 'get',
+    params: { pluginId },
+  });
+}
+
+export function savePluginMarketSysConfig<T = any>(body: {
+  pluginId: string;
+  items: Array<{ keySuffix: string; configName?: string; configValue?: string }>;
+}): AxiosPromise<T> {
+  return request({
+    url: marketBase() + '/pluginSysConfig',
+    method: 'post',
+    data: body,
+  });
+}
