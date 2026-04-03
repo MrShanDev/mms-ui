@@ -1,4 +1,5 @@
 import vue from '@vitejs/plugin-vue';
+import federation from '@originjs/vite-plugin-federation';
 import { resolve } from 'path';
 import { defineConfig, loadEnv, ConfigEnv, UserConfigFnObject } from 'vite';
 import vueSetupExtend from 'vite-plugin-vue-setup-extend-plus';
@@ -25,9 +26,24 @@ const viteConfig: UserConfigFnObject = defineConfig((mode: ConfigEnv) => {
     const env: Record<string, string> = loadEnv(mode.mode, process.cwd());
     // 设置EventEmitter默认最大监听次数
     require('events').EventEmitter.defaultMaxListeners = 20;
+    const syslogRemoteEntry =
+        env.VITE_SYSLOG_REMOTE_ENTRY ||
+        'http://localhost:5175/assets/remoteEntry.js';
     return {
         plugins: [
             vue(),
+            federation({
+                name: 'mms_ui_host',
+                remotes: {
+                    mms_plugin_syslog_ui: syslogRemoteEntry,
+                },
+                shared: {
+                    vue: { singleton: true, requiredVersion: '^3.5.0' },
+                    'vue-router': { singleton: true, requiredVersion: '^4.3.0' },
+                    pinia: { singleton: true, requiredVersion: '^2.0.0' },
+                    'element-plus': { singleton: true, requiredVersion: '^2.11.0' },
+                },
+            }),
             WindiCSS(),
             vueSetupExtend(),
             viteCompression(),
@@ -146,11 +162,18 @@ const viteConfig: UserConfigFnObject = defineConfig((mode: ConfigEnv) => {
                     target: env.VITE_APP_API_URL,
                     ws: true,
                     changeOrigin: true,
-                    rewrite: (path) => path.replace(new RegExp('^' + env.VITE_APP_BASE_API), '')
+                    rewrite: (path) => path.replace(new RegExp('^' + env.VITE_APP_BASE_API), ''),
+                    // 本地页 Origin 为 http://localhost:*，转发到线上 prod 时若带上该 Origin，后端 CORS（allowed-origins 为空）会 403 Invalid CORS request
+                    configure: (proxy) => {
+                        proxy.on('proxyReq', (proxyReq) => {
+                            proxyReq.removeHeader('origin');
+                        });
+                    },
                 },
             },
         },
         build: {
+            target: 'es2022',
             outDir: 'dist',
             chunkSizeWarningLimit: 1500,
             rollupOptions: {

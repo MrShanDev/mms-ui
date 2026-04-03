@@ -36,6 +36,16 @@ export function installPluginJar(file: File): AxiosPromise<any> {
   });
 }
 
+/** 服务端从 http(s) URL 下载 JAR 后安装（与上传安装等价，适合 CI/OSS 直链） */
+export function installPluginFromUrl(url: string): AxiosPromise<any> {
+  return request({
+    url: hostBase() + '/installFromUrl',
+    method: 'post',
+    data: { url },
+    timeout: 600_000,
+  });
+}
+
 export function uninstallPlugin(pluginId: string, version?: string | null): AxiosPromise<any> {
   return request({
     url: hostBase() + '/uninstall',

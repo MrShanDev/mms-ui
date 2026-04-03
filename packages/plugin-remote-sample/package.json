@@ -1,0 +1,25 @@
+{
+  "name": "@mms-ui/plugin-remote-sample",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "description": "Module Federation Remote 示例：可 import 主工程 /@ 下组件与工具，产出 remoteEntry.js + chunks",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 5174"
+  },
+  "devDependencies": {
+    "@originjs/vite-plugin-federation": "^1.4.1",
+    "@vitejs/plugin-vue": "^5.2.4",
+    "typescript": "^5.9.2",
+    "vite": "^6.3.5",
+    "vue": "^3.5.21",
+    "vue-tsc": "^2.2.12"
+  },
+  "peerDependencies": {
+    "pinia": "^2.0.34",
+    "vue": "^3.5.21",
+    "vue-router": "^4.3.2"
+  }
+}

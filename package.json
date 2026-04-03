@@ -31,7 +31,11 @@
 		"start:pnpm": "./scripts/start-pnpm.sh",
 		"start:pnpm:win": "powershell -ExecutionPolicy Bypass -File ./scripts/start-pnpm.ps1",
 		"mms": "./scripts/mms.sh",
-		"mms:win": "powershell -ExecutionPolicy Bypass -File ./scripts/mms.ps1"
+		"mms:win": "powershell -ExecutionPolicy Bypass -File ./scripts/mms.ps1",
+		"fed:remote:sample:dev": "pnpm --filter @mms-ui/plugin-remote-sample dev",
+		"fed:remote:sample:build": "pnpm --filter @mms-ui/plugin-remote-sample build",
+		"fed:syslog-ui:dev": "pnpm --filter @mms-ui/plugin-syslog-ui dev",
+		"fed:syslog-ui:build": "pnpm --filter @mms-ui/plugin-syslog-ui build"
 	},
 	"dependencies": {
 		"@element-plus/icons-vue": "^2.3.2",
@@ -78,6 +82,7 @@
 		"vxe-table": "4.7.87"
 	},
 	"devDependencies": {
+		"@originjs/vite-plugin-federation": "^1.4.1",
 		"@types/crypto-js": "^4.1.1",
 		"@types/file-saver": "^2.0.7",
 		"@types/js-cookie": "^3.0.0",
