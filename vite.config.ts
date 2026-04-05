@@ -1,5 +1,4 @@
 import vue from '@vitejs/plugin-vue';
-import federation from '@originjs/vite-plugin-federation';
 import { resolve } from 'path';
 import { defineConfig, loadEnv, ConfigEnv, UserConfigFnObject } from 'vite';
 import vueSetupExtend from 'vite-plugin-vue-setup-extend-plus';
@@ -20,30 +19,19 @@ const pathResolve = (dir: string) => {
 const alias: Record<string, string> = {
     '/@': pathResolve('./src/'),
     'vue-i18n': 'vue-i18n/dist/vue-i18n.cjs.js',
+    // 宿主不再启用 Module Federation（与 Vue shared / element-plus 组合会导致生产环境 ESM 循环依赖，#app 无法 mount）
+    'mms_plugin_syslog_ui/SyslogPage': pathResolve(
+        './src/views/system/runtimeLog/SyslogFederationPlaceholder.vue'
+    ),
 };
 
 const viteConfig: UserConfigFnObject = defineConfig((mode: ConfigEnv) => {
     const env: Record<string, string> = loadEnv(mode.mode, process.cwd());
     // 设置EventEmitter默认最大监听次数
     require('events').EventEmitter.defaultMaxListeners = 20;
-    const syslogRemoteEntry =
-        env.VITE_SYSLOG_REMOTE_ENTRY ||
-        'http://localhost:5175/assets/remoteEntry.js';
     return {
         plugins: [
             vue(),
-            federation({
-                name: 'mms_ui_host',
-                remotes: {
-                    mms_plugin_syslog_ui: syslogRemoteEntry,
-                },
-                shared: {
-                    vue: { singleton: true, requiredVersion: '^3.5.0' },
-                    'vue-router': { singleton: true, requiredVersion: '^4.3.0' },
-                    pinia: { singleton: true, requiredVersion: '^2.0.0' },
-                    'element-plus': { singleton: true, requiredVersion: '^2.11.0' },
-                },
-            }),
             WindiCSS(),
             vueSetupExtend(),
             viteCompression(),
@@ -80,7 +68,10 @@ const viteConfig: UserConfigFnObject = defineConfig((mode: ConfigEnv) => {
             }),
         ],
         root: process.cwd(),
-        resolve: { alias },
+        resolve: {
+            alias,
+            dedupe: ['vue', 'vue-router', 'vue-demi', 'pinia', 'element-plus'],
+        },
         base: mode.command === 'serve' ? './' : env.VITE_PUBLIC_PATH,
         optimizeDeps: {
             include: [
@@ -182,9 +173,19 @@ const viteConfig: UserConfigFnObject = defineConfig((mode: ConfigEnv) => {
                     entryFileNames: 'assets/js/[name]-[hash].js',
                     assetFileNames: 'assets/[ext]/[name]-[hash].[ext]',
                     manualChunks(id) {
-                        if (id.includes('node_modules')) {
-                            return id.toString().match(/\/node_modules\/(?!.pnpm)(?<moduleName>[^\/]*)\//)?.groups!.moduleName ?? 'vender';
+                        if (!id.includes('node_modules')) {
+                            return;
                         }
+                        // element-plus 与 vue-demi 分属不同 chunk 时，曾出现 TDZ；单独拆 EP，其余按包名分块。
+                        if (id.includes('element-plus') || id.includes('@element-plus/icons-vue')) {
+                            return 'element-plus-vendor';
+                        }
+                        return (
+                            id
+                                .toString()
+                                .match(/\/node_modules\/(?!\.pnpm)(?<moduleName>[^/\\]+)[/\\]/)?.groups
+                                ?.moduleName ?? 'vendor'
+                        );
                     },
                 },
                 ...(JSON.parse(env.VITE_OPEN_CDN) ? { external: buildConfig.external } : {}),

@@ -41,7 +41,7 @@ import {
 } from 'element-plus';
 import request from '/@/utils/request';
 
-const PLUGIN_ID = 'com.sxpcwlkj.plugin.syslog';
+const PLUGIN_ID = 'mms.plugin.syslog';
 const API = `/plugin/${PLUGIN_ID}/syslog`;
 
 const loading = ref(false);

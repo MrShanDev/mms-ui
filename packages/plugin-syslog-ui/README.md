@@ -25,7 +25,7 @@ pnpm run fed:syslog-ui:build    # 产出 packages/plugin-syslog-ui/dist/
 打包进插件 JAR 时，`base` 须与 **`plugin.json` 的 id、version** 及 **`remoteEntryFile`** 一致，例如：
 
 ```bash
-MMS_FED_REMOTE_BASE=/plugin-assets/com.sxpcwlkj.plugin.syslog/1.0.0/ pnpm run fed:syslog-ui:build
+MMS_FED_REMOTE_BASE=/plugin-assets/mms.plugin.syslog/1.0.0/ pnpm run fed:syslog-ui:build
 ```
 
 入口相对路径为 **`assets/remoteEntry.js`**（见 `plugin.json` → `frontend.remoteEntryFile`）。主工程生产环境在 **`.env.production`** 中配置 **`VITE_SYSLOG_REMOTE_ENTRY`** 指向同一 URL（默认已写 1.0.0 路径，升级插件版本时请同步修改）。
@@ -33,4 +33,4 @@ MMS_FED_REMOTE_BASE=/plugin-assets/com.sxpcwlkj.plugin.syslog/1.0.0/ pnpm run fe
 ## 注意事项
 
 - 子包未启用 **unplugin-auto-import**，请显式 `import` Element 等组件。
-- 需登录且具备 **`plugin:syslog:*`** 等权限，接口前缀为 **`/plugin/com.sxpcwlkj.plugin.syslog/syslog`**。
+- 需登录且具备 **`plugin:syslog:*`** 等权限，接口前缀为 **`/plugin/mms.plugin.syslog/syslog`**。
