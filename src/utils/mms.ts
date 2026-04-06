@@ -29,6 +29,17 @@ export const getEnv = (key?: string): string => {
   }
   return envCache[key];
 };
+
+/**
+ * 插件 HOST_MVC 路径前缀，与 {@link VITE_APP_BASE_API} 一致（如 `/dev-api`、`/prod-api`）。
+ * 经 Nginx / Vite 代理去掉该前缀后，后端实际路径仍为 `/plugin/...`。
+ * 用法：`${pluginHostMvcPrefix()}/${pluginId}/syslog` 等。
+ */
+export const pluginHostMvcPrefix = (): string => {
+  const api = getEnv('VITE_APP_BASE_API');
+  return `${api.replace(/\/$/, '')}/plugin`;
+};
+
 /**
  * 全局组件,属性安装
  * @param component 组件对象

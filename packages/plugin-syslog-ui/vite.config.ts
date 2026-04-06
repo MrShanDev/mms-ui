@@ -6,13 +6,22 @@ import { resolve } from 'node:path';
 
 const mmsUiRoot = fileURLToPath(new URL('../..', import.meta.url));
 
-/** 本地联调默认与 Host .env.development 的 VITE_SYSLOG_REMOTE_ENTRY 一致（5175 + /assets/remoteEntry.js） */
-const remoteBase =
-  process.env.MMS_FED_REMOTE_BASE ?? 'http://localhost:5175/';
+/**
+ * - dev（vite serve）：默认 http://localhost:5175/，与主站 .env.development 的联邦 Remote 联调一致。
+ * - build（打 JAR）：默认 ./ ，chunk 与 remoteEntry 同目录树发布，由 /plugin-assets/{pluginId}/{version}/ 提供，避免把 localhost 打进产物。
+ * - 任一阶段均可覆盖：MMS_FED_REMOTE_BASE=/plugin-assets/mms.plugin.syslog/1.0.1/
+ */
+function resolveBase(command: string): string {
+  if (process.env.MMS_FED_REMOTE_BASE) {
+    const raw = process.env.MMS_FED_REMOTE_BASE.trim();
+    return raw.endsWith('/') ? raw : raw + '/';
+  }
+  return command === 'serve' ? 'http://localhost:5175/' : './';
+}
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   root: fileURLToPath(new URL('.', import.meta.url)),
-  base: remoteBase,
+  base: resolveBase(command),
   plugins: [
     vue(),
     federation({
@@ -51,4 +60,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));

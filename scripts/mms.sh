@@ -575,7 +575,7 @@ verify_mirrors() {
 # npm 快速安装
 npm_install_fast() {
     echo -e "${BLUE}📦 NPM 快速安装依赖...${NC}"
-    npm run install:fast
+    npm install --registry=https://registry.npmmirror.com
     read -p "按任意键继续..." -n1 -s
 }
 
@@ -583,7 +583,7 @@ npm_install_fast() {
 pnpm_install_fast() {
     echo -e "${BLUE}📦 PNPM 快速安装依赖...${NC}"
     if command_exists pnpm; then
-        npm run pnpm:install
+        pnpm install --registry=https://registry.npmmirror.com
     else
         echo -e "${RED}❌ 请先安装 PNPM${NC}"
     fi

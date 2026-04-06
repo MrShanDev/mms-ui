@@ -16,7 +16,7 @@ if command -v npm &> /dev/null; then
         echo "  ✅ NPM 镜像配置正确"
     else
         echo "  ⚠️  NPM 镜像未配置或配置错误"
-        echo "     建议运行: npm run mirror:setup"
+        echo "     建议运行: bash scripts/setup-npm-mirrors.sh"
     fi
 else
     echo "  ❌ NPM 未安装"
@@ -98,7 +98,7 @@ fi
 TOTAL_OK=$((NPM_OK + PNPM_OK))
 
 if [ $TOTAL_OK -eq 0 ]; then
-    echo "❌ 建议运行 npm run mirror:setup 配置镜像加速"
+    echo "❌ 建议运行 bash scripts/setup-npm-mirrors.sh 配置镜像加速"
 elif [ $NPM_OK -eq 1 ]; then
     echo "✅ 镜像配置良好，可以正常使用"
 else
@@ -106,7 +106,7 @@ else
 fi
 
 echo ""
-echo "💡 常用命令:"
-echo "  npm run mirror:setup    - 配置 NPM 镜像"
-echo "  npm run mirror:test     - 测试镜像状态"  
-echo "  npm run install:fast    - 使用镜像快速安装"
+echo "💡 常用命令（在 mms-ui 根目录）:"
+echo "  bash scripts/setup-npm-mirrors.sh  - 配置 NPM 镜像"
+echo "  npm config get registry && npm view vue version  - 测试镜像"
+echo "  npm install --registry=https://registry.npmmirror.com  - npm 快速安装"

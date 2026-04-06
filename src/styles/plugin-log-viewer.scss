@@ -1,0 +1,201 @@
+/* 插件日志预览区：与 pluginMarket / 运行时 syslog 页共用（非 scoped，由外层包一层 class 限制作用域） */
+
+/* 外层：占满父级高度，子项仅日志区滚动；全屏时隐藏工具栏，仅保留日志区 */
+.plugin-log-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  flex: 1;
+  height: 100%;
+  overflow: hidden;
+}
+.plugin-log-panel--fullscreen {
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+}
+.plugin-log-panel--fullscreen .plugin-log-toolbar {
+  display: none !important;
+}
+.plugin-log-panel--fullscreen .plugin-log-body {
+  flex: 1;
+  min-height: 0;
+}
+/* 全屏仅看日志时，用于退出（宿主对话框全屏 / 页面内 overlay 全屏共用） */
+.plugin-log-exit-fullscreen {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 3100;
+}
+
+.plugin-log-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+.plugin-log-toolbar__gap {
+  flex: 1;
+  min-width: 4px;
+}
+.plugin-log-toolbar__gap--sm {
+  flex: 0.3;
+  min-width: 0;
+}
+.plugin-log-toolbar__label {
+  font-size: 12px;
+}
+.plugin-log-toolbar__interval {
+  width: 118px;
+}
+.plugin-log-toolbar__hint {
+  font-size: 12px;
+}
+.plugin-log-theme-switch {
+  flex-shrink: 0;
+}
+.plugin-log-meta {
+  margin: 0 0 8px;
+  font-size: 12px;
+  line-height: 1.5;
+  word-break: break-all;
+  flex-shrink: 0;
+}
+/* 路径/目录行（plugin-log-meta--path）：与正文区分，加强对比 */
+.plugin-log-meta--path .plugin-log-path {
+  color: var(--el-color-primary);
+  font-weight: 600;
+  font-size: 12px;
+  line-height: 1.45;
+  padding: 4px 10px;
+  border-radius: 6px;
+  border: 1px solid var(--el-color-primary-light-5);
+  background: linear-gradient(180deg, var(--el-color-primary-light-9) 0%, var(--el-color-primary-light-8) 100%);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  word-break: break-all;
+}
+.plugin-log-scroll.plugin-log-theme--dark .plugin-log-meta--path .plugin-log-path {
+  color: #8ecbff;
+  border-color: rgba(64, 158, 255, 0.55);
+  background: linear-gradient(180deg, rgba(64, 158, 255, 0.22) 0%, rgba(64, 158, 255, 0.12) 100%);
+  box-shadow: 0 0 0 1px rgba(64, 158, 255, 0.25), 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+.plugin-log-scroll.plugin-log-theme--eye-care .plugin-log-meta--path .plugin-log-path {
+  border-color: #8dae7a;
+  box-shadow: 0 1px 2px rgba(60, 90, 40, 0.12);
+}
+.plugin-log-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  /* 仅子级 .plugin-log-scroll 滚动，避免工具栏/元信息随外层一起滚 */
+  overflow: hidden;
+}
+.plugin-log-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  border-radius: 6px;
+  border: 1px solid var(--el-border-color);
+}
+.plugin-log-scroll.plugin-log-theme--dark {
+  background: #2d2d2d;
+  border-color: #444;
+  :deep(.plugin-log-hl-ts) {
+    color: #d4b8ff;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  :deep(.plugin-log-hl-err) {
+    color: #ff9ec7;
+    font-weight: 700;
+    padding: 0 4px;
+    border-radius: 3px;
+    background: rgba(249, 38, 114, 0.28);
+    box-shadow: 0 0 0 1px rgba(249, 38, 114, 0.35);
+  }
+  :deep(.plugin-log-hl-warn) {
+    color: #ffe066;
+    font-weight: 600;
+    padding: 0 3px;
+    border-radius: 3px;
+    background: rgba(230, 219, 116, 0.14);
+  }
+  :deep(.plugin-log-hl-info) {
+    color: #c8f7a0;
+    font-weight: 600;
+    padding: 0 2px;
+    border-radius: 2px;
+    background: rgba(166, 226, 46, 0.1);
+  }
+  :deep(.plugin-log-hl-debug) {
+    color: #b0a99a;
+    font-weight: 500;
+  }
+}
+.plugin-log-scroll.plugin-log-theme--eye-care {
+  background: linear-gradient(180deg, #f5f8ef 0%, #eef4e4 100%);
+  border-color: #b8c9a8;
+  :deep(.plugin-log-hl-ts) {
+    color: #5b2d8a;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+  :deep(.plugin-log-hl-err) {
+    color: #b71c1c;
+    font-weight: 700;
+    padding: 0 4px;
+    border-radius: 3px;
+    background: rgba(198, 40, 40, 0.14);
+    box-shadow: 0 0 0 1px rgba(198, 40, 40, 0.28);
+  }
+  :deep(.plugin-log-hl-warn) {
+    color: #bf360c;
+    font-weight: 600;
+    padding: 0 3px;
+    border-radius: 3px;
+    background: rgba(230, 81, 0, 0.12);
+  }
+  :deep(.plugin-log-hl-info) {
+    color: #1b5e20;
+    font-weight: 600;
+    padding: 0 2px;
+    border-radius: 2px;
+    background: rgba(46, 125, 50, 0.1);
+  }
+  :deep(.plugin-log-hl-debug) {
+    color: #5d5d5d;
+    font-weight: 500;
+  }
+}
+.plugin-log-pre {
+  margin: 0;
+  padding: 12px 14px;
+  box-sizing: border-box;
+  /* 滚动只发生在 .plugin-log-scroll，避免 pre/code 单独形成滚动层 */
+  overflow: visible;
+  max-height: none;
+}
+.plugin-log-code {
+  display: block;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  max-height: none;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.plugin-log-scroll.plugin-log-theme--dark .plugin-log-code {
+  color: #ccc;
+}
+.plugin-log-scroll.plugin-log-theme--eye-care .plugin-log-code {
+  color: #2d3a2d;
+}

@@ -41,16 +41,9 @@
 
 > 💡 **建议**：首次使用建议使用菜单脚本，会自动检查环境、配置镜像源和依赖安装
 
-- Mac OS 亲测好用
+- Mac / Linux：在 **`mms-ui` 根目录**执行 **`./scripts/mms.sh`**（交互菜单：镜像、依赖、构建等）。
 
-```
-npm run mms
-```
-
-- Windows 暂无测试
-```
-npm run mms:win
-```
+- Windows：`powershell -ExecutionPolicy Bypass -File ./scripts/mms.ps1`
  
 <img src="https://www.mmsadmin.cn/images/mms-ui-tool.png" width="60%" />
 
@@ -153,14 +146,14 @@ nvm ls
 ### 一键配置（推荐）
 
 ```bash
-# 配置镜像加速
-npm run mirror:setup
+# 配置镜像加速（在 mms-ui 根目录）
+bash scripts/setup-npm-mirrors.sh
 
 # 验证配置
-npm run mirror:verify
+bash scripts/verify-mirrors.sh
 
 # 测试镜像
-npm run mirror:test
+npm config get registry && npm view vue version
 ```
 
 ## 😀 项目启动
@@ -216,12 +209,12 @@ pnpm build
 #### 🛠️ PNPM 脚本功能说明
 
 
-| 脚本命令               | 功能说明        | 使用场景           |
-| ---------------------- | --------------- | ------------------ |
-| `npm run pnpm:install` | 快速安装依赖    | 首次安装或重新安装 |
-| `npm run pnpm:dev`     | PNPM 开发服务器 | 日常开发           |
-| `npm run pnpm:build`   | PNPM 项目构建   | 生产环境构建       |
-| `npm run pnpm:clean`   | 清理缓存和依赖  | 解决依赖问题       |
+| 命令 | 说明 |
+| ---- | ---- |
+| `pnpm install` | 安装依赖（可加 `--registry=https://registry.npmmirror.com`） |
+| `pnpm dev` / `npm run dev` | 开发服务器 |
+| `pnpm build` / `npm run build` | 生产构建 |
+| `pnpm store prune` | 清理 pnpm 存储（可选） |
 
 **📋 启动脚本特性：**
 
@@ -263,17 +256,17 @@ pnpm build
 #### 基础命令
 
 ```bash
-# 配置镜像
-npm run mirror:setup       # 一键配置淘宝镜像
-npm run mirror:verify      # 验证所有配置
-npm run mirror:test        # 测试当前镜像
+# 配置 / 验证镜像（在 mms-ui 根目录）
+bash scripts/setup-npm-mirrors.sh
+bash scripts/verify-mirrors.sh
+npm config get registry && npm view vue version
 
 # 切换镜像
-npm run mirror:taobao      # 切换到淘宝镜像
-npm run mirror:official    # 恢复官方镜像
+npm config set registry https://registry.npmmirror.com   # 淘宝
+npm config set registry https://registry.npmjs.org/       # 官方
 
-# 快速安装
-npm run install:fast       # 使用镜像快速安装
+# 快速安装（npm）
+npm install --registry=https://registry.npmmirror.com
 ```
 
 #### 高级管理
@@ -334,13 +327,13 @@ strict-peer-dependencies=false
    curl -I https://registry.npmmirror.com
 
    # 重新配置镜像
-   npm run mirror:setup
+   bash scripts/setup-npm-mirrors.sh
    ```
 2. **安装速度慢**
 
    ```bash
    # 验证镜像配置
-   npm run mirror:verify
+   bash scripts/verify-mirrors.sh
 
    # 测试镜像速度
    node scripts/mirror-manager.js test
@@ -352,7 +345,7 @@ strict-peer-dependencies=false
    npm cache clean --force
 
    # 重新配置
-   npm run mirror:setup
+   bash scripts/setup-npm-mirrors.sh
    ```
 
 #### 恢复官方源
@@ -399,53 +392,23 @@ pnpm config set registry https://registry.npmjs.org/
 
 如遇问题，请：
 
-1. 运行 `npm run mirror:verify` 检查配置
+1. 运行 `bash scripts/verify-mirrors.sh` 检查配置
 2. 查看 `scripts/mirror-manager.js report` 生成的报告
 3. 检查网络连接和防火墙设置
 
-## 🔧 启动命令解释
+## 🔧 `package.json` 脚本（核心）
 
-### NPM Scripts 命令说明
+`mms-ui` 根目录 **`package.json`** 以 **开发 / 构建 / 质量 / 插件联邦** 为主；**镜像、依赖、一键启动**等也可通过下方 **`mms`** 进入交互菜单（等同 **`./scripts/mms.sh`**）。
 
-```text
-		"dev": "vite --mode development --open",           // 开发环境启动
-		"preview": "vite --mode preview --open",          // 预览构建结果
-		"prod": "vite --mode production --open",          // 生产环境启动（建议移除，生产环境不应使用vite serve）
-		"build": "vite build --mode production",          // 生产环境构建
-		"lint": "eslint --ext .js,.jsx,.ts,.tsx,.vue src/", // ESLint检查
-		"lint:fix": "eslint --ext .js,.jsx,.ts,.tsx,.vue src/ --fix", // ESLint自动修复
-		"type-check": "vue-tsc --noEmit",                 // TypeScript类型检查
-		"format": "prettier --write \"src/**/*.{vue,js,jsx,ts,tsx,json,css,scss,md}\"", // 代码格式化
-		"format:check": "prettier --check \"src/**/*.{vue,js,jsx,ts,tsx,json,css,scss,md}\"", // 格式化检查
-		"format:lint": "npm run lint && npm run format",  // 组合命令：先lint后format
-		"pre-commit": "npm run lint && npm run format:check", // Git预提交钩子检查
+| 脚本 | 说明 |
+| ---- | ---- |
+| `dev` / `build` / `preview` | 开发 / 生产构建 / 预览 `dist` |
+| `mms` / `mms:win` | 交互菜单：`pnpm run mms`（`bash ./scripts/mms.sh`）；Windows 用 `pnpm run mms:win` |
+| `lint` / `lint:fix` / `type-check` | ESLint、类型检查 |
+| `format` / `format:check` / `format:lint` / `pre-commit` | Prettier 与提交前检查 |
+| `fed:plugin-ui:build` / `fed:plugin-ui:dev` | 联邦插件子包：`pnpm run fed:plugin-ui:build -- @mms-ui/plugin-xxx-ui` |
 
-		"serve": "vite preview",                         // 预览生产构建
-		"build:dev": "vite build --mode development",    // 开发环境构建
-		"clean": "rm -rf dist node_modules/.vite"        // 清理构建缓存
-		"mirror:setup": "bash scripts/setup-npm-mirrors.sh", // 配置淘宝镜像
-		"mirror:verify": "bash scripts/verify-mirrors.sh",  // 验证淘宝镜像
-		"mirror:taobao": "npm config set registry https://registry.npmmirror.com", // 淘宝镜像
-		"mirror:official": "npm config set registry https://registry.npmjs.org/",  // 官方镜像
-		"mirror:test": "npm config get registry && npm view vue version",          // 测试镜像
-		"install:fast": "npm install --registry=https://registry.npmmirror.com"    // 快速安装
-```
-
-### PNPM Scripts 命令说明（新增）
-
-```text
-		"pnpm:install": "pnpm install --registry=https://registry.npmmirror.com",  // PNPM快速安装依赖
-		"pnpm:dev": "pnpm run dev",                        // PNPM开发环境启动
-		"pnpm:build": "pnpm run build",                    // PNPM生产环境构建
-		"pnpm:clean": "pnpm store prune && rm -rf node_modules", // PNPM清理缓存和依赖
-		"start:pnpm": "./start-pnpm.sh"                     // 启动PNPM脚本（Linux/macOS）
-```
-
-### 启动脚本功能说明
-
-- **start-pnpm.sh** - Linux/macOS一键启动脚本，包含环境检查、镜像配置、启动选项
-- **start-pnpm.ps1** - Windows PowerShell一键启动脚本，功能与shell脚本相同
-- **PNPM-START-GUIDE.md** - PNPM启动脚本详细使用指南
+可选一键启动：**`./scripts/start-pnpm.sh`**（Linux/macOS）、**`./scripts/start-pnpm.ps1`**（Windows）。
 
 ## 💯 🐱 🙋‍♂️ 💫 📢 🔥常见问题
 

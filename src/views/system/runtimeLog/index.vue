@@ -5,6 +5,8 @@
 <script setup lang="ts">
 import { defineAsyncComponent } from 'vue';
 
-/** 与 packages/plugin-syslog-ui 中 federation exposes 的 ./SyslogPage 对应 */
-const SyslogPage = defineAsyncComponent(() => import('mms_plugin_syslog_ui/SyslogPage'));
+/** 与联邦子包 exposes 同源，宿主直出源码（不加载 remoteEntry）；新插件：`@mms-packages/<包目录>/src/...` */
+const SyslogPage = defineAsyncComponent(() =>
+  import('@mms-packages/plugin-syslog-ui/src/SyslogPage.vue')
+);
 </script>

@@ -1,6 +1,6 @@
 <template>
-  <div class="p-4">
-    <el-card shadow="never">
+  <div class="layout-padding">
+    <el-card shadow="hover" class="layout-padding-auto">
       <template #header>
         <span>Redis 预览（插件）</span>
         <el-button type="primary" size="small" class="ml-2" :loading="metaLoading" @click="loadMeta">刷新连接信息</el-button>
@@ -52,9 +52,10 @@
 import { ElMessage } from 'element-plus';
 import { computed, onMounted, ref } from 'vue';
 import request from '/@/utils/request';
+import { pluginHostMvcPrefix } from '/@/utils/mms';
 
 const PLUGIN_ID = 'mms.plugin.redis-inspect';
-const API = `/plugin/${PLUGIN_ID}/ri`;
+const API = `${pluginHostMvcPrefix()}/${PLUGIN_ID}/ri`;
 
 const metaLoading = ref(false);
 const meta = ref<any>(null);

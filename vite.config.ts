@@ -19,10 +19,8 @@ const pathResolve = (dir: string) => {
 const alias: Record<string, string> = {
     '/@': pathResolve('./src/'),
     'vue-i18n': 'vue-i18n/dist/vue-i18n.cjs.js',
-    // 宿主不再启用 Module Federation（与 Vue shared / element-plus 组合会导致生产环境 ESM 循环依赖，#app 无法 mount）
-    'mms_plugin_syslog_ui/SyslogPage': pathResolve(
-        './src/views/system/runtimeLog/SyslogFederationPlaceholder.vue'
-    ),
+    /** 联邦子包源码根（pnpm workspace packages/*），宿主直出用 `@mms-packages/<dir>/src/...`，勿为每个插件单独配别名 */
+    '@mms-packages': pathResolve('./packages'),
 };
 
 const viteConfig: UserConfigFnObject = defineConfig((mode: ConfigEnv) => {
@@ -155,6 +153,16 @@ const viteConfig: UserConfigFnObject = defineConfig((mode: ConfigEnv) => {
                     changeOrigin: true,
                     rewrite: (path) => path.replace(new RegExp('^' + env.VITE_APP_BASE_API), ''),
                     // 本地页 Origin 为 http://localhost:*，转发到线上 prod 时若带上该 Origin，后端 CORS（allowed-origins 为空）会 403 Invalid CORS request
+                    configure: (proxy) => {
+                        proxy.on('proxyReq', (proxyReq) => {
+                            proxyReq.removeHeader('origin');
+                        });
+                    },
+                },
+                // 插件接口已走 ${VITE_APP_BASE_API}/plugin（与 /dev-api 同源代理）；/plugin-assets 仍根路径，需单独转发
+                '/plugin-assets': {
+                    target: env.VITE_APP_API_URL,
+                    changeOrigin: true,
                     configure: (proxy) => {
                         proxy.on('proxyReq', (proxyReq) => {
                             proxyReq.removeHeader('origin');

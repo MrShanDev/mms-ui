@@ -297,6 +297,15 @@
   overflow-x: hidden;
 }
 
+/*
+ * 全屏：去掉 90vh-111px 的同时必须限制在视口内，否则 body 随内容增高会超出屏幕。
+ * 标题栏高度因主题略有差异，必要时改 --el-dialog-fullscreen-header。
+ */
+.el-dialog.is-fullscreen .el-dialog__body {
+  max-height: calc(100vh - var(--el-dialog-fullscreen-header, 56px)) !important;
+  box-sizing: border-box;
+}
+
 /* Card 卡片
 ------------------------------- */
 .el-card__header {

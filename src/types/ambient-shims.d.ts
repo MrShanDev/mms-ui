@@ -8,12 +8,6 @@ declare module '@wangeditor/editor-for-vue';
 declare module 'qs';
 declare module 'sortablejs';
 
-/** syslog 插件联邦 Remote（Host vite.config federation remotes） */
-declare module 'mms_plugin_syslog_ui/SyslogPage' {
-  const c: any;
-  export default c;
-}
-
 declare module '*.json';
 declare module '*.png';
 declare module '*.jpg';

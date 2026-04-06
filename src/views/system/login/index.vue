@@ -6,14 +6,6 @@
           <img :src="loginIllustrationSrc" alt="loginMain" />
         </Animate>
       </div>
-      <div class="login-left-brand flex">
-        <Animate>
-          <img :src="getThemeConfig.logo" alt="logo" />
-        </Animate>
-        <Animate>
-          <span class="ml10 shou">{{ getThemeConfig.globalTitle }}</span>
-        </Animate>
-      </div>
     </div>
     <div class="login-right flex">
       <div class="login-right-warp flex-margin">
@@ -290,6 +282,7 @@ const getThemeConfig = reactive({
           animation: logoAnimation 0.3s ease;
           animation-delay: 0.3s;
           color: #4487EC;
+          padding-top: 40px;
           img {
             width: 60px;
             height: 60px;
@@ -297,7 +290,7 @@ const getThemeConfig = reactive({
         }
         .login-right-warp-main-form {
           flex: 1;
-          padding: 70px 80px 50px;
+          padding: 10px 80px 50px;
           .login-content-main-sacn {
             position: absolute;
             top: 0;
@@ -416,7 +409,7 @@ const getThemeConfig = reactive({
         width: 650px;
         .login-right-warp-mian {
           .login-right-warp-main-form {
-            padding: 90px 100px 60px;
+            padding: 10px 100px 60px;
           }
         }
       }
@@ -431,7 +424,7 @@ const getThemeConfig = reactive({
         width: 480px;
         .login-right-warp-mian {
           .login-right-warp-main-form {
-            padding: 60px 60px 40px;
+            padding: 10px 60px 40px;
           }
         }
       }
@@ -453,7 +446,7 @@ const getThemeConfig = reactive({
         width: 420px;
         .login-right-warp-mian {
           .login-right-warp-main-form {
-            padding: 50px 50px 35px;
+            padding: 10px 50px 35px;
           }
         }
       }
@@ -493,7 +486,7 @@ const getThemeConfig = reactive({
           max-height: calc(100vh - 30px);
           .login-right-warp-main-title.login-right-brand-mobile {
             font-size: 20px;
-            padding: 30px 40px 15px;
+            padding: 40px 40px 15px;
             img {
               width: 40px;
               height: 40px;
@@ -538,7 +531,7 @@ const getThemeConfig = reactive({
           max-height: calc(100vh - 20px);
           .login-right-warp-main-title.login-right-brand-mobile {
             font-size: 18px;
-            padding: 25px 30px 12px;
+            padding: 40px 30px 12px;
             img {
               width: 36px;
               height: 36px;
@@ -582,7 +575,7 @@ const getThemeConfig = reactive({
           max-height: calc(100vh - 20px);
           .login-right-warp-main-title.login-right-brand-mobile {
             font-size: 16px;
-            padding: 20px 20px 10px;
+            padding: 40px 20px 10px;
             img {
               width: 32px;
               height: 32px;

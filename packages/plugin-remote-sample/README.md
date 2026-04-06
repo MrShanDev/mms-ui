@@ -14,8 +14,8 @@
 
 ```bash
 pnpm install
-pnpm run fed:remote:sample:dev    # 开发：http://localhost:5174
-pnpm run fed:remote:sample:build  # 产出 packages/plugin-remote-sample/dist/
+pnpm run fed:plugin-ui:dev -- @mms-ui/plugin-remote-sample   # 开发：http://localhost:5174
+pnpm run fed:plugin-ui:build -- @mms-ui/plugin-remote-sample  # 产出 packages/plugin-remote-sample/dist/
 ```
 
 ## 生产 publicPath
@@ -23,7 +23,7 @@ pnpm run fed:remote:sample:build  # 产出 packages/plugin-remote-sample/dist/
 构建默认 `base` 为 `/plugin-assets/com.sxpcwlkj.plugin.remote.sample/1.0.0/`。若你的插件 id/version 不同，构建前设置：
 
 ```bash
-MMS_FED_REMOTE_BASE=/plugin-assets/你的插件ID/版本/ pnpm run fed:remote:sample:build
+MMS_FED_REMOTE_BASE=/plugin-assets/你的插件ID/版本/ pnpm run fed:plugin-ui:build -- @mms-ui/plugin-remote-sample
 ```
 
 入口文件位于 **`dist/assets/remoteEntry.js`**（非根目录），`plugin.json` 的 `remoteEntryFile` 可写 `assets/remoteEntry.js`（以 v2.0.4 评审字段为准）。
