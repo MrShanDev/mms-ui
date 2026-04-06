@@ -34,10 +34,10 @@
     margin-bottom: 0 !important;
   }
 
-  // 修复行内表单最后一个 el-form-item 位置下移问题
+  // 行内表单最后一项与上方「最后一项 margin-bottom: 0」对齐，不再额外垫高
   &.el-form--inline {
     .el-form-item--large.el-form-item:last-of-type {
-      margin-bottom: 22px !important;
+      margin-bottom: 0 !important;
     }
 
     .el-form-item--default.el-form-item:last-of-type,

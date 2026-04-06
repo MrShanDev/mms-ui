@@ -1,7 +1,8 @@
 <template>
   <div class="layout-parent">
     <router-view v-slot="{ Component }">
-      <transition :name="setTransitionName" mode="out-in">
+      <!-- 不使用 out-in：先离场再进场会在两段动画之间留出空白（易被感知为白屏） -->
+      <transition :name="setTransitionName">
         <keep-alive :include="getKeepAliveNames">
           <component
             :is="Component"
@@ -12,7 +13,7 @@
         </keep-alive>
       </transition>
     </router-view>
-    <transition :name="setTransitionName" mode="out-in">
+    <transition :name="setTransitionName">
       <Iframes
         class="w100"
         v-show="isIframePage"

@@ -8,22 +8,18 @@
           刷新文件列表
         </el-button>
       </template>
-      <el-form :inline="true" class="mms-syslog-fed__form">
-        <el-form-item label="日志文件">
-          <el-select v-model="selectedFile" placeholder="选择 logs 目录下 .log" filterable style="width: 280px">
-            <el-option v-for="f in files" :key="f" :label="f" :value="f" />
-          </el-select>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" :disabled="!selectedFile" @click="loadTail">读取尾部</el-button>
-        </el-form-item>
-      </el-form>
-
-      <div class="mms-syslog-log-panel plugin-log-panel" :class="{ 'plugin-log-panel--fullscreen': logFullscreen }">
-        <el-button v-if="logFullscreen" type="primary" class="plugin-log-exit-fullscreen" @click="logFullscreen = false">
-          退出全屏
-        </el-button>
-        <div v-show="!logFullscreen" class="plugin-log-toolbar">
+      <div class="mms-syslog-fed__controls-row">
+        <el-form :inline="true" class="mms-syslog-fed__form">
+          <el-form-item label="日志文件">
+            <el-select v-model="selectedFile" placeholder="选择 logs 目录下 .log" filterable style="width: 280px">
+              <el-option v-for="f in files" :key="f" :label="f" :value="f" />
+            </el-select>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" :disabled="!selectedFile" @click="loadTail">读取尾部</el-button>
+          </el-form-item>
+        </el-form>
+        <div v-show="!logFullscreen" class="plugin-log-toolbar mms-syslog-fed__toolbar-inline">
           <el-radio-group v-model="logTheme" size="small" class="plugin-log-theme-switch">
             <el-radio-button label="eye-care">护眼</el-radio-button>
             <el-radio-button label="dark">深色</el-radio-button>
@@ -63,6 +59,12 @@
             <span class="text-gray plugin-log-toolbar__hint">ms</span>
           </template>
         </div>
+      </div>
+
+      <div class="mms-syslog-log-panel plugin-log-panel" :class="{ 'plugin-log-panel--fullscreen': logFullscreen }">
+        <el-button v-if="logFullscreen" type="primary" class="plugin-log-exit-fullscreen" @click="logFullscreen = false">
+          退出全屏
+        </el-button>
         <div class="plugin-log-body">
           <!-- 与插件市场独立日志一致：目录说明与正文同一滚动容器；全屏下仅 pre 区固定高度滚动 -->
           <div
@@ -248,9 +250,32 @@ refreshFiles();
 .mms-syslog-fed__refresh {
   float: right;
 }
-.mms-syslog-fed__form {
+.mms-syslog-fed__controls-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  width: 100%;
   margin-bottom: 8px;
   flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--el-bg-color);
+  padding-bottom: 8px;
+  box-shadow: 0 1px 0 var(--el-border-color-lighter);
+}
+.mms-syslog-fed__form {
+  flex: 0 1 auto;
+  margin-bottom: 0;
+}
+.mms-syslog-fed__form :deep(.el-form-item) {
+  margin-bottom: 0;
+}
+.mms-syslog-fed__toolbar-inline {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin-bottom: 0;
 }
 .text-gray {
   color: var(--el-text-color-secondary);
@@ -259,18 +284,9 @@ refreshFiles();
   color: var(--el-color-warning);
 }
 .mms-syslog-log-panel {
+  width: 100%;
   flex: 1;
   min-height: 0;
-}
-/* 非全屏：工具栏顶吸（与插件市场独立日志一致） */
-.mms-syslog-log-panel:not(.plugin-log-panel--fullscreen) .plugin-log-toolbar {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: var(--el-bg-color);
-  padding-bottom: 8px;
-  margin-bottom: 12px;
-  box-shadow: 0 1px 0 var(--el-border-color-lighter);
 }
 .mms-syslog-log-panel .plugin-log-body {
   flex: 1;
