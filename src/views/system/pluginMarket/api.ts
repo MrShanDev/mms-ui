@@ -21,6 +21,11 @@ export function fetchPluginHostHealth<T = any>(): AxiosPromise<T> {
   return request({ url: hostBase() + '/health', method: 'get' });
 }
 
+/** 安装向导：数据源 / JDBC / 插件根目录 / DDL 执行器 / 库表桥接 等探测 */
+export function fetchPluginInstallReadiness<T = any>(): AxiosPromise<T> {
+  return request({ url: hostBase() + '/installReadiness', method: 'get' });
+}
+
 /** 插件独立日志尾部（logs/plugins/{pluginId}@{version}.log），默认约 128KB */
 export function fetchPluginLogTail<T = any>(
   pluginId: string,
@@ -51,12 +56,34 @@ export function fetchPluginManifests<T = any>(): AxiosPromise<T> {
   return request({ url: hostBase() + '/manifests', method: 'get' });
 }
 
-export function installPluginJar(
+/** 安装前预览 JAR 内 META-INF/mms/schema.sql（不执行、不落盘） */
+export function previewBundledPluginSchema(
   file: File,
   options?: { onUploadProgress?: (e: AxiosProgressEvent) => void }
 ): AxiosPromise<any> {
   const fd = new FormData();
   fd.append('file', file);
+  return request({
+    url: hostBase() + '/bundledSchemaPreview',
+    method: 'post',
+    data: fd,
+    headers: { 'Content-Type': 'multipart/form-data' },
+    onUploadProgress: options?.onUploadProgress,
+    timeout: 600_000,
+  });
+}
+
+export function installPluginJar(
+  file: File,
+  options?: {
+    /** 默认 true：不执行 JAR 内 schema.sql（与历史行为一致） */
+    skipBundledSchemaExecution?: boolean;
+    onUploadProgress?: (e: AxiosProgressEvent) => void;
+  }
+): AxiosPromise<any> {
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('skipBundledSchemaExecution', String(options?.skipBundledSchemaExecution !== false));
   return request({
     url: hostBase() + '/install',
     method: 'post',

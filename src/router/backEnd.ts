@@ -145,10 +145,15 @@ export function backEndComponent(routes: any) {
  * @param component 当前要处理项 component
  * @returns 返回处理成函数后的 component
  */
+/** 将 glob 键规范为与后端 component 字段可比的路径（如 system/user/index.vue） */
+function normalizeViewGlobKey(key: string): string {
+  return key.replace(/^(?:\.\.\/)+views\//, '');
+}
+
 export function dynamicImport(dynamicViewsModules: Record<string, Function>, component: string) {
   const keys = Object.keys(dynamicViewsModules);
   const matchKeys = keys.filter((key) => {
-    const k = key.replace(/..\/views|../, '');
+    const k = normalizeViewGlobKey(key);
     return k.startsWith(`${component}`) || k.startsWith(`/${component}`);
   });
   if (matchKeys?.length === 1) {

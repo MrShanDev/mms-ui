@@ -3,8 +3,6 @@ import { getEnv } from '/@/utils/mms';
 import { AxiosPromise } from 'axios';
 import { SysEnum } from '/@/enums/SysEnum';
 import { EncryptTypeEnum } from '/@/enums/EncryptTypeEnum';
-import type { DocDocUserEntity } from '/@/views/doc/docUser/type';
-
 /**
  * 控制台
  * @param code
@@ -12,9 +10,22 @@ import type { DocDocUserEntity } from '/@/views/doc/docUser/type';
  */
 export function homeApi() {
   return {
-    list: (params?: object): AxiosPromise<{ rows: DocDocUserEntity[]; total: number }> => {
+    /** @deprecated 与 memberList 相同，保留兼容；文档用户已合并至 store_member */
+    list: (params?: object): AxiosPromise<{ rows: any[]; total: number }> => {
       return request({
-        url: getEnv() + '/doc/docUser/list',
+        url: getEnv() + '/member/storeMember/list',
+        method: 'post',
+        data: params,
+        headers: {
+          'Encrypt-State': SysEnum.SYS_COMMON_STATE_CLOSE,
+          'Encrypt-Type': EncryptTypeEnum.AES,
+        },
+      });
+    },
+    /** 首页「最新会员」表格，与 member/storeMember 列表接口一致 */
+    memberList: (params?: object): AxiosPromise<{ rows: any[]; total: number }> => {
+      return request({
+        url: getEnv() + '/member/storeMember/list',
         method: 'post',
         data: params,
         headers: {

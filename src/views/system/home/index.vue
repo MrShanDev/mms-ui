@@ -142,7 +142,6 @@
   import { noticeApi } from '/@/views/system/notice';
   import type { NoticeEntity } from '/@/views/system/notice/type';
   import { homeApi } from '/@/views/system/home';
-  import { memberStoreMemberApi } from '/@/views/member/storeMember';
   import * as echarts from 'echarts';
   import type { EChartsOption } from 'echarts';
   import FastTableColumn from "/@/components/fast-table-column/src/fast-table-column.vue";
@@ -153,7 +152,6 @@
   const router = useRouter();
   const baseApi = homeApi();
   const baseApiNotice = noticeApi();
-  const memberApi = memberStoreMemberApi();
 
   const incomeChartRef = ref<HTMLDivElement>();
   const paymentChartRef = ref<HTMLDivElement>();
@@ -491,7 +489,7 @@
    * 获取最新会员列表
    */
   const getLatestMembers = () => {
-    memberApi.list({
+    baseApi.memberList({
       pageNum: 1,
       pageSize: 10,
     }).then(res => {

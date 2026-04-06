@@ -4,7 +4,7 @@
       <template #header>
         <h2>FontAwesome 图标获取测试</h2>
       </template>
-      
+
       <div class="test-section">
         <div class="test-controls">
           <el-button @click="testGetAwesomeIcons" type="primary">
@@ -17,7 +17,7 @@
             测试获取 Element Plus 图标
           </el-button>
         </div>
-        
+
         <div class="test-results">
           <el-alert
             v-if="testResult.type"
@@ -27,26 +27,18 @@
             show-icon
             :closable="false"
           />
-          
+
           <div v-if="iconList.length > 0" class="icon-list">
             <h4>获取到的图标列表 ({{ iconList.length }} 个)：</h4>
             <div class="icon-grid">
-              <div 
-                v-for="(icon, index) in displayedIcons" 
-                :key="index"
-                class="icon-item"
-              >
+              <div v-for="(icon, index) in displayedIcons" :key="index" class="icon-item">
                 <SvgIcon :name="icon" :size="20" />
                 <span class="icon-name">{{ icon }}</span>
               </div>
             </div>
-            
+
             <div v-if="iconList.length > 20" class="show-more">
-              <el-button 
-                @click="showAll = !showAll" 
-                size="small" 
-                type="text"
-              >
+              <el-button @click="showAll = !showAll" size="small" type="text">
                 {{ showAll ? '收起' : `显示全部 (${iconList.length} 个)` }}
               </el-button>
             </div>
@@ -59,7 +51,7 @@
 
 <script setup lang="ts">
   import { ref, computed } from 'vue';
-  import initIconfont from '../../utils/getStyleSheets';
+  import initIconfont from '/@/utils/getStyleSheets';
 
   const testResult = ref<{
     type?: 'success' | 'warning' | 'info' | 'error';
@@ -80,20 +72,20 @@
   const testGetAwesomeIcons = async () => {
     testResult.value = { type: 'info', title: '测试中...', message: '正在获取 FontAwesome 图标列表' };
     iconList.value = [];
-    
+
     try {
-      const icons = await initIconfont.awe() as string[];
+      const icons = (await initIconfont.awe()) as string[];
       iconList.value = icons;
       testResult.value = {
         type: 'success',
         title: '获取成功',
-        message: `成功获取到 ${icons.length} 个 FontAwesome 图标`
+        message: `成功获取到 ${icons.length} 个 FontAwesome 图标`,
       };
     } catch (error) {
       testResult.value = {
         type: 'error',
         title: '获取失败',
-        message: `错误信息: ${error}`
+        message: `错误信息: ${error}`,
       };
     }
   };
@@ -101,20 +93,20 @@
   const testGetAliIcons = async () => {
     testResult.value = { type: 'info', title: '测试中...', message: '正在获取阿里图标列表' };
     iconList.value = [];
-    
+
     try {
-      const icons = await initIconfont.ali() as string[];
+      const icons = (await initIconfont.ali()) as string[];
       iconList.value = icons;
       testResult.value = {
         type: 'success',
         title: '获取成功',
-        message: `成功获取到 ${icons.length} 个阿里图标`
+        message: `成功获取到 ${icons.length} 个阿里图标`,
       };
     } catch (error) {
       testResult.value = {
         type: 'error',
         title: '获取失败',
-        message: `错误信息: ${error}`
+        message: `错误信息: ${error}`,
       };
     }
   };
@@ -122,20 +114,20 @@
   const testGetElementIcons = async () => {
     testResult.value = { type: 'info', title: '测试中...', message: '正在获取 Element Plus 图标列表' };
     iconList.value = [];
-    
+
     try {
-      const icons = await initIconfont.ele() as string[];
+      const icons = (await initIconfont.ele()) as string[];
       iconList.value = icons;
       testResult.value = {
         type: 'success',
         title: '获取成功',
-        message: `成功获取到 ${icons.length} 个 Element Plus 图标`
+        message: `成功获取到 ${icons.length} 个 Element Plus 图标`,
       };
     } catch (error) {
       testResult.value = {
         type: 'error',
         title: '获取失败',
-        message: `错误信息: ${error}`
+        message: `错误信息: ${error}`,
       };
     }
   };
@@ -211,12 +203,11 @@
     margin-top: 16px;
   }
 
-  /* 响应式调整 */
   @media (max-width: 768px) {
     .test-controls {
       flex-direction: column;
     }
-    
+
     .icon-grid {
       grid-template-columns: 1fr;
     }

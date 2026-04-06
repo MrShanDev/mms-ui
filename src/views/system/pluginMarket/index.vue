@@ -47,6 +47,8 @@
           <el-button type="success">上传Jar包安装</el-button>
         </el-upload>
         <el-button type="info" plain @click="urlInstallVisible = true">URL下载Jar包安装</el-button>
+        <el-button type="primary" plain @click="goPluginInstallWizardPage">全屏安装向导</el-button>
+        <el-button type="primary" plain @click="goPluginUsageAgreementPage">插件使用协议</el-button>
       </div>
     </div>
 
@@ -696,9 +698,30 @@
       </div>
     </el-dialog>
 
+    <el-dialog
+      v-model="installSchemaWizardVisible"
+      title="插件安装向导"
+      width="860px"
+      destroy-on-close
+      class="plugin-install-wizard-dialog"
+      @closed="onInstallSchemaWizardClosed"
+    >
+      <PluginInstallWizard
+        v-if="installSchemaWizardVisible"
+        ref="pluginInstallWizardRef"
+        variant="dialog"
+        @close="installSchemaWizardVisible = false"
+        @installed="loadAll"
+      />
+    </el-dialog>
+
     <el-dialog v-model="urlInstallVisible" title="从 URL 安装插件" width="520px" destroy-on-close>
       <p class="text-gray" style="margin: 0 0 12px; font-size: 13px">
-        由<strong>服务端</strong>下载 http(s) 直链（与上传安装相同校验）。适用于 CI 产物、对象存储；请确保来源可信。
+        由<strong>服务端</strong>下载 http(s) 直链（与上传安装相同校验）。适用于 CI 产物、对象存储；请确保来源可信。安装行为仍受
+        <el-button link type="primary" style="vertical-align: baseline; padding: 0" @click="goPluginUsageAgreementPage"
+          >《插件使用协议》</el-button
+        >
+        约束，请自行评估风险。
       </p>
       <el-input
         v-model="urlInstallUrl"
@@ -729,6 +752,7 @@ import type { UploadRequestOptions } from 'element-plus';
 import { saveAs } from 'file-saver';
 import { usePluginLogViewer } from '/@/composables/usePluginLogViewer';
 import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
+import { useRouter } from 'vue-router';
 import {
   activatePluginVersion,
   clearPluginLog,
@@ -738,7 +762,6 @@ import {
   fetchPluginLogTail,
   fetchPluginMarketCards,
   fetchPluginManifests,
-  installPluginJar,
   installPluginFromUrl,
   purgePlugin,
   reloadPlugins,
@@ -746,6 +769,7 @@ import {
   fetchPluginMarketSysConfig,
   savePluginMarketSysConfig,
 } from './api';
+import PluginInstallWizard from './components/PluginInstallWizard.vue';
 import { getEnv } from '/@/utils/mms';
 
 /** 市场卡片封面：相对路径拼 API base，便于 dev 代理与跨端口部署下 img 正常加载 */
@@ -1534,31 +1558,26 @@ async function onInstallFromUrl() {
   }
 }
 
-async function installJarWithProgress(file: File): Promise<void> {
-  const loading = ElLoading.service({
-    lock: true,
-    text: '准备上传…',
-    background: 'rgba(0, 0, 0, 0.35)',
-  });
-  try {
-    await installPluginJar(file, {
-      onUploadProgress: (evt) => {
-        const { loaded, total } = evt;
-        if (total && total > 0) {
-          const pct = Math.min(100, Math.round((loaded * 100) / total));
-          if (pct >= 100) {
-            loading.setText('上传已完成，正在等待服务器校验与安装…');
-          } else {
-            loading.setText(`正在上传 ${pct}%…`);
-          }
-        } else {
-          loading.setText('正在上传…');
-        }
-      },
-    });
-  } finally {
-    loading.close();
-  }
+const router = useRouter();
+const installSchemaWizardVisible = ref(false);
+const pluginInstallWizardRef = ref<InstanceType<typeof PluginInstallWizard> | null>(null);
+
+function goPluginInstallWizardPage() {
+  router.push('/system/pluginInstallWizard');
+}
+
+function goPluginUsageAgreementPage() {
+  router.push('/system/pluginUsageAgreement');
+}
+
+async function beginPluginInstallWithSchemaWizard(file: File) {
+  installSchemaWizardVisible.value = true;
+  await nextTick();
+  await pluginInstallWizardRef.value?.startWithFile(file);
+}
+
+function onInstallSchemaWizardClosed() {
+  pluginInstallWizardRef.value?.reset();
 }
 
 async function onUploadForRow(opt: UploadRequestOptions, row: any) {
@@ -1575,10 +1594,8 @@ async function onUploadForRow(opt: UploadRequestOptions, row: any) {
     }
   }
   try {
-    await installJarWithProgress(opt.file as File);
-    ElMessage.success('已安装并重载');
+    await beginPluginInstallWithSchemaWizard(opt.file as File);
     detailVisible.value = false;
-    await loadAll();
   } catch {
     /* */
   }
@@ -1611,9 +1628,7 @@ async function onReloadAll() {
 
 async function onUpload(opt: UploadRequestOptions) {
   try {
-    await installJarWithProgress(opt.file as File);
-    ElMessage.success('已安装并重载');
-    await loadAll();
+    await beginPluginInstallWithSchemaWizard(opt.file as File);
   } catch {
     /* */
   }
@@ -2431,4 +2446,5 @@ onMounted(() => loadAll());
   -webkit-overflow-scrolling: touch;
   box-sizing: border-box;
 }
+
 </style>
