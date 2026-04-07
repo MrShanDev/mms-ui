@@ -15,13 +15,12 @@
       </p>
     </div>
     <el-card shadow="never" class="plugin-install-wizard-page__card">
-      <PluginInstallWizard variant="page" @installed="onInstalled" />
+      <PluginInstallWizard variant="page" />
     </el-card>
   </div>
 </template>
 
 <script setup lang="ts" name="systemPluginInstallWizard">
-import { ElMessage } from 'element-plus';
 import { useRouter } from 'vue-router';
 import PluginInstallWizard from '../pluginMarket/components/PluginInstallWizard.vue';
 
@@ -33,10 +32,6 @@ function goMarket() {
 
 function goAgreement() {
   router.push('/system/pluginUsageAgreement');
-}
-
-function onInstalled() {
-  ElMessage.success('安装完成，可返回插件市场查看卡片状态');
 }
 </script>
 

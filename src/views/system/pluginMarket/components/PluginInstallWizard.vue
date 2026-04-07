@@ -281,6 +281,9 @@ const installWizardFile = ref<File | null>(null);
 const pluginUsageAgreementAccepted = ref(false);
 
 const canWizardNext = computed(() => {
+  if (installSchemaWizardError.value) {
+    return false;
+  }
   if (installWizardStep.value !== 0) {
     return true;
   }
@@ -293,6 +296,7 @@ const canWizardNext = computed(() => {
 
 const canStartWizardInstall = computed(
   () =>
+    !installSchemaWizardError.value &&
     !!installWizardReadiness.value?.pluginsRootReady &&
     pluginUsageAgreementAccepted.value
 );
@@ -334,6 +338,9 @@ async function startWithFile(file: File) {
       })(),
     ]);
   } catch {
+    // 并行请求其一失败时，另一项可能已写入状态；若不清理，步骤 0 仍可能「下一步」进入空步骤
+    installWizardReadiness.value = null;
+    installWizardPreview.value = null;
     installSchemaWizardError.value = '无法读取安装前置信息（请查看接口提示）';
   } finally {
     installSchemaWizardLoading.value = false;
@@ -352,6 +359,9 @@ function wizardPrev() {
 }
 
 async function wizardNext() {
+  if (installSchemaWizardError.value) {
+    return;
+  }
   if (installWizardStep.value === 0) {
     if (!installWizardReadiness.value?.pluginsRootReady) {
       ElMessage.warning('插件根目录不可用');
@@ -432,7 +442,9 @@ async function runWizardInstall() {
     const log = res?.data?.bundledSchemaExecutionLog;
     installWizardSchemaLog.value = Array.isArray(log) ? log : [];
     installWizardStep.value = 5;
-    ElMessage.success('安装完成');
+    ElMessage.success(
+      props.variant === 'page' ? '安装完成，可返回插件市场查看卡片状态' : '安装完成'
+    );
     emit('installed');
   } catch {
     /* 拦截器已提示 */
