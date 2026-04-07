@@ -43,12 +43,7 @@
       <div class="plugin-market__actions">
         <el-button type="primary" :loading="loading" @click="loadAll">刷新</el-button>
         <el-button type="warning" :loading="reloading" @click="onReloadAll">全量重载</el-button>
-        <el-upload :show-file-list="false" accept=".jar" :http-request="onUpload">
-          <el-button type="success">上传Jar包安装</el-button>
-        </el-upload>
-        <el-button type="info" plain @click="urlInstallVisible = true">URL下载Jar包安装</el-button>
-        <el-button type="primary" plain @click="goPluginInstallWizardPage">全屏安装向导</el-button>
-        <el-button type="primary" plain @click="goPluginUsageAgreementPage">插件使用协议</el-button>
+        <el-button type="success" @click="openInstallWizardDialog">安装插件</el-button>
       </div>
     </div>
 
@@ -658,6 +653,15 @@
           >
             下载日志
           </el-button>
+          <el-button
+            size="small"
+            type="primary"
+            plain
+            :disabled="!logContext || logData?.fileMissing || !logPlainText.trim()"
+            @click="copyPluginLogText"
+          >
+            复制日志
+          </el-button>
           <span class="plugin-log-toolbar__gap" />
           <span class="plugin-log-toolbar__label text-gray">跟随底部</span>
           <el-switch v-model="logFollowBottom" size="small" @change="onLogFollowSwitch" />
@@ -699,41 +703,23 @@
     </el-dialog>
 
     <el-dialog
-      v-model="installSchemaWizardVisible"
-      title="插件安装向导"
-      width="860px"
+      v-model="installFlowVisible"
+      :title="installFlowTitle"
+      width="70vw"
       destroy-on-close
-      class="plugin-install-wizard-dialog"
-      @closed="onInstallSchemaWizardClosed"
+      class="plugin-install-flow-dialog"
+      @closed="onInstallFlowClosed"
     >
-      <PluginInstallWizard
-        v-if="installSchemaWizardVisible"
-        ref="pluginInstallWizardRef"
+      <PluginInstallUnifiedFlow
+        v-if="installFlowVisible"
         variant="dialog"
-        @close="installSchemaWizardVisible = false"
-        @installed="loadAll"
+        :flow-mode="installFlowMode"
+        :initial-file="pendingInstallFile"
+        @close="installFlowVisible = false"
+        @installed="onInstallFlowInstalled"
       />
     </el-dialog>
 
-    <el-dialog v-model="urlInstallVisible" title="从 URL 安装插件" width="520px" destroy-on-close>
-      <p class="text-gray" style="margin: 0 0 12px; font-size: 13px">
-        由<strong>服务端</strong>下载 http(s) 直链（与上传安装相同校验）。适用于 CI 产物、对象存储；请确保来源可信。安装行为仍受
-        <el-button link type="primary" style="vertical-align: baseline; padding: 0" @click="goPluginUsageAgreementPage"
-          >《插件使用协议》</el-button
-        >
-        约束，请自行评估风险。
-      </p>
-      <el-input
-        v-model="urlInstallUrl"
-        type="textarea"
-        :rows="3"
-        placeholder="例如 https://releases.example.com/mms-plugin-syslog-21.jar"
-      />
-      <template #footer>
-        <el-button @click="urlInstallVisible = false">取消</el-button>
-        <el-button type="primary" :loading="urlInstallLoading" @click="onInstallFromUrl">安装</el-button>
-      </template>
-    </el-dialog>
   </div>
 </template>
 
@@ -747,12 +733,11 @@ import {
   SwitchButton,
   VideoPlay,
 } from '@element-plus/icons-vue';
-import { ElLoading, ElMessage, ElMessageBox } from 'element-plus';
+import { ElMessage, ElMessageBox } from 'element-plus';
 import type { UploadRequestOptions } from 'element-plus';
 import { saveAs } from 'file-saver';
 import { usePluginLogViewer } from '/@/composables/usePluginLogViewer';
-import { computed, nextTick, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
-import { useRouter } from 'vue-router';
+import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
 import {
   activatePluginVersion,
   clearPluginLog,
@@ -762,14 +747,13 @@ import {
   fetchPluginLogTail,
   fetchPluginMarketCards,
   fetchPluginManifests,
-  installPluginFromUrl,
   purgePlugin,
   reloadPlugins,
   removePluginCatalog,
   fetchPluginMarketSysConfig,
   savePluginMarketSysConfig,
 } from './api';
-import PluginInstallWizard from './components/PluginInstallWizard.vue';
+import PluginInstallUnifiedFlow from './components/PluginInstallUnifiedFlow.vue';
 import { getEnv } from '/@/utils/mms';
 
 /** 市场卡片封面：相对路径拼 API base，便于 dev 代理与跨端口部署下 img 正常加载 */
@@ -898,9 +882,6 @@ const powerBusy = ref<{
   op: 'enable' | 'deactivate' | 'restart' | 'purge';
 } | null>(null);
 
-const urlInstallVisible = ref(false);
-const urlInstallUrl = ref('');
-const urlInstallLoading = ref(false);
 
 /** 与后端 PluginDescriptorValidator 中 SYS_CONFIG_VALUE_TYPES 一致 */
 const PLUGIN_SYS_CONFIG_VALUE_TYPES = new Set([
@@ -1496,6 +1477,38 @@ async function downloadPluginLogFile() {
   }
 }
 
+async function copyPluginLogText() {
+  const text = logPlainText.value;
+  if (!text.trim()) {
+    ElMessage.warning('暂无可复制的日志内容');
+    return;
+  }
+  try {
+    if (navigator?.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      ElMessage.success('已复制到剪贴板');
+      return;
+    }
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', 'true');
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    ta.style.pointerEvents = 'none';
+    document.body.appendChild(ta);
+    ta.select();
+    const ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+    if (ok) {
+      ElMessage.success('已复制到剪贴板');
+    } else {
+      ElMessage.warning('复制失败，请手动复制');
+    }
+  } catch {
+    ElMessage.warning('复制失败，请手动复制');
+  }
+}
+
 async function openPluginLog(row: any) {
   const ver = pluginLogVersion(row);
   if (!ver) {
@@ -1531,53 +1544,33 @@ async function onRollback(row: any) {
   }
 }
 
-/** 大文件上传：全屏 loading + 进度文案；结束后由调用方处理成功提示与刷新 */
-async function onInstallFromUrl() {
-  const u = urlInstallUrl.value?.trim();
-  if (!u) {
-    ElMessage.warning('请输入 URL');
-    return;
-  }
-  urlInstallLoading.value = true;
-  const loading = ElLoading.service({
-    lock: true,
-    text: '正在从 URL 下载并安装…',
-    background: 'rgba(0, 0, 0, 0.35)',
-  });
-  try {
-    await installPluginFromUrl(u);
-    ElMessage.success('已安装并重载');
-    urlInstallVisible.value = false;
-    urlInstallUrl.value = '';
-    await loadAll();
-  } catch {
-    /* 拦截器已提示 */
-  } finally {
-    loading.close();
-    urlInstallLoading.value = false;
-  }
-}
+const installFlowVisible = ref(false);
+const installFlowMode = ref<'install' | 'agreement'>('install');
+const pendingInstallFile = ref<File | null>(null);
 
-const router = useRouter();
-const installSchemaWizardVisible = ref(false);
-const pluginInstallWizardRef = ref<InstanceType<typeof PluginInstallWizard> | null>(null);
+const installFlowTitle = computed(() =>
+  installFlowMode.value === 'agreement' ? '插件使用协议' : '插件安装'
+);
 
-function goPluginInstallWizardPage() {
-  router.push('/system/pluginInstallWizard');
-}
-
-function goPluginUsageAgreementPage() {
-  router.push('/system/pluginUsageAgreement');
+function openInstallWizardDialog() {
+  installFlowMode.value = 'install';
+  pendingInstallFile.value = null;
+  installFlowVisible.value = true;
 }
 
 async function beginPluginInstallWithSchemaWizard(file: File) {
-  installSchemaWizardVisible.value = true;
-  await nextTick();
-  await pluginInstallWizardRef.value?.startWithFile(file);
+  installFlowMode.value = 'install';
+  pendingInstallFile.value = file;
+  installFlowVisible.value = true;
 }
 
-function onInstallSchemaWizardClosed() {
-  pluginInstallWizardRef.value?.reset();
+function onInstallFlowInstalled() {
+  void loadAll();
+}
+
+function onInstallFlowClosed() {
+  installFlowMode.value = 'install';
+  pendingInstallFile.value = null;
 }
 
 async function onUploadForRow(opt: UploadRequestOptions, row: any) {

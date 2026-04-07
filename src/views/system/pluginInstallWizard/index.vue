@@ -3,35 +3,30 @@
     <div class="plugin-install-wizard-page__head">
       <el-page-header @back="goMarket">
         <template #content>
-          <span class="plugin-install-wizard-page__title">插件安装向导（全屏）</span>
+          <span class="plugin-install-wizard-page__title">插件安装</span>
         </template>
       </el-page-header>
       <p class="text-gray plugin-install-wizard-page__hint">
-        与插件市场「上传安装」弹窗流程一致，并包含<strong>联邦前端</strong>说明步骤。适合分步对照文档完成安装；快速安装仍可在
+        与插件市场「上传安装」为<strong>同一套流程</strong>：<strong>安装协议</strong> → <strong>选择 JAR</strong> →
+        <strong>分步安装向导</strong>（环境检测、建表 DDL、联邦前端说明、安装加载、权限菜单、健康检查）。也可在
         <el-button link type="primary" @click="goMarket">插件市场</el-button>
-        使用上传入口。安装前请阅读
-        <el-button link type="primary" @click="goAgreement">《插件使用协议》</el-button>
-        。
+        直接上传安装。
       </p>
     </div>
     <el-card shadow="never" class="plugin-install-wizard-page__card">
-      <PluginInstallWizard variant="page" />
+      <PluginInstallUnifiedFlow variant="page" flow-mode="install" @close="goMarket" @installed="goMarket" />
     </el-card>
   </div>
 </template>
 
 <script setup lang="ts" name="systemPluginInstallWizard">
 import { useRouter } from 'vue-router';
-import PluginInstallWizard from '../pluginMarket/components/PluginInstallWizard.vue';
+import PluginInstallUnifiedFlow from '../pluginMarket/components/PluginInstallUnifiedFlow.vue';
 
 const router = useRouter();
 
 function goMarket() {
   router.push('/system/pluginMarket');
-}
-
-function goAgreement() {
-  router.push('/system/pluginUsageAgreement');
 }
 </script>
 
@@ -51,5 +46,8 @@ function goAgreement() {
 }
 .plugin-install-wizard-page__card {
   max-width: 960px;
+}
+.text-gray {
+  color: var(--el-text-color-secondary);
 }
 </style>
