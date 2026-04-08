@@ -11,6 +11,7 @@ import { useRoutesList } from '/@/stores/routesList';
 import { useTagsViewRoutes } from '/@/stores/tagsViewRoutes';
 import { getMenu } from '/@/views/system/init';
 import { useAppStore } from '/@/stores/app';
+import { resolvePluginFederatedView } from '/@/router/pluginFederation';
 
 // 后端控制路由
 
@@ -174,6 +175,10 @@ export function dynamicImport(dynamicViewsModules: Record<string, Function>, com
     .trim()
     .replace(/^\/+/, '');
   if (!comp) return;
+  const pluginFed = resolvePluginFederatedView(comp);
+  if (pluginFed) {
+    return pluginFed;
+  }
   const keys = Object.keys(dynamicViewsModules);
   const matchKeys = keys.filter((key) => {
     const k = normalizeViewGlobKey(key);
