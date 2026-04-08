@@ -7,7 +7,7 @@ import { useKeepALiveNames } from '/@/stores/keepAliveNames';
 import { useRoutesList } from '/@/stores/routesList';
 import { useThemeConfig } from '/@/stores/themeConfig';
 import { Session } from '/@/utils/storage';
-import { staticRoutes, notFoundAndNoPower } from '/@/router/route';
+import { dynamicRoutes, staticRoutes, notFoundAndNoPower } from '/@/router/route';
 import { initFrontEndControlRoutes } from '/@/router/frontEnd';
 import { initBackEndControlRoutes } from '/@/router/backEnd';
 
@@ -52,7 +52,7 @@ export const router = createRouter({
  * @returns 返回处理后的一维路由菜单数组
  */
 export function formatFlatteningRoutes(arr: any) {
-  if (arr.length <= 0) return false;
+  if (!arr || arr.length <= 0) return false;
   for (let i = 0; i < arr.length; i++) {
     if (arr[i].children) {
       arr = arr.slice(0, i + 1).concat(arr[i].children, arr.slice(i + 1));
@@ -68,12 +68,32 @@ export function formatFlatteningRoutes(arr: any) {
  * @param arr 处理后的一维路由菜单数组
  * @returns 返回将一维数组重新处理成 `定义动态路由（dynamicRoutes）` 的格式
  */
+function ensureLayoutShellForTwoStage(newArr: any[]) {
+  if (newArr.length > 0) {
+    return;
+  }
+  const shell = dynamicRoutes[0];
+  if (!shell || shell.path !== '/') {
+    return;
+  }
+  newArr.push({
+    component: shell.component,
+    name: shell.name,
+    path: shell.path,
+    redirect: shell.redirect,
+    meta: shell.meta ? { ...shell.meta } : {},
+    children: [],
+  });
+}
+
 export function formatTwoStageRoutes(arr: any) {
-  if (arr.length <= 0) return false;
+  if (!arr || arr.length <= 0) return false;
   const newArr: any = [];
   const cacheList: Array<string> = [];
   arr.forEach((v: any) => {
-    if (v.path === '/') {
+    // 后端可能返回 path 为 null 的权限/按钮节点，不可对 path 直接调用字符串方法
+    const pathStr = v.path == null ? '' : String(v.path);
+    if (pathStr === '/') {
       newArr.push({
         component: v.component,
         name: v.name,
@@ -83,22 +103,30 @@ export function formatTwoStageRoutes(arr: any) {
         children: [],
       });
     } else {
+      ensureLayoutShellForTwoStage(newArr);
+      if (!newArr[0]) {
+        return;
+      }
       // 判断是否是动态路由（xx/:id/:name），用于 tagsView 等中使用
-      if (v.path.indexOf('/:') > -1) {
+      if (pathStr.indexOf('/:') > -1) {
+        v.meta = v.meta || {};
         v.meta['isDynamic'] = true;
-        v.meta['isDynamicPath'] = v.path;
+        v.meta['isDynamicPath'] = pathStr;
       }
       newArr[0].children.push({ ...v });
       // 存 name 值，keep-alive 中 include 使用，实现路由的缓存
       // 路径：/@/layout/routerView/parent.vue
-      if (newArr[0].meta.isKeepAlive && v.meta.isKeepAlive) {
+      if (newArr[0].meta?.isKeepAlive && v.meta?.isKeepAlive) {
         cacheList.push(v.name);
         const stores = useKeepALiveNames(pinia);
         stores.setCacheKeepAlive(cacheList);
       }
     }
   });
-  return newArr;
+  if (newArr.length === 0) {
+    ensureLayoutShellForTwoStage(newArr);
+  }
+  return newArr.length > 0 ? newArr : false;
 }
 
 // 路由加载前

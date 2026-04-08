@@ -10,7 +10,7 @@
       >
         <el-step title="插件协议" description="阅读并同意" />
         <el-step title="上传与预览" description="插件信息/环境检测" />
-        <el-step title="安装插件" description="Java类/管理页面/SQL/权限" />
+        <el-step title="安装插件" description="Jar/页面/载数据安装" />
         <el-step
           title="安装结果"
           description="结果健康检测"
@@ -140,30 +140,58 @@
 
         <template v-if="installWizardPreview">
           <el-divider content-position="left">包内容预览</el-divider>
-          <div class="plugin-install-wizard__section-title">建表 DDL（schema.sql）</div>
+          <div class="plugin-install-wizard__section-title">SQL 脚本预览</div>
           <el-alert
-            v-if="installWizardPreview?.hasSchema && installWizardPreview?.bundledSchemaExecutorAvailable === false"
+            v-if="
+              (installWizardPreview?.hasSchema || installWizardPreview?.hasBundledInstallSql) &&
+              installWizardPreview?.bundledSchemaExecutorAvailable === false
+            "
             type="warning"
             :closable="false"
             show-icon
             class="mb-3"
-            title="当前环境无法自动执行 DDL：请先在库中手工执行 schema.sql，并在安装时选择「跳过建表」。"
+            title="当前环境无法自动执行 JAR 内 SQL：请关闭下方「自动执行」或配置 mms-system + 数据源后再装。"
           />
           <div class="plugin-install-wizard__row mb-3">
-            <span class="text-gray">安装时执行建表（META-INF/mms/schema.sql）</span>
+            <span class="text-gray">自动执行包内 SQL（schema.sql + script/install.sql，无则跳过）</span>
             <el-switch
               v-model="installWizardRunSchema"
-              :disabled="!installWizardPreview?.hasSchema || !installWizardPreview?.bundledSchemaExecutorAvailable"
+              :disabled="
+                (!installWizardPreview?.hasSchema && !installWizardPreview?.hasBundledInstallSql) ||
+                !installWizardPreview?.bundledSchemaExecutorAvailable
+              "
               inline-prompt
               active-text="执行"
               inactive-text="跳过"
             />
           </div>
-          <template v-if="installWizardPreview.hasSchema">
-            <p v-if="installWizardPreview.truncated" class="text-warning text-sm">预览已截断，完整内容见 JAR。</p>
-            <pre class="plugin-detail__pre plugin-install-wizard__sql">{{ installWizardPreview.schemaSql || '（空）' }}</pre>
-          </template>
-          <el-empty v-else description="本 JAR 未包含 schema.sql，将跳过建表步骤。" :image-size="72" />
+          <el-tabs
+            v-model="sqlPreviewActiveTab"
+            type="border-card"
+            class="plugin-install-wizard__sql-tabs"
+          >
+            <el-tab-pane label="插件SQL表" name="schema">
+              <p class="text-gray text-xs mb-2">
+                <code>META-INF/mms/schema.sql</code>：安装时默认自动执行（白名单 DDL），可通过上方开关整体跳过包内 SQL。
+              </p>
+              <template v-if="installWizardPreview.hasSchema">
+                <p v-if="installWizardPreview.truncated" class="text-warning text-sm">预览已截断，完整内容见 JAR。</p>
+                <pre class="plugin-detail__pre plugin-install-wizard__sql">{{ installWizardPreview.schemaSql || '（空）' }}</pre>
+              </template>
+              <el-empty v-else description="本 JAR 未包含 schema.sql，将跳过建表步骤。" :image-size="56" />
+            </el-tab-pane>
+            <el-tab-pane label="菜单权限SQL" name="install">
+              <p class="text-gray text-xs mb-2">
+                <code>script/install.sql</code>：安装时默认自动执行（仅允许 <code>INSERT INTO sys_function</code>；主键重复则跳过该条）。可与
+                <code>menuBootstrap</code> 并存。
+              </p>
+              <template v-if="installWizardPreview.hasBundledInstallSql">
+                <p v-if="installWizardPreview.installSqlTruncated" class="text-warning text-sm">预览已截断，完整内容见 JAR。</p>
+                <pre class="plugin-detail__pre plugin-install-wizard__sql">{{ installWizardPreview.installSql || '（空）' }}</pre>
+              </template>
+              <el-empty v-else description="本 JAR 未包含 script/install.sql。" :image-size="56" />
+            </el-tab-pane>
+          </el-tabs>
 
           <el-divider content-position="left">插件信息（plugin.json）</el-divider>
           <el-descriptions :column="1" border size="small">
@@ -175,14 +203,23 @@
             </el-descriptions-item>
             <el-descriptions-item label="名称">{{ installWizardPreview.name || '—' }}</el-descriptions-item>
             <el-descriptions-item label="运行模式">{{ installWizardPreview.runtimeMode || '—' }}</el-descriptions-item>
-            <el-descriptions-item label="requiresMms.revisionMin">
+            <el-descriptions-item label="版本最低要求">
               {{ installWizardPreview.requiresMmsRevisionMin ?? '—' }}
-              <span class="text-gray text-sm">（宿主 revision：{{ installWizardReadiness?.hostMmsRevision ?? '—' }}）</span>
+              <span class="text-gray text-sm">（当前宿主 revision：{{ installWizardReadiness?.hostMmsRevision ?? '—' }}）</span>
             </el-descriptions-item>
-            <el-descriptions-item label="menuBootstrap">
-              <el-tag :type="installWizardPreview.hasMenuBootstrap ? 'success' : 'info'" size="small">
-                {{ installWizardPreview.hasMenuBootstrap ? '已声明（安装后自动写菜单）' : '未声明（需手工或 install.sql）' }}
-              </el-tag>
+            <el-descriptions-item label="插件配置">
+              <template v-if="installWizardSysConfigLabels.length">
+                <el-tag
+                  v-for="(name, idx) in installWizardSysConfigLabels"
+                  :key="idx"
+                  type="info"
+                  size="small"
+                  class="plugin-install-wizard__cfg-name-tag"
+                >
+                  {{ name }}
+                </el-tag>
+              </template>
+              <span v-else class="text-gray text-sm">未在 plugin.json 声明 sysConfig</span>
             </el-descriptions-item>
             <el-descriptions-item label="描述">
               <span class="plugin-install-wizard__desc">{{ installWizardPreview.description || '—' }}</span>
@@ -200,10 +237,17 @@
           </div>
 
           <el-divider content-position="left">联邦前端（META-INF/mms/web）</el-divider>
-          <el-alert type="info" :closable="false" show-icon class="mb-3" title="与「管理端页面」联动的部分" />
-          <p class="text-gray text-sm">
-            插件 JAR 可内嵌联邦构建产物目录 <code>META-INF/mms/web</code>。安装并重载宿主后，静态资源随插件生效；路由等在
-            <code>plugin.json</code> 的 <code>frontend</code> 中声明。
+          <el-alert
+            type="info"
+            :closable="false"
+            show-icon
+            class="plugin-install-wizard__fed-alert"
+            title="与「管理端页面」联动的部分"
+          />
+          <p class="plugin-install-wizard__fed-desc text-gray text-sm">
+            <strong>即本插件在后台管理系统里使用的操作界面</strong>（列表、表单等页面及其资源）。常见做法是把页面打进 JAR 目录
+            <code>META-INF/mms/web</code>，并在 <code>plugin.json</code> 的 <code>frontend</code> 里配置入口与路由。
+            <strong>安装并重载宿主后</strong>，这些页面会随插件一起在管理端生效。
           </p>
         </template>
       </div>
@@ -211,10 +255,9 @@
       <!-- 2 安装执行 -->
       <div v-show="installWizardStep === 2" class="plugin-install-wizard__pane">
         <el-alert type="warning" :closable="false" show-icon title="即将执行安装" class="mb-3" />
-        <p class="text-gray">
-          将按上一步中的选项执行：<strong>建表（若勾选）</strong>、<strong>JAR 落盘与类加载</strong>、<strong>版本登记与全量重载</strong>；若插件声明
-          <code>menuBootstrap</code> 或提供 <code>install.sql</code>，将同步 <strong>菜单与权限</strong>；若包含
-          <code>META-INF/mms/web</code>，重载后 <strong>管理端联邦页面资源</strong> 一并生效。
+        <p class="text-gray plugin-install-wizard__install-hint">
+          点击「开始安装」，将按上一步所选执行。<strong>结果</strong>：未关闭「自动执行」时会跑包内
+          <code>schema.sql</code> / <code>install.sql</code>（若有）；随后插件落盘、版本登记、<code>menuBootstrap</code> 同步与全量重载；含联邦前端时重载后管理端页面可用。
         </p>
         <p v-if="installSourceType === 'local' && installWizardFile" class="text-sm text-gray mt-2">
           文件：<code>{{ installWizardFile.name }}</code>
@@ -222,6 +265,18 @@
         <p v-else-if="installSourceType === 'url' && installRemoteUrl.trim()" class="text-sm text-gray mt-2">
           URL：<code class="plugin-install-wizard__code">{{ installRemoteUrl.trim() }}</code>
         </p>
+        <div v-if="installWizardProgressLog.length" class="plugin-install-wizard__install-log mt-3">
+          <div class="plugin-install-wizard__label">安装过程（实时）</div>
+          <div ref="installLogScrollRef" class="plugin-install-wizard__install-log-body">
+            <div
+              v-for="(row, idx) in installWizardProgressLog"
+              :key="idx"
+              :class="['plugin-install-wizard__install-log-line', 'is-' + (row.level || 'info')]"
+            >
+              {{ row.text }}
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- 3 结果 + 健康 -->
@@ -230,37 +285,50 @@
           <el-result icon="success" title="安装成功" sub-title="宿主已重载插件；请在下表查看健康状态。" />
         </template>
         <template v-else-if="installOutcome === 'failure'">
-          <el-result icon="error" title="安装失败" sub-title="请根据接口提示或后端日志排查后重试。" />
+          <el-result
+            icon="error"
+            title="安装失败"
+            sub-title="详细原因请以服务端日志为准（如 mms-admin 控制台 / 按环境配置的 log 文件）。若上一步「安装插件」中曾展示实时输出，可对照其中错误行。"
+          />
         </template>
         <template v-else>
           <el-empty description="尚未执行安装" :image-size="72" />
         </template>
 
         <template v-if="installWizardSchemaLog.length && installOutcome === 'success'">
-          <div class="plugin-install-wizard__label mt-3">本次 DDL 执行日志</div>
+          <div class="plugin-install-wizard__label mt-3">schema.sql（DDL）执行日志</div>
           <pre class="plugin-detail__pre plugin-install-wizard__log">{{ installWizardSchemaLog.join('\n') }}</pre>
         </template>
+        <template v-if="installWizardInstallSqlLog.length && installOutcome === 'success'">
+          <div class="plugin-install-wizard__label mt-3">script/install.sql 执行日志</div>
+          <pre class="plugin-detail__pre plugin-install-wizard__log">{{ installWizardInstallSqlLog.join('\n') }}</pre>
+        </template>
 
-        <div class="plugin-install-wizard__label mt-3">健康检测（当前实例中与插件 ID 匹配）</div>
-        <p class="text-gray text-sm mb-2">插件 ID：{{ resolvedPluginIdForHealth || '—' }}</p>
-        <el-empty
-          v-if="!installWizardHealthRows.length && !installWizardHealthLoading && installOutcome"
-          description="暂无健康数据（可能尚未 LOADED 或无 PluginHealthContributor）"
-        />
-        <el-table v-else-if="installWizardHealthRows.length" :data="installWizardHealthRows" size="small" border stripe>
-          <el-table-column prop="pluginId" label="插件" width="200" />
-          <el-table-column prop="version" label="版本" width="120" />
-          <el-table-column prop="state" label="状态" width="100" />
-          <el-table-column prop="body" label="详情" min-width="240" show-overflow-tooltip />
-        </el-table>
+        <template v-if="installOutcome === 'success'">
+          <div class="plugin-install-wizard__label mt-3">健康检测（当前实例中与插件 ID 匹配）</div>
+          <p class="text-gray text-sm mb-2">插件 ID：{{ resolvedPluginIdForHealth || '—' }}</p>
+          <el-empty
+            v-if="!installWizardHealthRows.length && !installWizardHealthLoading"
+            description="暂无健康数据（可能尚未 LOADED 或无 PluginHealthContributor）"
+          />
+          <el-table v-else-if="installWizardHealthRows.length" :data="installWizardHealthRows" size="small" border stripe>
+            <el-table-column prop="pluginId" label="插件" width="200" />
+            <el-table-column prop="version" label="版本" width="120" />
+            <el-table-column prop="state" label="状态" width="100" />
+            <el-table-column prop="body" label="详情" min-width="240" show-overflow-tooltip />
+          </el-table>
+        </template>
       </div>
 
       <div class="plugin-install-wizard__footer">
         <el-button v-if="variant === 'page' && installWizardStep >= 1" @click="reset">重新开始</el-button>
         <el-button @click="onCancel">{{ installWizardStep >= 3 ? '关闭' : '取消' }}</el-button>
         <el-button
-          v-if="installWizardStep > 0 && installWizardStep < 3"
-          :disabled="installWizardInstalling"
+          v-if="
+            installWizardStep > 0 &&
+            (installWizardStep < 3 || (installWizardStep === 3 && installOutcome !== 'success'))
+          "
+          :disabled="installWizardInstalling && installSourceType !== 'local'"
           @click="wizardPrev"
         >
           上一步
@@ -284,15 +352,16 @@
 <script setup lang="ts">
 import { ElLoading, ElMessage } from 'element-plus';
 import type { UploadRequestOptions } from 'element-plus';
-import { computed, ref } from 'vue';
+import { computed, nextTick, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import PluginUsageAgreementContent from './PluginUsageAgreementContent.vue';
 import {
   fetchPluginHostHealth,
   fetchPluginInstallReadiness,
   installPluginFromUrl,
-  installPluginJar,
+  installPluginJarStream,
   previewBundledPluginSchema,
+  PluginInstallStreamResultCode,
 } from '../api';
 
 const props = withDefaults(
@@ -316,12 +385,20 @@ const router = useRouter();
 
 const installSchemaWizardLoading = ref(false);
 const installWizardInstalling = ref(false);
+/** 本地上传流式安装：供「取消」「上一步」触发 Abort */
+const installStreamAbortRef = ref<AbortController | null>(null);
 const installSchemaWizardError = ref('');
 const installWizardStep = ref(0);
 const installWizardReadiness = ref<any>(null);
 const installWizardPreview = ref<any>(null);
-const installWizardRunSchema = ref(false);
+const sqlPreviewActiveTab = ref<'schema' | 'install'>('schema');
+/** true：自动执行 JAR 内 schema.sql + install.sql（默认开启） */
+const installWizardRunSchema = ref(true);
 const installWizardSchemaLog = ref<string[]>([]);
+const installWizardInstallSqlLog = ref<string[]>([]);
+/** 本地上传安装：NDJSON 流式日志行 */
+const installWizardProgressLog = ref<{ level: string; text: string }[]>([]);
+const installLogScrollRef = ref<HTMLElement | null>(null);
 const installWizardHealthRows = ref<any[]>([]);
 const installWizardHealthLoading = ref(false);
 const installWizardFile = ref<File | null>(null);
@@ -336,6 +413,34 @@ const installOutcome = ref<'success' | 'failure' | null>(null);
 const resolvedPluginIdForHealth = computed(
   () => installResolvedPluginId.value ?? installWizardPreview.value?.pluginId ?? null
 );
+
+/** 预览：menuBootstrap 与 JAR 内 script/install.sql 分别探测（后端 hasBundledInstallSql） */
+watch(
+  installWizardPreview,
+  (p) => {
+    if (!p) {
+      sqlPreviewActiveTab.value = 'schema';
+      return;
+    }
+    if (p.hasSchema) {
+      sqlPreviewActiveTab.value = 'schema';
+    } else if (p.hasBundledInstallSql) {
+      sqlPreviewActiveTab.value = 'install';
+    } else {
+      sqlPreviewActiveTab.value = 'schema';
+    }
+  },
+  { immediate: true }
+);
+
+/** plugin.json sysConfig 项的展示名（后端 sysConfigConfigNames：configName，缺省为 keySuffix） */
+const installWizardSysConfigLabels = computed(() => {
+  const raw = installWizardPreview.value?.sysConfigConfigNames;
+  if (!Array.isArray(raw)) {
+    return [] as string[];
+  }
+  return raw.filter((x: unknown) => typeof x === 'string' && x.trim().length > 0).map((s: string) => s.trim());
+});
 
 /** el-steps 的 active 必须为 number；最后一步在结果页用 status 强制高亮（成功/失败/进行中） */
 const stepsActiveIndex = computed(() => {
@@ -401,13 +506,25 @@ const stepMetas = [
 
 const currentStepMeta = computed(() => stepMetas[installWizardStep.value] ?? stepMetas[0]);
 
+function scrollInstallLogToEnd() {
+  const el = installLogScrollRef.value;
+  if (el) {
+    el.scrollTop = el.scrollHeight;
+  }
+}
+
 function reset() {
+  installStreamAbortRef.value?.abort();
+  installStreamAbortRef.value = null;
   installWizardFile.value = null;
+  sqlPreviewActiveTab.value = 'schema';
   installWizardPreview.value = null;
+  installWizardProgressLog.value = [];
   installWizardReadiness.value = null;
   installWizardStep.value = 0;
-  installWizardRunSchema.value = false;
+  installWizardRunSchema.value = true;
   installWizardSchemaLog.value = [];
+  installWizardInstallSqlLog.value = [];
   installWizardHealthRows.value = [];
   installSchemaWizardError.value = '';
   pluginUsageAgreementAccepted.value = false;
@@ -429,8 +546,9 @@ async function startWithFile(file: File) {
   installWizardStep.value = 0;
   installWizardPreview.value = null;
   installWizardReadiness.value = null;
-  installWizardRunSchema.value = false;
+  installWizardRunSchema.value = true;
   installWizardSchemaLog.value = [];
+  installWizardInstallSqlLog.value = [];
   installWizardHealthRows.value = [];
   installSchemaWizardError.value = '';
   pluginUsageAgreementAccepted.value = false;
@@ -478,6 +596,14 @@ async function onUrlLoadEnv() {
 }
 
 function wizardPrev() {
+  if (installWizardStep.value === 3 && installOutcome.value === 'success') {
+    return;
+  }
+  if (installWizardInstalling.value && installSourceType.value === 'local') {
+    installStreamAbortRef.value?.abort();
+    ElMessage.info('正在中止安装…');
+    return;
+  }
   if (installWizardStep.value <= 0) {
     return;
   }
@@ -553,11 +679,11 @@ async function wizardNext() {
       return;
     }
     if (
-      installWizardPreview.value?.hasSchema &&
       installWizardRunSchema.value &&
+      (installWizardPreview.value?.hasSchema || installWizardPreview.value?.hasBundledInstallSql) &&
       !installWizardPreview.value?.bundledSchemaExecutorAvailable
     ) {
-      ElMessage.warning('当前无法自动执行 DDL：请关闭「执行建表」或先在库中手工执行 schema.sql');
+      ElMessage.warning('当前无法自动执行包内 SQL：请关闭「自动执行」或配置数据源与 mms-system');
       return;
     }
   }
@@ -604,63 +730,131 @@ async function runWizardInstall() {
   const skipSchema = !installWizardRunSchema.value;
   installWizardInstalling.value = true;
   installOutcome.value = null;
-  const loading = ElLoading.service({
-    lock: true,
-    text: '正在上传并安装…',
-    background: 'rgba(0, 0, 0, 0.35)',
-  });
+  installWizardProgressLog.value = [];
+  const loading =
+    installSourceType.value === 'url'
+      ? ElLoading.service({
+          lock: true,
+          text: '正在从 URL 下载并安装…',
+          background: 'rgba(0, 0, 0, 0.35)',
+        })
+      : null;
+  /** 健康检测单独 loading，避免卡住「安装中」导致按钮一直 loading / 上一步一直禁用 */
+  let loadHealthAfter = false;
   try {
-    let res: any = null;
     if (installSourceType.value === 'local') {
       const file = installWizardFile.value;
       if (!file) {
         ElMessage.warning('请先选择插件 JAR 文件');
         return;
       }
-      res = await installPluginJar(file, {
+      const ac = new AbortController();
+      installStreamAbortRef.value = ac;
+      const last = await installPluginJarStream(file, {
         skipBundledSchemaExecution: skipSchema,
-        onUploadProgress: (evt) => {
-          const { loaded, total } = evt;
-          if (total && total > 0) {
-            const pct = Math.min(100, Math.round((loaded * 100) / total));
-            loading.setText(
-              pct >= 100 ? '上传完成，正在校验、执行 DDL（若开启）与安装…' : `正在上传 ${pct}%…`
-            );
+        signal: ac.signal,
+        onEvent: (ev) => {
+          if (ev.type === 'line') {
+            installWizardProgressLog.value.push({
+              level: (ev.level || 'info').toLowerCase(),
+              text: ev.text,
+            });
+            void nextTick(() => scrollInstallLogToEnd());
           }
         },
       });
+      if (last.ok && (last.code === undefined || last.code === PluginInstallStreamResultCode.SUCCESS)) {
+        const d = last.data;
+        const log = d?.bundledSchemaExecutionLog;
+        installWizardSchemaLog.value = Array.isArray(log) ? (log as string[]) : [];
+        const ilog = d?.bundledInstallSqlExecutionLog;
+        installWizardInstallSqlLog.value = Array.isArray(ilog) ? (ilog as string[]) : [];
+        installResolvedPluginId.value =
+          (d?.pluginId != null ? String(d.pluginId) : null) ??
+          pickPluginIdFromInstallResponse({ data: d }) ??
+          (installWizardPreview.value?.pluginId != null ? String(installWizardPreview.value.pluginId) : null);
+        installOutcome.value = 'success';
+        installWizardStep.value = 3;
+        ElMessage.success(props.variant === 'page' ? '安装完成，可返回插件市场查看卡片状态' : '安装完成');
+        emit('installed');
+        loadHealthAfter = true;
+      } else {
+        const codeTag = !last.ok && last.code ? ` [${last.code}]` : '';
+        installWizardProgressLog.value.push({
+          level: 'error',
+          text: (last.ok ? '安装流返回异常状态' : last.msg || '安装失败') + codeTag,
+        });
+        void nextTick(() => scrollInstallLogToEnd());
+        installResolvedPluginId.value = null;
+        installOutcome.value = 'failure';
+        installWizardSchemaLog.value = [];
+        installWizardInstallSqlLog.value = [];
+        installWizardHealthRows.value = [];
+        installWizardStep.value = 3;
+        loadHealthAfter = false;
+      }
     } else {
       const u = installRemoteUrl.value.trim();
       if (!u) {
         ElMessage.warning('请输入 URL');
         return;
       }
-      loading.setText('正在从 URL 下载并安装…');
-      res = await installPluginFromUrl(u);
+      installWizardProgressLog.value.push({
+        level: 'info',
+        text: 'URL 安装走单次请求，详细步骤请查看后端日志；以下为接口结果。',
+      });
+      const res: any = await installPluginFromUrl(u);
+      const log = res?.data?.bundledSchemaExecutionLog;
+      installWizardSchemaLog.value = Array.isArray(log) ? log : [];
+      const ilog = res?.data?.bundledInstallSqlExecutionLog;
+      installWizardInstallSqlLog.value = Array.isArray(ilog) ? ilog : [];
+      installResolvedPluginId.value =
+        pickPluginIdFromInstallResponse(res) ??
+        (installWizardPreview.value?.pluginId != null ? String(installWizardPreview.value.pluginId) : null);
+      installOutcome.value = 'success';
+      installWizardStep.value = 3;
+      ElMessage.success(props.variant === 'page' ? '安装完成，可返回插件市场查看卡片状态' : '安装完成');
+      emit('installed');
+      loadHealthAfter = true;
     }
-    const log = res?.data?.bundledSchemaExecutionLog;
-    installWizardSchemaLog.value = Array.isArray(log) ? log : [];
-    installResolvedPluginId.value =
-      pickPluginIdFromInstallResponse(res) ?? (installWizardPreview.value?.pluginId != null ? String(installWizardPreview.value.pluginId) : null);
-    installOutcome.value = 'success';
-    installWizardStep.value = 3;
-    ElMessage.success(props.variant === 'page' ? '安装完成，可返回插件市场查看卡片状态' : '安装完成');
-    emit('installed');
-    await loadWizardHealth();
-  } catch {
-    installResolvedPluginId.value =
-      installWizardPreview.value?.pluginId != null ? String(installWizardPreview.value.pluginId) : null;
-    installOutcome.value = 'failure';
-    installWizardSchemaLog.value = [];
-    installWizardStep.value = 3;
-    await loadWizardHealth();
+  } catch (e: any) {
+    const msg = e?.message || '安装请求失败';
+    const interrupted =
+      msg.includes('无新数据') ||
+      msg.includes('已取消') ||
+      msg.includes('连接已中断') ||
+      (msg.includes('整体超过') && msg.includes('已中断'));
+    if (interrupted) {
+      installWizardProgressLog.value.push({ level: 'warn', text: msg });
+      void nextTick(() => scrollInstallLogToEnd());
+      loadHealthAfter = false;
+    } else {
+      installWizardProgressLog.value.push({ level: 'error', text: msg });
+      void nextTick(() => scrollInstallLogToEnd());
+      installResolvedPluginId.value = null;
+      installOutcome.value = 'failure';
+      installWizardSchemaLog.value = [];
+      installWizardInstallSqlLog.value = [];
+      installWizardHealthRows.value = [];
+      installWizardStep.value = 3;
+      loadHealthAfter = false;
+    }
   } finally {
-    loading.close();
+    loading?.close();
     installWizardInstalling.value = false;
+    installStreamAbortRef.value = null;
+  }
+  if (loadHealthAfter) {
+    await loadWizardHealth();
   }
 }
 
 function onCancel() {
+  if (installWizardInstalling.value && installSourceType.value === 'local' && installWizardStep.value === 2) {
+    installStreamAbortRef.value?.abort();
+    ElMessage.info('正在中止安装…');
+    return;
+  }
   if (props.variant === 'page') {
     router.push('/system/pluginMarket');
     return;
@@ -756,7 +950,7 @@ defineExpose({ startWithFile, reset });
   box-shadow: 0 1px 2px rgb(0 0 0 / 2%);
 }
 .plugin-install-wizard__pane--preview {
-  max-height: min(58vh, 620px);
+  max-height: min(40vh, 420px);
   overflow: auto;
 }
 .plugin-install-wizard__section-title {
@@ -791,6 +985,52 @@ defineExpose({ startWithFile, reset });
 .text-xs {
   font-size: 12px;
 }
+.plugin-install-wizard__fed-alert {
+  margin-bottom: 0;
+}
+.plugin-install-wizard__install-hint {
+  text-indent: 2em;
+}
+
+.plugin-install-wizard__fed-desc {
+  margin-top: 14px;
+  margin-bottom: 18px;
+  line-height: 1.65;
+}
+.plugin-install-wizard__cfg-name-tag {
+  margin-right: 8px;
+  margin-bottom: 6px;
+}
+.plugin-install-wizard__install-log-body {
+  max-height: 220px;
+  overflow: auto;
+  margin-top: 8px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: var(--el-fill-color-light);
+  font-size: 12px;
+  line-height: 1.55;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+}
+.plugin-install-wizard__install-log-line {
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.plugin-install-wizard__install-log-line.is-info {
+  color: var(--el-text-color-regular);
+}
+.plugin-install-wizard__install-log-line.is-warn {
+  color: var(--el-color-warning);
+}
+.plugin-install-wizard__install-log-line.is-error {
+  color: var(--el-color-danger);
+}
+.plugin-install-wizard__sql-tabs {
+  margin-top: 4px;
+}
+:deep(.plugin-install-wizard__sql-tabs .el-tabs__content) {
+  padding: 10px 12px 12px;
+}
 .plugin-install-wizard__source-tabs {
   margin-bottom: 4px;
 }
@@ -813,7 +1053,7 @@ defineExpose({ startWithFile, reset });
   font-size: 12px;
 }
 .plugin-install-wizard__sql {
-  max-height: 280px;
+  max-height: 200px;
   overflow: auto;
   font-size: 12px;
   margin: 0;

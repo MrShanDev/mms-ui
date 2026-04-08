@@ -100,7 +100,8 @@
 
 <style scoped lang="scss">
   .layout-navbars-breadcrumb-index {
-    height: 90px;
+    height: var(--layout-topbar-row-height);
+    min-height: var(--layout-topbar-row-height);
     display: flex;
     align-items: center;
     background: var(--next-bg-topBar);
