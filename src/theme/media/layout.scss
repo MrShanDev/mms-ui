@@ -20,7 +20,7 @@
   // 注意：全局 scss 勿用 :deep()，Vue 不会编译，会导致整段选择器无效
   .layout-navbars-breadcrumb-index {
     height: auto;
-    min-height: 52px;
+    min-height: var(--layout-topbar-row-height-compact);
     padding: 4px 0;
     flex-wrap: nowrap;
     justify-content: space-between;
@@ -93,6 +93,13 @@
         margin-left: 2px;
       }
     }
+  }
+
+  // 侧栏 Logo 与窄屏顶栏第一行同高（需压过 Logo 组件内固定高度）
+  .layout-aside > .layout-logo,
+  .layout-aside > .layout-logo-size {
+    min-height: var(--layout-topbar-row-height-compact) !important;
+    height: auto !important;
   }
 
   // Breadcrumb 面包屑

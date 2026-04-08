@@ -31,31 +31,38 @@
 </script>
 
 <style scoped lang="scss">
+  /* 与右侧顶栏第一行同高：见 --layout-topbar-row-height（窄屏见 media/layout.scss） */
   .layout-logo {
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
-    min-height: 100px;
-    height: auto;
-    padding: 12px 10px;
+    height: var(--layout-topbar-row-height);
+    min-height: var(--layout-topbar-row-height);
+    padding: 0 10px;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    justify-content: center;
-    text-align: center;
+    justify-content: flex-start;
+    gap: 8px;
+    text-align: left;
+    flex-shrink: 0;
     box-shadow: rgb(0 21 41 / 2%) 0px 1px 4px;
     background: #4487EC;
     color: var(--el-color-white);
-    font-size: 16px;
+    font-size: 14px;
     cursor: pointer;
     animation: logoAnimation 0.3s ease-in-out;
     border-bottom-right-radius: 10px;
 
     > div {
-      line-height: 1.35;
-      word-break: break-word;
+      line-height: 1.3;
+      flex: 1;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
-    
+
     span {
       white-space: nowrap;
       display: inline-block;
@@ -66,13 +73,16 @@
       }
     }
     &-medium-img {
-      width: 50px;
-      margin-bottom: 10px;
+      width: 40px;
+      height: 40px;
+      flex-shrink: 0;
+      object-fit: contain;
     }
   }
   .layout-logo-size {
     width: 100%;
-    height: 50px;
+    height: var(--layout-topbar-row-height);
+    min-height: var(--layout-topbar-row-height);
     display: flex;
     cursor: pointer;
     animation: logoAnimation 0.3s ease-in-out;

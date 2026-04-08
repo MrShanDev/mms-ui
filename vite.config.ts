@@ -1,9 +1,11 @@
 import vue from '@vitejs/plugin-vue';
+import federation from '@originjs/vite-plugin-federation';
 import { resolve } from 'path';
 import { defineConfig, loadEnv, ConfigEnv, UserConfigFnObject } from 'vite';
 import vueSetupExtend from 'vite-plugin-vue-setup-extend-plus';
 import viteCompression from 'vite-plugin-compression';
 import { buildConfig } from './src/utils/build';
+import { buildOriginjsFederationRemotes, PLUGIN_FEDERATION_SHARED } from './plugin-federation.host';
 import { lazyImport, VxeResolver } from 'vite-plugin-lazy-import'
 import WindiCSS from 'vite-plugin-windicss'
 import AutoImport from 'unplugin-auto-import/vite'
@@ -30,6 +32,11 @@ const viteConfig: UserConfigFnObject = defineConfig((mode: ConfigEnv) => {
     return {
         plugins: [
             vue(),
+            federation({
+                name: 'mms_ui_host',
+                remotes: buildOriginjsFederationRemotes(env, mode.command),
+                shared: { ...PLUGIN_FEDERATION_SHARED },
+            }),
             WindiCSS(),
             vueSetupExtend(),
             viteCompression(),

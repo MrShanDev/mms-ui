@@ -1,16 +1,25 @@
 <template>
   <div class="plugin-market layout-padding layout-padding-auto">
     <div class="plugin-market__hero">
-      <div>
+      <div class="plugin-market__hero-body">
         <h2 class="plugin-market__title">插件市场</h2>
-        <p class="plugin-market__subtitle">
-          <strong>安装</strong>：校验 JAR 内 <code>plugin.json</code> 与宿主版本；通过后写入磁盘并登记版本、激活，再全量重载。
-          <strong>停用</strong>（运行中）：只取消库表中的<strong>激活</strong>标记并重载，插件不再加载；<em>不删磁盘</em>、不移除市场卡片，可在详情里切换版本再激活或覆盖上传。
-          <strong>删除/彻底卸载</strong>：删除<strong>磁盘</strong>上该插件全部安装目录，并移除<strong>库表</strong>中的版本与市场登记（<code>sys_plugin_version</code> / <code>sys_plugins</code>）后重载；运行中也可使用（服务端先卸载再删盘）。等同于彻底下架并清盘。
-          <strong>仅清库表</strong>（未安装磁盘时）：仍可用详情中的「删除库表登记」，只删登记、不动磁盘（若盘上无文件则与删除效果一致）。
-          <strong>日志</strong>：运行控制区或详情中打开「日志」可查看独立日志文件尾部（默认 <code>logs/plugins/</code><em>插件ID@版本</em><code>.log</code>，仅含插件 MDC 下 INFO 及以上条目）。
-          点击卡片<strong>封面图</strong>打开完整信息；回切激活版本与维护参数均在「插件配置」页签中完成。
-        </p>
+        <div class="plugin-market__intro">
+          <p class="plugin-market__subtitle">
+            <strong>插件市场</strong>是 MMS 管理端内统一管理 JAR 扩展的入口，在界面中完成上架、安装、激活与健康观测，减少纯脚本或手工改库的分散操作。开发/封装约定详见
+            <a
+              class="plugin-market__subtitle-link"
+              href="https://mmsadmin.cn/mms-plugins/plugin-develop.html"
+              target="_blank"
+              rel="noopener noreferrer"
+            >《MMS插件开发指南》</a>。<strong>好处</strong>：安装走向导并可预览依赖与
+            <code>schema.sql</code>；版本与激活状态集中可见；与宿主全量重载衔接清晰，降低漏表、漏菜单风险。本页汇总已登记/已安装的插件，可浏览能力、切换激活版本、查看日志与健康。安装须符合宿主与
+            <code>plugin.json</code>：通过「安装插件」<strong>向导</strong>（协议 → 本地上传或 URL 与预览 → 执行 → 结果与健康探针）完成落盘、版本登记、可选
+            <code>schema.sql</code>、菜单/权限写入与全量重载；日常可停用、卸载或仅清库表。卡片可进详情、日志与运行控制，封面可看完整信息。
+          </p>
+          <p class="plugin-market__intro-p plugin-market__intro-p--note">
+            <strong>注意事项</strong>：仅安装来源可信、包体完整的插件；生产库执行 DDL 前请<strong>备份</strong>并评估窗口与回滚。插件在宿主进程内运行，安全与合规需由贵方自行把关。
+          </p>
+        </div>
         <p v-if="statusBody" class="plugin-market__meta text-gray">
           宿主启用：<b :class="statusBody.enabled ? 'text-success' : 'text-warning'">{{
             statusBody.enabled ? '是' : '否'
@@ -40,7 +49,7 @@
           </template>
         </p>
       </div>
-      <div class="plugin-market__actions">
+      <div class="plugin-market__actions" role="toolbar" aria-label="插件市场操作">
         <el-button type="primary" :loading="loading" @click="loadAll">刷新</el-button>
         <el-button type="warning" :loading="reloading" @click="onReloadAll">全量重载</el-button>
         <el-button type="success" @click="openInstallWizardDialog">安装插件</el-button>
@@ -62,7 +71,7 @@
       <p class="plugin-market__alert-p"><code>{{ statusBody.resolvedPluginsRoot }}</code></p>
     </el-alert>
 
-    <el-empty v-if="!loading && cards.length === 0" description="暂无上架插件，请执行 sys_plugins 脚本并维护上架数据" />
+    <el-empty v-if="!loading && cards.length === 0" description="暂无插件" />
 
     <el-row v-else :gutter="16" class="plugin-market__grid">
       <el-col v-for="row in cards" :key="row.pluginId" :xs="24" :sm="12" :md="8" :lg="6">
@@ -1780,32 +1789,69 @@ onMounted(() => loadAll());
 </style>
 
 <style scoped lang="scss">
+/* 修复：layout-padding 全局 overflow:hidden + layout-padding-auto 覆盖为横向 flex，
+   在长说明文案下会裁切 hero/subtitle；由外层 el-scrollbar 负责滚动 */
+.plugin-market.layout-padding.layout-padding-auto {
+  flex-direction: column;
+  align-items: stretch;
+  overflow: visible;
+  min-height: 100%;
+  height: auto;
+  flex: 0 0 auto;
+}
 .plugin-market__hero {
   display: flex;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0;
   margin-bottom: 20px;
   padding: 20px 22px;
   border-radius: 12px;
   background: linear-gradient(120deg, var(--el-fill-color-light) 0%, var(--el-bg-color) 100%);
   border: 1px solid var(--el-border-color-lighter);
 }
+.plugin-market__hero-body {
+  min-width: 0;
+}
 .plugin-market__title {
   margin: 0 0 8px;
   font-size: 22px;
   font-weight: 600;
 }
+.plugin-market__intro {
+  margin: 0;
+}
 .plugin-market__subtitle {
-  margin: 0 0 10px;
+  margin: 0 0 12px;
   color: var(--el-text-color-secondary);
   font-size: 13px;
-  max-width: 720px;
-  line-height: 1.55;
+  max-width: 100%;
+  line-height: 1.65;
+  text-indent: 2em;
+}
+.plugin-market__subtitle-link {
+  color: var(--el-color-primary);
+  text-decoration: none;
+  font-weight: 500;
+  &:hover {
+    text-decoration: underline;
+  }
+}
+.plugin-market__intro-p {
+  margin: 0 0 12px;
+  color: var(--el-text-color-secondary);
+  font-size: 13px;
+  line-height: 1.65;
+  max-width: 100%;
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+.plugin-market__intro-p--note {
+  color: var(--el-text-color-regular);
 }
 .plugin-market__meta {
-  margin: 0;
+  margin: 18px 0 0;
   font-size: 12px;
 }
 .plugin-market__actions {
@@ -1813,6 +1859,10 @@ onMounted(() => loadAll());
   flex-wrap: wrap;
   gap: 10px;
   align-items: center;
+  justify-content: flex-start;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--el-border-color-lighter);
 }
 .plugin-market__grid {
   margin-top: 8px;

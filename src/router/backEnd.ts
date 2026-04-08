@@ -11,6 +11,7 @@ import { useRoutesList } from '/@/stores/routesList';
 import { useTagsViewRoutes } from '/@/stores/tagsViewRoutes';
 import { getMenu } from '/@/views/system/init';
 import { useAppStore } from '/@/stores/app';
+import { resolvePluginFederatedView } from '/@/router/pluginFederation';
 
 // 后端控制路由
 
@@ -45,7 +46,9 @@ export async function initBackEndControlRoutes() {
   // 获取路由菜单数据
   var res = await getBackEndControlRoutes();
   // 无登录权限时，添加判断
-  if (res.data.length <= 0) return Promise.resolve(true);
+  if (!res.data || !Array.isArray(res.data) || res.data.length <= 0) {
+    return Promise.resolve(true);
+  }
   // 存储接口原始路由（未处理component），根据需求选择使用
   useRequestOldRoutes().setRequestOldRoutes(JSON.parse(JSON.stringify(res.data)));
   // 处理路由（component），替换 dynamicRoutes（/@/router/route）第一个顶级 children 的路由
@@ -73,9 +76,10 @@ export async function setFilterMenuAndCacheTagsViewRoutes() {
  */
 export function setCacheTagsViewRoutes() {
   const storesTagsView = useTagsViewRoutes(pinia);
-  storesTagsView.setTagsViewRoutes(
-    formatTwoStageRoutes(formatFlatteningRoutes(dynamicRoutes))[0].children
-  );
+  const flat = formatFlatteningRoutes(dynamicRoutes);
+  const staged = flat && flat.length > 0 ? formatTwoStageRoutes(flat) : false;
+  const root = staged && staged[0] ? staged[0] : null;
+  storesTagsView.setTagsViewRoutes(root?.children ?? []);
 }
 
 /**
@@ -84,10 +88,19 @@ export function setCacheTagsViewRoutes() {
  * @returns 返回替换后的路由数组
  */
 export function setFilterRouteEnd() {
-  let filterRouteEnd: any = formatTwoStageRoutes(formatFlatteningRoutes(dynamicRoutes));
+  const flat = formatFlatteningRoutes(dynamicRoutes);
+  if (!flat || flat.length <= 0) {
+    console.error('setFilterRouteEnd: formatFlatteningRoutes 无有效路由');
+    return formatTwoStageRoutes([dynamicRoutes[0]]) || [dynamicRoutes[0]];
+  }
+  let filterRouteEnd: any = formatTwoStageRoutes(flat);
+  if (!filterRouteEnd || filterRouteEnd.length <= 0 || !filterRouteEnd[0]) {
+    console.error('setFilterRouteEnd: formatTwoStageRoutes 未得到布局根路由');
+    filterRouteEnd = formatTwoStageRoutes([dynamicRoutes[0]]) || [dynamicRoutes[0]];
+  }
   // notFoundAndNoPower 防止 404、401 不在 layout 布局中，不设置的话，404、401 界面将全屏显示
   // 关联问题 No match found for location with path 'xxx'
-  filterRouteEnd[0].children = [...filterRouteEnd[0].children, ...notFoundAndNoPower];
+  filterRouteEnd[0].children = [...(filterRouteEnd[0].children || []), ...notFoundAndNoPower];
   return filterRouteEnd;
 }
 
@@ -98,7 +111,8 @@ export function setFilterRouteEnd() {
  * @link 参考：https://next.router.vuejs.org/zh/api/#addroute
  */
 export async function setAddRoute() {
-  await setFilterRouteEnd().forEach((route: RouteRecordRaw) => {
+  const toAdd = setFilterRouteEnd();
+  toAdd.forEach((route: RouteRecordRaw) => {
     router.addRoute(route);
   });
 }
@@ -130,11 +144,16 @@ export async function setBackEndControlRefreshRoutes() {
  * @returns 返回处理成函数后的 component
  */
 export function backEndComponent(routes: any) {
-  if (!routes) return;
+  if (!routes) return [];
   return routes.map((item: any) => {
-    if (item.component)
-      item.component = dynamicImport(dynamicViewsModules, item.component as string);
-    item.children && backEndComponent(item.children);
+    if (item.component) {
+      const resolved = dynamicImport(dynamicViewsModules, item.component as string);
+      // false 表示多个 glob 匹配，Vue Router 无法挂载；置空避免 addRoute 内部空引用
+      item.component = resolved === false ? undefined : resolved;
+    }
+    if (item.children) {
+      item.children = backEndComponent(item.children);
+    }
     return item;
   });
 }
@@ -151,16 +170,31 @@ function normalizeViewGlobKey(key: string): string {
 }
 
 export function dynamicImport(dynamicViewsModules: Record<string, Function>, component: string) {
+  // 与 views 下 glob 键一致：去掉前导 /（库内脚本曾写入 '/system/user/index'，会导致无法匹配、组件为 undefined）
+  const comp = String(component ?? '')
+    .trim()
+    .replace(/^\/+/, '');
+  if (!comp) return;
+  const pluginFed = resolvePluginFederatedView(comp);
+  if (pluginFed) {
+    return pluginFed;
+  }
   const keys = Object.keys(dynamicViewsModules);
   const matchKeys = keys.filter((key) => {
     const k = normalizeViewGlobKey(key);
-    return k.startsWith(`${component}`) || k.startsWith(`/${component}`);
+    return k.startsWith(comp) || k.startsWith(`/${comp}`);
   });
   if (matchKeys?.length === 1) {
     const matchKey = matchKeys[0];
     return dynamicViewsModules[matchKey];
   }
   if (matchKeys?.length > 1) {
-    return false;
+    // 多文件前缀重叠（如 system/user 与 system/user/extra）时取最短路径，避免返回 false 导致路由注册崩溃
+    matchKeys.sort((a, b) => normalizeViewGlobKey(a).length - normalizeViewGlobKey(b).length);
+    const pick = matchKeys[0];
+    console.warn(
+      `[路由] component「${comp}」匹配到多个视图，已选用最短路径: ${normalizeViewGlobKey(pick)}`
+    );
+    return dynamicViewsModules[pick];
   }
 }

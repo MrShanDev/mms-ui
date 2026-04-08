@@ -3,6 +3,9 @@
 
   --theme-aside-width: 200px;
   --theme-header-height: 50px;
+  /* 侧栏 Logo 与主区顶栏第一行（.layout-navbars-breadcrumb-index）同高，改一处即可全局对齐 */
+  --layout-topbar-row-height: 90px;
+  --layout-topbar-row-height-compact: 52px;
   --theme-border-color-light: #f1f2f3;
   --theme-logo-text-color: #ffffff;
 
