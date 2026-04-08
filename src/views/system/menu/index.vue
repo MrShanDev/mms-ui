@@ -66,7 +66,7 @@
           ></el-table-column>
           <el-table-column label="组件路径" show-overflow-tooltip>
             <template #default="scope">
-              <span v-if="scope.row.type == 1 && scope.row.component.length > 0">
+              <span v-if="scope.row.type == 1 && (scope.row.component?.length ?? 0) > 0">
                 <el-tag type="warning" size="small">/@/views/</el-tag>
                 <el-tag size="small">{{ scope.row.component }}</el-tag>
                 <el-tag type="warning" size="small">.vue</el-tag>
@@ -220,7 +220,7 @@
   const getTableData = () => {
     state.tableData.loading = true;
     baseApi.list().then((res) => {
-      state.tableData.data = res.data;
+      state.tableData.data = Array.isArray(res.data) ? res.data : [];
       state.tableData.loading = false;
       expandArr.value.push(String(1));
     });

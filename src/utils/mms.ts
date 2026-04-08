@@ -93,13 +93,19 @@ export function parseTime(time: any, pattern?: string): string {
     s: date.getSeconds(),
     a: date.getDay(),
   };
-  return format.replace(/(yyyy|MM|dd|HH|mm|ss|a)/g, (result, key) => {
-    let value = formatObj[key.charAt(0).toLowerCase()];
+  // 同时兼容两类模板：
+  // 1) 旧模板：{y}-{m}-{d} {h}:{i}:{s}
+  // 2) 新模板：yyyy-MM-dd HH:mm:ss
+  return format.replace(/\{([ymdhisa])\}|(yyyy|MM|dd|HH|mm|ss|a)/g, (_result, braceKey, plainKey) => {
+    const key = (braceKey || plainKey || '').toString();
+    const mapKey = (braceKey ? braceKey : key.charAt(0).toLowerCase()) as keyof typeof formatObj;
+    let value = formatObj[mapKey];
     if (key === 'a') {
       return ['日', '一', '二', '三', '四', '五', '六'][value];
     }
     // 对于两位数的格式进行补零
-    if (key.length > 1 && value < 10) {
+    const needPad = braceKey != null || key.length > 1;
+    if (needPad && value < 10) {
       return '0' + value;
     }
     return value.toString();

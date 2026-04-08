@@ -738,6 +738,10 @@ import type { UploadRequestOptions } from 'element-plus';
 import { saveAs } from 'file-saver';
 import { usePluginLogViewer } from '/@/composables/usePluginLogViewer';
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
+import { initBackEndControlRoutes } from '/@/router/backEnd';
+import { useUserInfo } from '/@/stores/userInfo';
+import { Session } from '/@/utils/storage';
+import { userApi } from '/@/views/system/user';
 import {
   activatePluginVersion,
   clearPluginLog,
@@ -1551,6 +1555,7 @@ const pendingInstallFile = ref<File | null>(null);
 const installFlowTitle = computed(() =>
   installFlowMode.value === 'agreement' ? '插件使用协议' : '插件安装'
 );
+const baseUserApi = userApi();
 
 function openInstallWizardDialog() {
   installFlowMode.value = 'install';
@@ -1564,8 +1569,23 @@ async function beginPluginInstallWithSchemaWizard(file: File) {
   installFlowVisible.value = true;
 }
 
-function onInstallFlowInstalled() {
-  void loadAll();
+async function refreshCurrentUserPermissionContext() {
+  try {
+    const userRes: any = await baseUserApi.getUserInfo();
+    if (userRes?.code === 200 && userRes?.data) {
+      Session.set('userInfo', userRes.data);
+      await useUserInfo().setUserInfos();
+    }
+    // 重新拉取菜单并重建动态路由，避免 install.sql 后权限/菜单需重登才生效
+    await initBackEndControlRoutes();
+  } catch {
+    // 不阻断安装流程，允许用户手动刷新页面兜底
+  }
+}
+
+async function onInstallFlowInstalled() {
+  await Promise.all([loadAll(), refreshCurrentUserPermissionContext()]);
+  ElMessage.success('插件安装成功，已自动刷新当前登录权限与菜单');
 }
 
 function onInstallFlowClosed() {
@@ -1641,7 +1661,7 @@ async function onDeactivate(row: any, closeDetail: boolean) {
     await deactivatePlugin(row.pluginId);
     ElMessage.success('已停用并重载');
     if (closeDetail) detailVisible.value = false;
-    await loadAll();
+    await Promise.all([loadAll(), refreshCurrentUserPermissionContext()]);
   } catch (e: any) {
     if (e !== 'cancel') {
       /* */
@@ -1667,7 +1687,7 @@ async function onEnable(row: any, closeDetail: boolean) {
     await activatePluginVersion(row.pluginId, ver);
     ElMessage.success('已启用并重载');
     if (closeDetail) detailVisible.value = false;
-    await loadAll();
+    await Promise.all([loadAll(), refreshCurrentUserPermissionContext()]);
   } catch (e: any) {
     if (e !== 'cancel') {
       /* */
@@ -1693,7 +1713,7 @@ async function onRestart(row: any) {
     await deactivatePlugin(row.pluginId);
     await activatePluginVersion(row.pluginId, ver);
     ElMessage.success('已重启');
-    await loadAll();
+    await Promise.all([loadAll(), refreshCurrentUserPermissionContext()]);
   } catch (e: any) {
     if (e !== 'cancel') {
       /* */
@@ -1721,7 +1741,7 @@ async function onPurge(row: any, closeDetail: boolean) {
     await purgePlugin(row.pluginId);
     ElMessage.success('已删除安装目录与库表登记并重载');
     if (closeDetail) detailVisible.value = false;
-    await loadAll();
+    await Promise.all([loadAll(), refreshCurrentUserPermissionContext()]);
   } catch (e: any) {
     if (e !== 'cancel') {
       /* */
@@ -1744,7 +1764,7 @@ async function onRemoveCatalog(row: any, closeDetail: boolean) {
     await removePluginCatalog(row.pluginId);
     ElMessage.success('已移除库表登记并重载');
     if (closeDetail) detailVisible.value = false;
-    await loadAll();
+    await Promise.all([loadAll(), refreshCurrentUserPermissionContext()]);
   } catch (e: any) {
     if (e !== 'cancel') {
       /* */
