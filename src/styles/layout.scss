@@ -67,3 +67,8 @@ a:hover {
     padding: 15px;
   }
 }
+
+/* .layout-padding（theme/app.scss 继承 .layout-pd）已四边等距 padding，首子再写 mt-* 会顶距大于左右 */
+.layout-container .layout-padding > :first-child {
+  margin-top: 0 !important;
+}

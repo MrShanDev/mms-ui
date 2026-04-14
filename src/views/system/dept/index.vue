@@ -2,7 +2,7 @@
   <div class="block">
     <!-- Table  -->
     <div class="system-dept-container layout-padding">
-      <el-card shadow="hover" class="layout-padding-auto mt-15">
+      <el-card shadow="hover" class="layout-padding-auto">
         <el-container>
           <el-header>
             <!-- 功能栏 -->

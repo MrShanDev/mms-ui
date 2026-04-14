@@ -48,9 +48,8 @@
   color: var(--theme-menu-hover-color) !important;
 }
 
-/* 纵向侧栏当前项：须用布局配置 --next-bg-menuBarActiveColor（本文件在 main.ts 中晚于 theme 加载，否则会盖住 theme/element.scss） */
+/* 纵向菜单当前项（含折叠弹层等）：布局「菜单高亮背景色」 */
 .el-menu:not(.el-menu--horizontal) .el-menu-item.is-active {
-  // border-right: 2px solid var(--theme-menu-border-color);
   position: relative;
   right: 1px;
   overflow: hidden;
@@ -59,6 +58,64 @@
 
   &:hover {
     background-color: var(--next-bg-menuBarActiveColor, var(--theme-menu-hover-bg-color)) !important;
+  }
+}
+
+/*
+ * 主侧栏（layout-aside）展开态：
+ * - 选中块四角圆角（含右上/右下），底色同主区 --next-bg-main-color；左右各留 10px 落在侧栏底上，右侧圆弧才明显。
+ * - ::before/::after 侧栏色小块补上下接缝凹弧（与圆角块配套）。
+ */
+.layout-aside .el-scrollbar .el-scrollbar__view {
+  overflow-x: hidden;
+  overflow-y: visible;
+}
+
+.layout-aside .el-scrollbar__view > .el-menu:not(.el-menu--collapse) {
+  padding-top: var(--layout-menu-notch-r, 12px);
+  padding-bottom: var(--layout-menu-notch-r, 12px);
+}
+
+.layout-aside .el-menu--inline {
+  overflow: visible !important;
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+.layout-aside .el-menu:not(.el-menu--horizontal):not(.el-menu--collapse) .el-menu-item.is-active {
+  right: 0;
+  overflow: visible !important;
+  margin: 4px 10px;
+  width: calc(100% - 20px);
+  max-width: calc(100% - 20px);
+  box-sizing: border-box;
+  color: var(--el-color-primary) !important;
+  background-color: var(--next-bg-main-color) !important;
+  border-radius: var(--layout-menu-notch-r, 12px);
+
+  &:hover {
+    background-color: var(--next-bg-main-color) !important;
+  }
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    width: var(--layout-menu-notch-r, 12px);
+    height: var(--layout-menu-notch-r, 12px);
+    background-color: var(--next-bg-menuBar);
+    pointer-events: none;
+  }
+
+  &::before {
+    top: calc(-1 * var(--layout-menu-notch-r, 12px));
+    border-bottom-right-radius: var(--layout-menu-notch-r, 12px);
+  }
+
+  &::after {
+    bottom: calc(-1 * var(--layout-menu-notch-r, 12px));
+    border-top-right-radius: var(--layout-menu-notch-r, 12px);
   }
 }
 
