@@ -84,21 +84,20 @@
     // 设置批量第三方 js
     setIntroduction.jsCdn();
   });
-  // 页面加载时
+  // 页面加载时：须先读本地缓存再合并进 store，禁止先用默认 store 覆盖写入 Local（否则刷新后配色永远回到默认）
   onMounted(() => {
-    Local.remove('themeConfig');
-    Local.set('themeConfig', themeConfig.value);
     nextTick(() => {
-      // 监听布局配'置弹窗点击打开
       mittBus.on('openSetingsDrawer', () => {
         setingsRef.value.openDrawer();
       });
-      // 获取缓存中的布局配置
-      if (Local.get('themeConfig')) {
-        storesThemeConfig.setThemeConfig({ themeConfig: Local.get('themeConfig') });
-        document.documentElement.style.cssText = Local.get('themeConfigStyle');
+      const cachedTheme = Local.get('themeConfig');
+      if (cachedTheme) {
+        storesThemeConfig.setThemeConfig({ themeConfig: cachedTheme });
+        const cachedStyle = Local.get('themeConfigStyle');
+        if (cachedStyle) {
+          document.documentElement.style.cssText = cachedStyle;
+        }
       }
-      // 获取缓存中的全屏配置
       if (Session.get('isTagsViewCurrenFull')) {
         stores.setCurrenFullscreen(Session.get('isTagsViewCurrenFull'));
       }

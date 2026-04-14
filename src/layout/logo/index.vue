@@ -42,13 +42,14 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
     gap: 8px;
-    text-align: left;
+    text-align: center;
     flex-shrink: 0;
     box-shadow: rgb(0 21 41 / 2%) 0px 1px 4px;
-    background: #4487EC;
-    color: var(--el-color-white);
+    /* 布局配置「Logo区背景颜色」→ --next-bg-logoBar */
+    background: var(--next-bg-logoBar);
+    color: var(--next-bg-logoBarColor, var(--next-bg-topBarColor));
     font-size: 14px;
     cursor: pointer;
     animation: logoAnimation 0.3s ease-in-out;
@@ -56,8 +57,9 @@
 
     > div {
       line-height: 1.3;
-      flex: 1;
+      flex: 0 1 auto;
       min-width: 0;
+      max-width: 100%;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -67,10 +69,8 @@
       white-space: nowrap;
       display: inline-block;
     }
-    &:hover {
-      span {
-        color: var(--color-primary-light-2);
-      }
+    &:hover > div {
+      color: var(--next-bg-menuBarColor);
     }
     &-medium-img {
       width: 40px;
@@ -83,7 +83,11 @@
     width: 100%;
     height: var(--layout-topbar-row-height);
     min-height: var(--layout-topbar-row-height);
+    /* 折叠态顶条：与 Logo 区背景一致 */
+    background: var(--next-bg-logoBar);
     display: flex;
+    align-items: center;
+    justify-content: center;
     cursor: pointer;
     animation: logoAnimation 0.3s ease-in-out;
     &-img {

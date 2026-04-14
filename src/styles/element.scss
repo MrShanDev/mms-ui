@@ -8,9 +8,10 @@
   }
 }
 
-.el-menu-item,
-.el-sub-menu__title {
-  color: var(--theme-menu-text-color) !important;
+/* 纵向菜单（侧栏、折叠弹出）：随布局配置「菜单默认字体颜色」(--next-bg-menuBarColor)；横向顶栏菜单勿用此项 */
+.el-menu:not(.el-menu--horizontal) .el-menu-item,
+.el-menu:not(.el-menu--horizontal) .el-sub-menu__title {
+  color: var(--next-bg-menuBarColor) !important;
   height: 48px !important;
   overflow: hidden;
 }
@@ -47,8 +48,22 @@
   color: var(--theme-menu-hover-color) !important;
 }
 
-.el-menu-item.is-active {
+/* 纵向侧栏当前项：须用布局配置 --next-bg-menuBarActiveColor（本文件在 main.ts 中晚于 theme 加载，否则会盖住 theme/element.scss） */
+.el-menu:not(.el-menu--horizontal) .el-menu-item.is-active {
   // border-right: 2px solid var(--theme-menu-border-color);
+  position: relative;
+  right: 1px;
+  overflow: hidden;
+  color: var(--theme-menu-hover-color) !important;
+  background-color: var(--next-bg-menuBarActiveColor, var(--theme-menu-hover-bg-color)) !important;
+
+  &:hover {
+    background-color: var(--next-bg-menuBarActiveColor, var(--theme-menu-hover-bg-color)) !important;
+  }
+}
+
+/* 顶栏横向菜单：仍用主题主色浅底，不受侧栏「菜单高亮背景色」影响 */
+.el-menu--horizontal .el-menu-item.is-active {
   position: relative;
   right: 1px;
   overflow: hidden;

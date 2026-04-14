@@ -71,10 +71,9 @@
 
 /* NavMenu 导航菜单
 ------------------------------- */
-// 鼠标 hover 时颜色
+// 鼠标 hover / 高亮背景：与布局配置「菜单高亮背景色」一致
 .el-menu-hover-bg-color {
-  background-color: #ECF3FD !important;
-  // background-color: var(--next-color-hover-rgba) !important;
+  background-color: var(--next-bg-menuBarActiveColor) !important;
 }
 
 // 默认样式修改
@@ -90,7 +89,7 @@
 
 .el-menu-item,
 .el-sub-menu__title {
-  color: var(--next-bg-main);
+  color: var(--next-bg-menuBarColor);
 }
 
 // 修复点击左侧菜单折叠再展开时，宽度不跟随问题
@@ -143,9 +142,9 @@
 // 水平菜单、横向菜单折叠背景色
 .el-popper.is-pure.is-light {
 
-  // 水平菜单
+  // 水平菜单 / 折叠弹出：与布局配置「菜单背景」一致
   .el-menu--vertical {
-    background: #fff;
+    background: var(--next-bg-menuBar);
 
     .el-sub-menu.is-active .el-sub-menu__title {
       color: var(--next-color-hover-rgba);

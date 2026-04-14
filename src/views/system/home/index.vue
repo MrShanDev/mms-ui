@@ -661,24 +661,17 @@
             width: 80px;
             height: 80px;
             border-radius: 8px;
-            background: #48A1FA;
+            background: transparent;
             display: flex;
             align-items: center;
             justify-content: center;
             margin-bottom: 10px;
             transition: all 0.3s;
-            color: #fff;
           }
-
 
           .quick-menu-text {
             font-size: 14px;
             color: #333;
-          }
-        }
-        .quick-menu-item:nth-child(2n) {
-          .quick-menu-icon {
-            background: #45DDB6;
           }
         }
         .notice-list {

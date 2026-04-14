@@ -9,6 +9,16 @@
 
 :root {
   --next-color-white: #ffffff;
+  /* 与 stores/themeConfig 默认值对齐，供首屏与 SCSS 引用；布局配置里改色会通过 JS 覆盖 */
+  --next-bg-menuBar: #ffffff;
+  --next-bg-menuBarColor: #4d4d4d;
+  --next-bg-menuBarActiveColor: rgba(24, 144, 255, 0.12);
+  --next-bg-topBar: #ffffff;
+  --next-bg-topBarColor: #4f4f4f;
+  --next-bg-logoBar: #1890ff;
+  --next-bg-logoBarColor: #ffffff;
+  --next-bg-columnsMenuBar: #ffffff;
+  --next-bg-columnsMenuBarColor: #4d4d4d;
   --next-bg-main-color: #f8f8f8;
   --next-bg-color: #f5f5ff;
   --next-border-color-light: #f1f2f3;
@@ -65,7 +75,7 @@ body,
   }
 
   .layout-aside {
-    background: var(--next-color-white);
+    background: var(--next-bg-menuBar);
     box-shadow: 2px 0 6px rgb(0 21 41 / 1%);
     height: inherit;
     position: relative;

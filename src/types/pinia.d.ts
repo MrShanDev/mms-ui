@@ -64,6 +64,8 @@ declare interface ThemeConfigState {
     lockScreenTime: number;
     isShowLogo: boolean;
     isShowLogoChange: boolean;
+    logoBar: string;
+    logoBarColor: string;
     isBreadcrumb: boolean;
     isTagsview: boolean;
     isBreadcrumbIcon: boolean;

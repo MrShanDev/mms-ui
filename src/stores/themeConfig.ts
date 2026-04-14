@@ -17,8 +17,8 @@ export const useThemeConfig = defineStore('themeConfig', {
       /**
        * 全局主题
        */
-      // 默认 primary 主题颜色
-      primary: '#4487EC',
+      // 默认 primary 主题颜色（与布局默认配色一致）
+      primary: '#1890FF',
       // 是否开启深色模式
       isIsDark: false,
 
@@ -28,7 +28,7 @@ export const useThemeConfig = defineStore('themeConfig', {
       // 默认顶栏导航背景颜色
       topBar: '#ffffff',
       // 默认顶栏导航字体颜色
-      topBarColor: '#606266',
+      topBarColor: '#4f4f4f',
       // 是否开启顶栏背景颜色渐变
       isTopBarColorGradual: false,
 
@@ -36,11 +36,11 @@ export const useThemeConfig = defineStore('themeConfig', {
        * 菜单设置
        */
       // 默认菜单导航背景颜色
-      menuBar: '#393e46',
-      // 默认菜单导航字体颜色
-      menuBarColor: '#ffff',
-      // 默认菜单高亮背景色
-      menuBarActiveColor: 'rgba(0, 0, 0, 0.2)',
+      menuBar: '#ffffff',
+      // 默认菜单导航字体颜色（与主题一 / blueWhite 预设一致）
+      menuBarColor: '#4d4d4d',
+      // 默认菜单高亮背景色（白底侧栏上用淡主色底）
+      menuBarActiveColor: 'rgba(24, 144, 255, 0.12)',
       // 是否开启菜单背景颜色渐变
       isMenuBarColorGradual: false,
 
@@ -48,9 +48,9 @@ export const useThemeConfig = defineStore('themeConfig', {
        * 分栏设置
        */
       // 默认分栏菜单背景颜色
-      columnsMenuBar: '#545c64',
+      columnsMenuBar: '#ffffff',
       // 默认分栏菜单字体颜色
-      columnsMenuBarColor: '#e6e6e6',
+      columnsMenuBarColor: '#4d4d4d',
       // 是否开启分栏菜单背景颜色渐变
       isColumnsMenuBarColorGradual: false,
       // 是否开启分栏菜单鼠标悬停预加载(预览菜单)
@@ -81,6 +81,10 @@ export const useThemeConfig = defineStore('themeConfig', {
       isShowLogo: true,
       // 初始化变量，用于 el-scrollbar 的高度更新，请勿删除
       isShowLogoChange: false,
+      // Logo 区背景（侧栏顶部 Logo 条、经典/横向顶栏内 Logo 条），对应 CSS --next-bg-logoBar
+      logoBar: '#1890FF',
+      // Logo 区标题字色，空则同顶栏字色（--next-bg-topBarColor）
+      logoBarColor: '#ffffff',
       // 是否开启 Breadcrumb，强制经典、横向布局不显示
       isBreadcrumb: false,
       // 是否开启 Tagsview
@@ -136,12 +140,14 @@ export const useThemeConfig = defineStore('themeConfig', {
       /**
        * 全局网站标题 / 副标题
        */
-      // 网站主标题（菜单导航、浏览器当前网页标题）
-      globalTitle: import.meta.env.VITE_APP_TITLE,
-      // 网站副标题（登录页顶部文字）
-      globalViceTitle: import.meta.env.VITE_APP_VICE_TITLE,
-      // 网站副标题（登录页顶部文字）
-      globalViceTitleMsg: import.meta.env.VITE_APP_VICE_TITLE_MSG,
+      // 网站主标题（菜单导航、浏览器当前网页标题）；默认与产品约定文案一致，仍可由 env 覆盖构建
+      globalTitle: import.meta.env.VITE_APP_TITLE || '模块化管理系统',
+      globalViceTitle:
+        import.meta.env.VITE_APP_VICE_TITLE || '模块化管理系统（Modular management system），简称：MMS。',
+      // 登录页等长说明
+      globalViceTitleMsg:
+        import.meta.env.VITE_APP_VICE_TITLE_MSG ||
+        'MMS（模块化管理系统，Modular Management System）基于Spring Boot 3.x构建，采用前后端分离的现代化架构设计。该系统集成了用户管理、商品管理、支付系统、订单处理、分销体系、日志监控、定时任务、通信服务、直播支持、广告管理与内容发布等多个功能模块，致力于为开发者提供高效、稳定且可扩展的开发脚手架，显著提升项目开发效率，助力各类应用快速落地与迭代。!',
       // 默认初始语言，可选值"<zh-cn|en|zh-tw>"，默认 zh-cn
       globalI18n: 'zh-cn',
       // 默认全局组件大小，可选值"<large|'default'|small>"，默认 'large'
@@ -150,7 +156,8 @@ export const useThemeConfig = defineStore('themeConfig', {
   }),
   actions: {
     setThemeConfig(data: ThemeConfigState) {
-      this.themeConfig = data.themeConfig;
+      // 与本地缓存合并，避免新增字段缺失导致 undefined
+      this.themeConfig = { ...this.themeConfig, ...data.themeConfig };
     },
   },
 });

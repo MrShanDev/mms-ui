@@ -279,28 +279,36 @@
       width: 200px;
 
       :deep(.el-input__wrapper) {
-        background-color: #ECF3FD;
+        /* 浅底随全局 primary 变浅，与布局配置「全局主题」一致 */
+        background-color: var(--el-color-primary-light-9);
         border-radius: 8px;
         box-shadow: none;
         border: none;
 
         .el-input__inner {
-          color: #4487EC;
+          color: var(--next-bg-topBarColor);
           font-size: 14px;
-          background-color: #ECF3FD;
+          background-color: transparent;
 
           &::placeholder {
-            color: #4487EC;
+            color: var(--next-bg-topBarColor);
+            opacity: 0.55;
           }
         }
 
-        .el-input__prefix {
-          color: #409eff;
+        .el-input__prefix,
+        .el-input__suffix {
+          color: var(--next-bg-topBarColor);
+        }
+
+        .el-input__prefix .el-icon,
+        .el-input__suffix .el-icon {
+          color: inherit;
         }
       }
 
       &:hover :deep(.el-input__wrapper) {
-        background-color: #ECF3FD;
+        background-color: var(--el-color-primary-light-9);
       }
     }
   }

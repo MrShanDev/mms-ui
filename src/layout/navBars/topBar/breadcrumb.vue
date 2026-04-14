@@ -225,7 +225,7 @@
 
     .welcome-text {
       font-size: 18px;
-      color: #1D2129;
+      color: var(--next-bg-topBarColor);
       font-weight: 400;
     }
   }
