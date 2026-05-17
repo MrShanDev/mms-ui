@@ -41,6 +41,22 @@ export function homeApi() {
         params,
       });
     },
+    /** 系统运行信息（实时）：OS/CPU/内存/磁盘/JDK/JVM/数据库等 */
+    runtimeInfo: <T = any>(params?: object): AxiosPromise<T> => {
+      return request({
+        url: getEnv() + '/system/home/runtimeInfo',
+        method: 'get',
+        params,
+      });
+    },
+    /** 系统运行趋势（实时采样）：CPU/内存/JVM 内存 */
+    runtimeTrend: <T = any>(params?: object): AxiosPromise<T> => {
+      return request({
+        url: getEnv() + '/system/home/runtimeTrend',
+        method: 'get',
+        params,
+      });
+    },
     info: <T = any>(params?: object): AxiosPromise<T> => {
       return request({
         url: getEnv() + '/system/home/info',
