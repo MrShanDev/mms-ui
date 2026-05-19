@@ -53,7 +53,7 @@ export const smsCode = <T = any>(bo: {
  */
 export const emailCode = <T = any>(bo: {
   type: number;
-  phone?: string;
+  email?: string;
   code?: string;
 }): AxiosPromise<T> => {
   return request({

@@ -73,6 +73,17 @@ export function userApi() {
         },
       });
     },
+    resetPwdEmail: <T = any>(params?: object): AxiosPromise<T> => {
+      return request({
+        url: getEnv() + '/system/user/resetPwdEmail',
+        method: 'post',
+        data: params,
+        headers: {
+          'Encrypt-State': SysEnum.SYS_COMMON_STATE_CLOSE,
+          'Encrypt-Type': EncryptTypeEnum.AES,
+        },
+      });
+    },
     editHeaderImg: <T = any>(params?: object): AxiosPromise<T> => {
       return request({
         url: getEnv() + '/system/user/editHeaderImg',

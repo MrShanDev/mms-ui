@@ -1,26 +1,5 @@
 <template>
   <div class="personal layout-pd">
-    <!-- 消息通知区域 -->
-    <div class="notice-section">
-      <div class="notice-header">
-        <span class="notice-title">消息通知</span>
-      </div>
-      <div class="notice-list">
-        <div
-          v-for="(v, k) in stateNews.newsList"
-          :key="k"
-          class="notice-item"
-          @click="openNews(v)"
-        >
-          <span class="notice-item-title">{{ k + 1 }}、{{ v.title }}</span>
-          <span class="notice-item-date">{{ v.createTime || '2026-01-09' }}</span>
-        </div>
-        <div v-if="stateNews.newsList.length === 0" class="notice-empty">
-          暂无消息通知
-        </div>
-      </div>
-    </div>
-
     <!-- 主内容区域 -->
     <el-row :gutter="20" class="main-content">
       <!-- 左侧用户卡片 -->
@@ -132,34 +111,55 @@
           <div v-show="activeMenu === 'password'" class="setting-content">
             <div class="setting-title">账号密码</div>
             <div class="setting-form">
-              <div class="form-item">
-                <label class="form-label">当前id：</label>
-                <el-input v-model="userInfos.loginIp" disabled placeholder="当前IP" />
-              </div>
-              <div class="form-item">
-                <label class="form-label">当前密码：</label>
-                <el-input
-                  v-model="displayPassword"
-                  :type="showPassword ? 'text' : 'password'"
-                  disabled
-                  placeholder="************"
-                >
-                  <template #suffix>
-                    <el-icon class="password-eye" @click="showPassword = !showPassword">
-                      <ele-View v-if="showPassword" />
-                      <ele-Hide v-else />
-                    </el-icon>
-                  </template>
-                </el-input>
-              </div>
-              <div class="form-item">
-                <label class="form-label">密码强度：</label>
-                <span class="password-strength" :class="passwordStrengthClass">
-                  {{ userInfos.passwordStrength || '中级' }}
-                </span>
-              </div>
-              <div class="form-item form-btn">
-                <el-button type="primary" class="reset-btn" @click="openDialog">重置密码</el-button>
+              <div class="setting-inline-panel">
+                <div v-if="!hasPwdResetEmailBound">
+                  <el-alert
+                    type="warning"
+                    :closable="false"
+                    show-icon
+                    title="当前账号尚未绑定邮箱，请先在左侧进入「绑定邮箱」完成绑定后再重置密码。"
+                  />
+                </div>
+                <template v-else>
+                  <el-form :model="pwdEmailForm" label-width="96px" class="setting-inline-el-form">
+                    <el-row :gutter="12">
+                      <el-col :xs="24" :sm="14">
+                        <el-form-item label="验证码">
+                          <el-input
+                            v-model="pwdEmailForm.code"
+                            maxlength="6"
+                            autocomplete="one-time-code"
+                            :placeholder="pwdResetCodePlaceholder"
+                            clearable
+                          />
+                        </el-form-item>
+                      </el-col>
+                      <el-col :xs="24" :sm="10" class="inline-send-col">
+                        <el-button
+                          type="primary"
+                          plain
+                          :disabled="pwdEmailExitTime !== 60"
+                          class="full-w-xs"
+                          @click="getPwdResetEmailCode"
+                        >
+                          {{ pwdEmailExitTime === 60 ? '获取验证码' : pwdEmailExitTime + 's后可重发' }}
+                        </el-button>
+                      </el-col>
+                    </el-row>
+                    <el-form-item label="新密码">
+                      <el-input show-password v-model="pwdEmailForm.password" autocomplete="new-password" clearable />
+                    </el-form-item>
+                    <el-form-item label="确认密码">
+                      <el-input show-password v-model="pwdEmailForm.passwordTwo" autocomplete="new-password" clearable />
+                    </el-form-item>
+                    <el-form-item label=" ">
+                      <div class="inline-form-actions">
+                        <el-button @click="clearPwdEmailInlineForm">重置</el-button>
+                        <el-button type="primary" @click="submitPwdEmailReset">保存新密码</el-button>
+                      </div>
+                    </el-form-item>
+                  </el-form>
+                </template>
               </div>
             </div>
           </div>
@@ -205,10 +205,7 @@
                   placeholder="未绑定邮箱"
                 />
               </div>
-              <div class="form-item form-btn">
-                <el-button type="primary" class="reset-btn" @click="stateEmail.dialog = true">
-                  {{ userInfos.email && userInfos.email.length > 0 ? '修改邮箱' : '绑定邮箱' }}
-                </el-button>
+              <div class="form-item form-btn bind-actions-top">
                 <el-popconfirm
                   v-if="userInfos.email && userInfos.email.length > 0"
                   title="是否继续要解除绑定邮箱?"
@@ -218,6 +215,62 @@
                     <el-button type="danger">解除绑定</el-button>
                   </template>
                 </el-popconfirm>
+              </div>
+              <div class="setting-inline-panel">
+                <el-divider content-position="left">{{
+                  userInfos.email && userInfos.email.length > 0 ? '修改绑定邮箱' : '绑定邮箱'
+                }}</el-divider>
+                <el-form
+                  ref="ruleFormEmailRef"
+                  :model="stateEmail.form"
+                  :rules="stateEmail.rules"
+                  label-width="96px"
+                  status-icon
+                  class="setting-inline-el-form"
+                >
+                  <el-row :gutter="12">
+                    <el-col :span="24">
+                      <el-form-item label="邮箱" prop="email">
+                        <el-input
+                          v-model="stateEmail.form.email"
+                          autocomplete="email"
+                          placeholder="请输入邮箱"
+                          clearable
+                        />
+                      </el-form-item>
+                    </el-col>
+                    <el-col :xs="24" :sm="14">
+                      <el-form-item label="验证码" prop="code">
+                        <el-input
+                          v-model="stateEmail.form.code"
+                          autocomplete="off"
+                          placeholder="请输入邮箱验证码"
+                          maxlength="6"
+                          clearable
+                        />
+                      </el-form-item>
+                    </el-col>
+                    <el-col :xs="24" :sm="10" class="inline-send-col">
+                      <el-button
+                        type="primary"
+                        plain
+                        class="full-w-xs"
+                        :disabled="bindEmailExitTime !== 60"
+                        @click="getEmailCode"
+                      >
+                        {{
+                          bindEmailExitTime === 60 ? '获取验证码' : bindEmailExitTime + 's后可重发'
+                        }}
+                      </el-button>
+                    </el-col>
+                  </el-row>
+                  <el-form-item label=" ">
+                    <div class="inline-form-actions">
+                      <el-button @click="resetEmailBindForm(ruleFormEmailRef)">重置</el-button>
+                      <el-button type="primary" @click="submitEmailForm(ruleFormEmailRef)">确定</el-button>
+                    </div>
+                  </el-form-item>
+                </el-form>
               </div>
             </div>
           </div>
@@ -253,26 +306,6 @@
         </div>
       </el-col>
     </el-row>
-    <!--修改密码-->
-    <el-dialog v-model="dialogFormVisible" title="修改密码" width="500">
-      <el-form :model="form">
-        <el-form-item label="原密码" label-width="100">
-          <el-input show-password v-model="form.oldPassword" autocomplete="off" />
-        </el-form-item>
-        <el-form-item label="新密码" label-width="100">
-          <el-input show-password v-model="form.password" autocomplete="off" />
-        </el-form-item>
-        <el-form-item label="确认密码" label-width="100">
-          <el-input show-password v-model="form.passwordTwo" autocomplete="off" />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button @click="dialogFormVisible = false">取消</el-button>
-          <el-button type="primary" @click="updatePress">确定</el-button>
-        </div>
-      </template>
-    </el-dialog>
     <!--绑定手机号-->
     <el-dialog
       draggable
@@ -322,58 +355,6 @@
         </div>
       </template>
     </el-dialog>
-    <!--绑定邮箱-->
-    <el-dialog
-      draggable
-      v-model="stateEmail.dialog"
-      :key="stateEmail.key"
-      @close="
-        stateEmail.dialog = false;
-        stateEmail.key = generateUUID();
-      "
-      :title="stateEmail.title"
-      width="450"
-    >
-      <el-form
-        ref="ruleFormEmailRef"
-        :model="stateEmail.form"
-        :rules="stateEmail.rules"
-        label-width="auto"
-        status-icon
-      >
-        <el-row>
-          <el-col :span="24">
-            <el-form-item label="邮箱" prop="email">
-              <el-input
-                v-model="stateEmail.form.email"
-                autocomplete="off"
-                placeholder="请输入邮箱"
-              />
-            </el-form-item>
-          </el-col>
-          <el-col :span="14" class="mt25">
-            <el-form-item label="验证码" prop="code">
-              <el-input
-                v-model="stateEmail.form.code"
-                autocomplete="off"
-                placeholder="请输入验证码"
-              />
-            </el-form-item>
-          </el-col>
-          <el-col :span="10" class="mt25 text-right">
-            <el-button type="primary" :disabled="!(exitTime == 60)" @click="getEmailCode">
-              {{ exitTime == 60 ? '获取验证码' : exitTime + 's后重新获取' }}
-            </el-button>
-          </el-col>
-        </el-row>
-      </el-form>
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button @click="resetForm(ruleFormEmailRef)">重置</el-button>
-          <el-button type="primary" @click="submitEmailForm(ruleFormEmailRef)">确定</el-button>
-        </div>
-      </template>
-    </el-dialog>
     <!--绑定微信-->
     <el-dialog
       draggable
@@ -412,26 +393,22 @@
 </template>
 
 <script setup lang="ts" name="personal">
-  import { reactive, computed, ref, onMounted, onUnmounted } from 'vue';
+  import { reactive, computed, ref, onMounted, onUnmounted, watch } from 'vue';
   import { formatAxis } from '/@/utils/formatTime';
   import { useUserInfo } from '/@/stores/userInfo';
   import { storeToRefs } from 'pinia';
   import { uploadImg } from '/@/views/system/upload';
-  import { Action, ElMessage, ElMessageBox, UploadRequestOptions } from 'element-plus';
+  import { ElMessage, UploadRequestOptions } from 'element-plus';
   import { generateUUID } from '/@/utils/mms';
   import { smsCode, emailCode } from '/@/views/system/init';
   import { userApi } from '/@/views/system/user';
-  import { noticeApi } from '/@/views/system/notice';
   import { Session } from '/@/utils/storage';
   import { elEmail, elPhone, email, phone } from '/@/utils/toolsValidate';
-  import type { ComponentSize, FormInstance, FormRules } from 'element-plus';
-  import { Message } from '@element-plus/icons-vue';
   const succeed = ref(false);
   const unCode = ref(false);
   const unCodeMsg = ref('二维码已失效');
   const stores = useUserInfo();
   const { userInfos } = storeToRefs(stores);
-  const baseSysNoticeApi = noticeApi();
   // 引入 api 请求接口
   const baseUserApi = userApi();
   // 倒计时
@@ -439,26 +416,35 @@
   let intervalId: ReturnType<typeof setInterval> | undefined;
   // 生成组件唯一id
   const uuid = ref('id-' + generateUUID());
-  const dialogFormVisible = ref(false);
-  const form = reactive({
+  const pwdEmailForm = reactive({
+    code: '',
     password: '',
     passwordTwo: '',
-    oldPassword: '',
+  });
+  const pwdEmailExitTime = ref(60);
+  let intervalIdPwd: ReturnType<typeof setInterval> | undefined;
+  const hasPwdResetEmailBound = computed(() => !!(userInfos.value.email && `${userInfos.value.email}`.trim()));
+  /** 验证码输入框占位：写明验证码将发往的绑定邮箱（与接口返回展示一致） */
+  const pwdResetCodePlaceholder = computed(() => {
+    const em = `${userInfos.value.email || ''}`.trim();
+    if (!em) {
+      return '请输入6位验证码';
+    }
+    return `发送至 ${em}，请输入6位验证码`;
   });
 
   // 新增：当前激活的菜单
   const activeMenu = ref('password');
-  // 新增：是否显示密码
-  const showPassword = ref(false);
-  // 新增：显示的密码占位符
-  const displayPassword = ref('************');
-  // 新增：密码强度对应的类名
-  const passwordStrengthClass = computed(() => {
-    const strength = userInfos.value.passwordStrength || '中级';
-    if (strength === '高级' || strength === '强') return 'strength-high';
-    if (strength === '中级' || strength === '中') return 'strength-medium';
-    return 'strength-low';
-  });
+  const clearPwdEmailInlineForm = () => {
+    if (intervalIdPwd !== undefined) {
+      clearInterval(intervalIdPwd);
+      intervalIdPwd = undefined;
+    }
+    pwdEmailExitTime.value = 60;
+    pwdEmailForm.code = '';
+    pwdEmailForm.password = '';
+    pwdEmailForm.passwordTwo = '';
+  };
   // 新增：菜单点击处理
   const handleMenuClick = (menu: string) => {
     activeMenu.value = menu;
@@ -561,31 +547,93 @@
     if (!formEl) return;
     formEl.resetFields();
   };
-  // 设置密码
-  const updatePress = () => {
-    if (form.password !== form.passwordTwo) {
+
+  const bindEmailExitTime = ref(60);
+  let intervalIdBindEmail: ReturnType<typeof setInterval> | undefined;
+
+  const clearBindEmailCountdown = () => {
+    if (intervalIdBindEmail !== undefined) {
+      clearInterval(intervalIdBindEmail);
+      intervalIdBindEmail = undefined;
+    }
+    bindEmailExitTime.value = 60;
+  };
+
+  /** 重置「绑定邮箱」内联表单并重置倒计时 */
+  const resetEmailBindForm = (formEl: FormInstance | undefined) => {
+    resetForm(formEl);
+    clearBindEmailCountdown();
+  };
+
+  watch(activeMenu, (menu, prev) => {
+    if (prev === 'password' && menu !== 'password') {
+      clearPwdEmailInlineForm();
+    }
+    if (prev === 'email' && menu !== 'email') {
+      clearBindEmailCountdown();
+    }
+  });
+
+  const getPwdResetEmailCode = () => {
+    if (!hasPwdResetEmailBound.value) {
+      ElMessage.warning('请先绑定邮箱');
+      return;
+    }
+    if (pwdEmailExitTime.value !== 60) {
+      return;
+    }
+    emailCode({ type: 3 })
+      .then((res) => {
+        if (res.code === 200) {
+          ElMessage.success(res.msg);
+          pwdEmailForm.code = '';
+          intervalIdPwd = setInterval(() => {
+            if (pwdEmailExitTime.value <= 0) {
+              if (intervalIdPwd !== undefined) {
+                clearInterval(intervalIdPwd);
+                intervalIdPwd = undefined;
+              }
+              pwdEmailExitTime.value = 60;
+              return;
+            }
+            pwdEmailExitTime.value--;
+          }, 1000);
+        }
+      })
+      .catch((e) => {
+        ElMessage.error(e as any);
+      });
+  };
+
+  const submitPwdEmailReset = () => {
+    if (!hasPwdResetEmailBound.value) {
+      ElMessage.warning('请先绑定邮箱');
+      return;
+    }
+    if (!pwdEmailForm.code || pwdEmailForm.code.length !== 6) {
+      ElMessage.warning('请输入6位验证码');
+      return;
+    }
+    if (pwdEmailForm.password !== pwdEmailForm.passwordTwo) {
       ElMessage.error('两次密码输入不一致');
       return;
     }
+    if ((pwdEmailForm.password || '').length < 6) {
+      ElMessage.error('新密码至少6位');
+      return;
+    }
     baseUserApi
-      .resetPwd(form)
+      .resetPwdEmail({ code: pwdEmailForm.code, password: pwdEmailForm.password })
       .then((res) => {
         if (res.code === 200) {
           ElMessage.success(res.msg);
           updateUserInfo();
-          dialogFormVisible.value = false;
+          clearPwdEmailInlineForm();
         }
       })
       .catch((err) => {
         ElMessage.error(err);
       });
-  };
-  // 获取用户信息
-  const openDialog = () => {
-    form.password = '';
-    form.passwordTwo = '';
-    form.oldPassword = '';
-    dialogFormVisible.value = true;
   };
   // 上传图片
   const handleHttpUpload = async (options: UploadRequestOptions) => {
@@ -615,32 +663,6 @@
       options.onError(error as any);
     }
   };
-  // 公告列表
-  const getListData = () => {
-    baseSysNoticeApi
-      .list({ pageNum: 1, pageSize: 20 })
-      .then((res) => {
-        stateNews.newsList = res.rows;
-      })
-      .catch(async (err) => {})
-      .finally(() => {});
-  };
-  // 定义变量内容
-  interface NewsItem {
-    title: string;
-    content?: string;
-    createTime?: string;
-  }
-  const stateNews = reactive<{ newsList: NewsItem[] }>({
-    newsList: [],
-  });
-  const openNews = (v?: { content?: string; title?: string }) => {
-    ElMessageBox.alert(v?.content || '', v?.title || '消息详情', {
-      dangerouslyUseHTMLString: true,
-      confirmButtonText: 'OK',
-      callback: (action: Action) => {},
-    });
-  };
   // 当前时间提示语
   const currentTime = computed(() => {
     return formatAxis(new Date());
@@ -654,9 +676,6 @@
   }
 
   const stateEmail = reactive<VerifyType<TypeEmailForm>>({
-    dialog: false,
-    key: generateUUID(),
-    title: '绑定邮箱',
     form: {
       email: '',
       code: '',
@@ -675,18 +694,24 @@
       ElMessage.error('请正确输入邮箱');
       return;
     }
+    if (bindEmailExitTime.value !== 60) {
+      return;
+    }
     emailCode({ ...stateEmail.form, ...{ type: 1 } })
       .then((res) => {
         if (res.code === 200) {
           ElMessage.success(res.msg);
-          state.form.code = '';
-          intervalId = setInterval(() => {
-            if (exitTime.value <= 0) {
-              clearInterval(intervalId);
-              exitTime.value = 60;
+          stateEmail.form.code = '';
+          intervalIdBindEmail = setInterval(() => {
+            if (bindEmailExitTime.value <= 0) {
+              if (intervalIdBindEmail !== undefined) {
+                clearInterval(intervalIdBindEmail);
+                intervalIdBindEmail = undefined;
+              }
+              bindEmailExitTime.value = 60;
               return;
             }
-            exitTime.value--;
+            bindEmailExitTime.value--;
           }, 1000);
         }
       })
@@ -704,8 +729,8 @@
           .then((res) => {
             if (res.code === 200) {
               ElMessage.success(res.msg);
-              stateEmail.dialog = false;
               updateUserInfo();
+              resetEmailBindForm(formEl);
             }
           })
           .catch((err) => {
@@ -800,10 +825,15 @@
     // 销毁事件
     clearInterval(intervalIdWxState);
     clearInterval(intervalId);
+    if (intervalIdPwd !== undefined) {
+      clearInterval(intervalIdPwd);
+    }
+    if (intervalIdBindEmail !== undefined) {
+      clearInterval(intervalIdBindEmail);
+    }
   });
   // 页面加载时
   onMounted(() => {
-    getListData();
     updateUserInfo();
   });
 </script>
@@ -814,94 +844,6 @@
   .personal {
     padding: 20px;
     
-    // 消息通知区域
-    .notice-section {
-      height: 400px;
-      background: var(--el-color-white);
-      border-radius: 8px;
-      padding: 20px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05);
-
-
-      .notice-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 15px;
-
-        .notice-title {
-          font-size: 16px;
-          font-weight: 600;
-          color: #333;
-        }
-
-        .notice-more {
-          font-size: 14px;
-          color: #999;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          gap: 4px;
-
-          &:hover {
-            color: var(--el-color-primary);
-          }
-        }
-      }
-
-      .notice-list {
-        height: calc(100% - 40px);
-        overflow-y: auto;
-      
-        .notice-item {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 12px 0;
-          border-bottom: 1px solid #f5f5f5;
-          cursor: pointer;
-          transition: all 0.3s;
-
-          &:last-child {
-            border-bottom: none;
-          }
-
-          &:hover {
-            background: #fafafa;
-            padding-left: 10px;
-            padding-right: 10px;
-            margin: 0 -10px;
-            border-radius: 4px;
-
-            .notice-item-title {
-              color: var(--el-color-primary);
-            }
-          }
-
-          .notice-item-title {
-            flex: 1;
-            font-size: 14px;
-            color: #333;
-            @include v.text-ellipsis(1);
-            margin-right: 20px;
-          }
-
-          .notice-item-date {
-            font-size: 14px;
-            color: #999;
-            flex-shrink: 0;
-          }
-        }
-
-        .notice-empty {
-          text-align: center;
-          padding: 30px 0;
-          color: #999;
-        }
-      }
-    }
-
     // 主内容区域
     .main-content {
       height: 600px;
@@ -1066,7 +1008,7 @@
           }
 
           .setting-form {
-            max-width: 400px;
+            max-width: 560px;
 
             .form-item {
               display: flex;
@@ -1084,40 +1026,60 @@
                 flex: 1;
               }
 
-              .password-eye {
-                cursor: pointer;
-                color: #999;
-                
-                &:hover {
-                  color: var(--el-color-primary);
-                }
-              }
-
-              .password-strength {
-                font-size: 14px;
-                font-weight: 500;
-
-                &.strength-high {
-                  color: #2dac34;
-                }
-
-                &.strength-medium {
-                  color: var(--el-color-primary);
-                }
-
-                &.strength-low {
-                  color: #f56c6c;
-                }
-              }
-
               &.form-btn {
                 margin-top: 40px;
-                
+                /* 与同表单 .form-label(80px) 后的输入框左缘对齐 */
+                margin-left: 80px;
+                align-items: center;
+                justify-content: flex-start;
+                flex-wrap: wrap;
+                gap: 12px;
+
                 .reset-btn {
-                  width: 160px;
+                  flex-shrink: 0;
+                  min-width: 120px;
                   height: 40px;
                   font-size: 14px;
                 }
+
+                &.bind-actions-top {
+                  margin-top: 12px;
+                  margin-bottom: 8px;
+                }
+              }
+            }
+
+            .setting-inline-panel {
+              width: 100%;
+              max-width: 540px;
+
+              :deep(.el-divider) {
+                margin: 8px 0 18px;
+              }
+
+              :deep(.el-divider__text) {
+                font-weight: 600;
+                font-size: 14px;
+              }
+
+              .inline-send-col {
+                display: flex;
+                align-items: flex-end;
+                padding-bottom: 18px;
+              }
+
+              .inline-form-actions {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 12px;
+              }
+
+              .full-w-xs {
+                min-height: var(--el-component-size-default);
+              }
+
+              :deep(.setting-inline-el-form .el-form-item:last-of-type) {
+                margin-bottom: 0;
               }
             }
           }
@@ -1152,22 +1114,6 @@
     .personal {
       padding: 10px;
 
-      .notice-section {
-        padding: 15px;
-
-        .notice-list {
-          .notice-item {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 5px;
-
-            .notice-item-date {
-              font-size: 12px;
-            }
-          }
-        }
-      }
-
       .main-content {
         .setting-card {
           padding: 20px;
@@ -1185,6 +1131,30 @@
 
                 :deep(.el-input) {
                   width: 100%;
+                }
+
+                &.form-btn {
+                  margin-left: 0;
+                }
+              }
+
+              .setting-inline-panel {
+                max-width: 100%;
+
+                .inline-send-col {
+                  align-items: stretch;
+                  padding-bottom: 0;
+                  padding-top: 4px;
+                  width: 100%;
+
+                  .full-w-xs {
+                    width: 100%;
+                  }
+                }
+
+                .inline-form-actions .el-button {
+                  flex: 1;
+                  min-width: 0;
                 }
               }
             }
