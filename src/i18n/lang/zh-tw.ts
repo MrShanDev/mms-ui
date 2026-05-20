@@ -10,6 +10,7 @@ export default {
     systemDic: '字典管理',
     systemNotice: '系统公告',
     systemSetting: '系统配置',
+    websiteConfig: '網站設定',
     sxpcwlkj: '品创官网',
     sxpcwlkjDoc: '項目文檔',
     limits: '許可權管理',

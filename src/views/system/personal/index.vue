@@ -39,11 +39,16 @@
             </div>
             <div class="user-detail">
               <span class="detail-label">登录ip：</span>
-              <span class="detail-value">{{ userInfos.loginIp }}</span>
+              <span class="detail-value">
+                <template v-if="userInfos.loginIp"
+                  >{{ userInfos.loginIp }}（{{ userInfos.loginRegion || '未知' }}）</template
+                >
+                <template v-else>—</template>
+              </span>
             </div>
             <div class="user-detail">
               <span class="detail-label">登录时间：</span>
-              <span class="detail-value">{{ userInfos.loginDate }}</span>
+              <span class="detail-value">{{ formatUserLoginDate(userInfos.loginDate) }}</span>
             </div>
           </div>
           <!-- 功能菜单 -->
@@ -121,36 +126,69 @@
                   />
                 </div>
                 <template v-else>
-                  <el-form :model="pwdEmailForm" label-width="96px" class="setting-inline-el-form">
-                    <el-row :gutter="12">
-                      <el-col :xs="24" :sm="14">
-                        <el-form-item label="验证码">
+                  <el-form
+                    :model="pwdEmailForm"
+                    label-width="96px"
+                    class="setting-inline-el-form setting-pwd-email-form"
+                  >
+                    <el-form-item label="验证码">
+                      <div class="pwd-email-code-block">
+                        <div class="code-with-send">
                           <el-input
                             v-model="pwdEmailForm.code"
                             maxlength="6"
                             autocomplete="one-time-code"
-                            :placeholder="pwdResetCodePlaceholder"
+                            placeholder="请输入6位验证码"
                             clearable
                           />
-                        </el-form-item>
-                      </el-col>
-                      <el-col :xs="24" :sm="10" class="inline-send-col">
-                        <el-button
-                          type="primary"
-                          plain
-                          :disabled="pwdEmailExitTime !== 60"
-                          class="full-w-xs"
-                          @click="getPwdResetEmailCode"
-                        >
-                          {{ pwdEmailExitTime === 60 ? '获取验证码' : pwdEmailExitTime + 's后可重发' }}
-                        </el-button>
-                      </el-col>
-                    </el-row>
+                          <el-button
+                            type="primary"
+                            plain
+                            :disabled="pwdEmailExitTime !== 60"
+                            @click="getPwdResetEmailCode"
+                          >
+                            {{ pwdEmailExitTime === 60 ? '获取验证码' : pwdEmailExitTime + 's后可重发' }}
+                          </el-button>
+                        </div>
+                        <p v-if="pwdResetCodeSendToLine" class="pwd-email-code-sendto">{{ pwdResetCodeSendToLine }}</p>
+                      </div>
+                    </el-form-item>
                     <el-form-item label="新密码">
-                      <el-input show-password v-model="pwdEmailForm.password" autocomplete="new-password" clearable />
+                      <div class="pwd-with-strength">
+                        <el-input
+                          show-password
+                          v-model="pwdEmailForm.password"
+                          autocomplete="new-password"
+                          :placeholder="pwdCompositionHintShort"
+                          :title="pwdCompositionHintDetail"
+                          clearable
+                        />
+                        <PwdStrengthMeter :password="pwdEmailForm.password" />
+                      </div>
                     </el-form-item>
                     <el-form-item label="确认密码">
-                      <el-input show-password v-model="pwdEmailForm.passwordTwo" autocomplete="new-password" clearable />
+                      <div class="pwd-with-strength pwd-with-strength--trail-only">
+                        <el-input
+                          show-password
+                          v-model="pwdEmailForm.passwordTwo"
+                          autocomplete="new-password"
+                          :placeholder="pwdCompositionHintShort"
+                          :title="pwdCompositionHintDetail"
+                          clearable
+                          @blur="onPwdEmailConfirmBlur"
+                        />
+                        <div class="pwd-email-confirm-match" aria-live="polite">
+                          <span
+                            v-if="pwdEmailConfirmMatchLabel"
+                            :class="{
+                              'is-match': pwdEmailConfirmMatchLabel === '一致',
+                              'is-mismatch': pwdEmailConfirmMatchLabel === '不一致',
+                            }"
+                          >
+                            {{ pwdEmailConfirmMatchLabel }}
+                          </span>
+                        </div>
+                      </div>
                     </el-form-item>
                     <el-form-item label=" ">
                       <div class="inline-form-actions">
@@ -168,28 +206,72 @@
           <div v-show="activeMenu === 'phone'" class="setting-content">
             <div class="setting-title">密保手机</div>
             <div class="setting-form">
-              <div class="form-item">
-                <label class="form-label">当前手机：</label>
-                <el-input
-                  :value="userInfos.phoneNumber || '未绑定'"
-                  disabled
-                  placeholder="未绑定手机"
-                />
-              </div>
-              <div class="form-item form-btn">
-                <el-button type="primary" class="reset-btn" @click="state.dialog = true">
-                  {{ userInfos.phoneNumber && userInfos.phoneNumber.length > 0 ? '修改手机' : '绑定手机' }}
-                </el-button>
-                <el-popconfirm
-                  v-if="userInfos.phoneNumber && userInfos.phoneNumber.length > 0"
-                  title="是否继续要解除绑定手机号?"
-                  @confirm="confirmEvent(1)"
-                >
-                  <template #reference>
-                    <el-button type="danger">解除绑定</el-button>
-                  </template>
-                </el-popconfirm>
-              </div>
+              <el-form
+                ref="ruleFormRef"
+                :model="state.form"
+                :rules="state.rules"
+                label-width="96px"
+                status-icon
+                class="setting-inline-el-form"
+              >
+                <el-form-item label="当前手机：">
+                  <div class="current-field-with-action">
+                    <span class="current-field-text" :title="userInfos.phoneNumber || '未绑定'">
+                      {{ userInfos.phoneNumber || '未绑定' }}
+                    </span>
+                    <el-popconfirm
+                      v-if="userInfos.phoneNumber && userInfos.phoneNumber.length > 0"
+                      title="是否继续要解除绑定手机号?"
+                      @confirm="confirmEvent(1)"
+                    >
+                      <template #reference>
+                        <el-link type="danger" :underline="false" class="field-unbind-link">解除绑定</el-link>
+                      </template>
+                    </el-popconfirm>
+                  </div>
+                </el-form-item>
+                <div class="setting-inline-panel">
+                  <el-divider content-position="left">
+                    {{ userInfos.phoneNumber && userInfos.phoneNumber.length > 0 ? '修改绑定手机' : '绑定手机' }}
+                  </el-divider>
+                  <el-form-item label="新手机号" prop="phone">
+                    <el-input
+                      v-model="state.form.phone"
+                      autocomplete="tel"
+                      placeholder="请输入新手机号"
+                      maxlength="11"
+                      clearable
+                    />
+                  </el-form-item>
+                  <el-form-item label="验证码" prop="code">
+                    <div class="code-with-send">
+                      <el-input
+                        v-model="state.form.code"
+                        autocomplete="one-time-code"
+                        placeholder="请输入短信验证码"
+                        maxlength="6"
+                        clearable
+                      />
+                      <el-button
+                        type="primary"
+                        plain
+                        :disabled="bindPhoneExitTime !== 60"
+                        @click="getSmsCode"
+                      >
+                        {{
+                          bindPhoneExitTime === 60 ? '获取验证码' : bindPhoneExitTime + 's后可重发'
+                        }}
+                      </el-button>
+                    </div>
+                  </el-form-item>
+                  <el-form-item label=" ">
+                    <div class="inline-form-actions">
+                      <el-button @click="resetPhoneBindForm(ruleFormRef)">重置</el-button>
+                      <el-button type="primary" @click="submitForm(ruleFormRef)">确定</el-button>
+                    </div>
+                  </el-form-item>
+                </div>
+              </el-form>
             </div>
           </div>
 
@@ -197,64 +279,54 @@
           <div v-show="activeMenu === 'email'" class="setting-content">
             <div class="setting-title">绑定邮箱</div>
             <div class="setting-form">
-              <div class="form-item">
-                <label class="form-label">当前邮箱：</label>
-                <el-input
-                  :value="userInfos.email || '未绑定'"
-                  disabled
-                  placeholder="未绑定邮箱"
-                />
-              </div>
-              <div class="form-item form-btn bind-actions-top">
-                <el-popconfirm
-                  v-if="userInfos.email && userInfos.email.length > 0"
-                  title="是否继续要解除绑定邮箱?"
-                  @confirm="confirmEvent(2)"
-                >
-                  <template #reference>
-                    <el-button type="danger">解除绑定</el-button>
-                  </template>
-                </el-popconfirm>
-              </div>
-              <div class="setting-inline-panel">
-                <el-divider content-position="left">{{
-                  userInfos.email && userInfos.email.length > 0 ? '修改绑定邮箱' : '绑定邮箱'
-                }}</el-divider>
-                <el-form
-                  ref="ruleFormEmailRef"
-                  :model="stateEmail.form"
-                  :rules="stateEmail.rules"
-                  label-width="96px"
-                  status-icon
-                  class="setting-inline-el-form"
-                >
-                  <el-row :gutter="12">
-                    <el-col :span="24">
-                      <el-form-item label="邮箱" prop="email">
-                        <el-input
-                          v-model="stateEmail.form.email"
-                          autocomplete="email"
-                          placeholder="请输入邮箱"
-                          clearable
-                        />
-                      </el-form-item>
-                    </el-col>
-                    <el-col :xs="24" :sm="14">
-                      <el-form-item label="验证码" prop="code">
-                        <el-input
-                          v-model="stateEmail.form.code"
-                          autocomplete="off"
-                          placeholder="请输入邮箱验证码"
-                          maxlength="6"
-                          clearable
-                        />
-                      </el-form-item>
-                    </el-col>
-                    <el-col :xs="24" :sm="10" class="inline-send-col">
+              <el-form
+                ref="ruleFormEmailRef"
+                :model="stateEmail.form"
+                :rules="stateEmail.rules"
+                label-width="96px"
+                status-icon
+                class="setting-inline-el-form"
+              >
+                <el-form-item label="当前邮箱：">
+                  <div class="current-field-with-action">
+                    <span class="current-field-text" :title="userInfos.email || '未绑定'">
+                      {{ userInfos.email || '未绑定' }}
+                    </span>
+                    <el-popconfirm
+                      v-if="userInfos.email && userInfos.email.length > 0"
+                      title="是否继续要解除绑定邮箱?"
+                      @confirm="confirmEvent(2)"
+                    >
+                      <template #reference>
+                        <el-link type="danger" :underline="false" class="field-unbind-link">解除绑定</el-link>
+                      </template>
+                    </el-popconfirm>
+                  </div>
+                </el-form-item>
+                <div class="setting-inline-panel">
+                  <el-divider content-position="left">{{
+                    userInfos.email && userInfos.email.length > 0 ? '修改绑定邮箱' : '绑定邮箱'
+                  }}</el-divider>
+                  <el-form-item label="邮箱" prop="email">
+                    <el-input
+                      v-model="stateEmail.form.email"
+                      autocomplete="email"
+                      placeholder="请输入邮箱"
+                      clearable
+                    />
+                  </el-form-item>
+                  <el-form-item label="验证码" prop="code">
+                    <div class="code-with-send">
+                      <el-input
+                        v-model="stateEmail.form.code"
+                        autocomplete="off"
+                        placeholder="请输入邮箱验证码"
+                        maxlength="6"
+                        clearable
+                      />
                       <el-button
                         type="primary"
                         plain
-                        class="full-w-xs"
                         :disabled="bindEmailExitTime !== 60"
                         @click="getEmailCode"
                       >
@@ -262,16 +334,16 @@
                           bindEmailExitTime === 60 ? '获取验证码' : bindEmailExitTime + 's后可重发'
                         }}
                       </el-button>
-                    </el-col>
-                  </el-row>
+                    </div>
+                  </el-form-item>
                   <el-form-item label=" ">
                     <div class="inline-form-actions">
                       <el-button @click="resetEmailBindForm(ruleFormEmailRef)">重置</el-button>
                       <el-button type="primary" @click="submitEmailForm(ruleFormEmailRef)">确定</el-button>
                     </div>
                   </el-form-item>
-                </el-form>
-              </div>
+                </div>
+              </el-form>
             </div>
           </div>
 
@@ -279,82 +351,74 @@
           <div v-show="activeMenu === 'wechat'" class="setting-content">
             <div class="setting-title">绑定微信</div>
             <div class="setting-form">
-              <div class="form-item">
-                <label class="form-label">当前微信：</label>
-                <el-input
-                  :value="userInfos.wxOpenid || '未绑定'"
-                  disabled
-                  placeholder="未绑定微信"
-                />
-              </div>
-              <div class="form-item form-btn">
-                <el-button type="primary" class="reset-btn" @click="openWxCode">
-                  {{ userInfos.wxOpenid && userInfos.wxOpenid.length > 0 ? '修改微信' : '绑定微信' }}
-                </el-button>
-                <el-popconfirm
-                  v-if="userInfos.wxOpenid && userInfos.wxOpenid.length > 0"
-                  title="是否继续要解除绑定微信?"
-                  @confirm="confirmEvent(3)"
-                >
-                  <template #reference>
-                    <el-button type="danger">解除绑定</el-button>
+              <template v-if="!isWxBound">
+                <div class="wx-bind-inline">
+                  <template v-if="wxInlineUnCode">
+                    <div class="wx-bind-inline__fail">
+                      <el-icon color="#f0a71a" :size="48"><ele-WarningFilled /></el-icon>
+                      <p>{{ wxInlineUnMsg }}</p>
+                      <div class="wx-bind-inline__refresh-wrap">
+                        <el-button type="primary" link @click="startInlineWxBind({ newSession: true })"
+                          >刷新二维码</el-button
+                        >
+                      </div>
+                    </div>
                   </template>
-                </el-popconfirm>
-              </div>
+                  <template v-else>
+                    <div class="wx-bind-inline__qr">
+                      <div v-if="wxInlineQrBroken" class="wx-bind-inline__qr-broken">
+                        <div class="wx-bind-inline__qr-broken-visual" aria-hidden="true">
+                          <span class="wx-bind-inline__qr-broken-crack" />
+                        </div>
+                        <p class="wx-bind-inline__qr-broken-msg">
+                          <template v-if="wxInlineQrFailDetail">{{ wxInlineQrFailDetail }}</template>
+                          <template v-else>二维码生成失败或已损坏，请刷新重试</template>
+                        </p>
+                      </div>
+                      <img
+                        v-else-if="wxInlineQrUrl"
+                        :src="wxInlineQrUrl"
+                        alt="微信绑定二维码"
+                        @error="onWxInlineQrImgError"
+                      />
+                      <div v-else class="wx-bind-inline__loading">二维码加载中…</div>
+                    </div>
+                    <p class="wx-bind-inline__hint">
+                      微信扫一扫完成绑定
+                      <span v-if="wxInlineExitTime > 0 && !wxInlineQrBroken" class="wx-bind-inline__time"
+                        >（{{ wxInlineExitTime }}s）</span>
+                    </p>
+                    <div class="wx-bind-inline__refresh-wrap">
+                      <el-button type="primary" link @click="startInlineWxBind({ newSession: true })"
+                        >刷新二维码</el-button
+                      >
+                    </div>
+                  </template>
+                </div>
+              </template>
+              <template v-else>
+                <div class="form-item">
+                  <label class="form-label">当前微信：</label>
+                  <div class="current-field-with-action">
+                    <span class="current-field-text" :title="userInfos.wxOpenid || ''">
+                      {{ maskWxOpenid(userInfos.wxOpenid) }}
+                    </span>
+                    <el-link type="primary" :underline="false" class="field-change-link" @click="openWxCode">
+                      更换绑定
+                    </el-link>
+                    <el-popconfirm title="是否继续要解除绑定微信?" @confirm="confirmEvent(3)">
+                      <template #reference>
+                        <el-link type="danger" :underline="false" class="field-unbind-link">解除绑定</el-link>
+                      </template>
+                    </el-popconfirm>
+                  </div>
+                </div>
+              </template>
             </div>
           </div>
         </div>
       </el-col>
     </el-row>
-    <!--绑定手机号-->
-    <el-dialog
-      draggable
-      v-model="state.dialog"
-      :key="state.key"
-      @close="
-        state.dialog = false;
-        state.key = generateUUID();
-      "
-      :title="state.title"
-      width="450"
-    >
-      <el-form
-        ref="ruleFormRef"
-        :model="state.form"
-        :rules="state.rules"
-        label-width="auto"
-        status-icon
-      >
-        <el-row>
-          <el-col :span="24">
-            <el-form-item label="手机号" prop="phone">
-              <el-input
-                v-model="state.form.phone"
-                autocomplete="off"
-                placeholder="请输入手机号"
-                maxlength="11"
-              />
-            </el-form-item>
-          </el-col>
-          <el-col :span="14" class="mt25">
-            <el-form-item label="短信码" prop="code">
-              <el-input v-model="state.form.code" autocomplete="off" placeholder="请输入短信码" />
-            </el-form-item>
-          </el-col>
-          <el-col :span="10" class="mt25 text-right">
-            <el-button type="primary" :disabled="!(exitTime == 60)" @click="getSmsCode">
-              {{ exitTime == 60 ? '获取验证码' : exitTime + 's后重新获取' }}
-            </el-button>
-          </el-col>
-        </el-row>
-      </el-form>
-      <template #footer>
-        <div class="dialog-footer">
-          <el-button @click="resetForm(ruleFormRef)">重置</el-button>
-          <el-button type="primary" @click="submitForm(ruleFormRef)">确定</el-button>
-        </div>
-      </template>
-    </el-dialog>
     <!--绑定微信-->
     <el-dialog
       draggable
@@ -375,10 +439,25 @@
           </div>
         </div>
         <div v-else class="flex flex-col f-c">
-          <img :src="stateWx.form.wxCode" alt="" style="width: 50%" />
+          <div v-if="wxDialogQrBroken" class="wx-dialog-qr-broken">
+            <div class="wx-dialog-qr-broken__visual" aria-hidden="true">
+              <span class="wx-dialog-qr-broken__crack" />
+            </div>
+            <p class="wx-dialog-qr-broken__msg">
+              <template v-if="wxDialogQrFailDetail">{{ wxDialogQrFailDetail }}</template>
+              <template v-else>二维码生成失败或已损坏，请点击刷新</template>
+            </p>
+          </div>
+          <img
+            v-else
+            :src="stateWx.form.wxCode"
+            alt=""
+            style="width: 50%"
+            @error="onWxDialogQrImgError"
+          />
           <div class="mt10 text-center">
-            请用微信扫一扫进行绑定
-            <span v-if="exitTime > 0">{{ exitTime + 's' }}</span>
+            微信扫一扫完成绑定
+            <span v-if="exitTime > 0 && !wxDialogQrBroken">{{ exitTime + 's' }}</span>
           </div>
         </div>
       </div>
@@ -394,16 +473,48 @@
 
 <script setup lang="ts" name="personal">
   import { reactive, computed, ref, onMounted, onUnmounted, watch } from 'vue';
-  import { formatAxis } from '/@/utils/formatTime';
+  import { formatAxis, formatDate } from '/@/utils/formatTime';
   import { useUserInfo } from '/@/stores/userInfo';
   import { storeToRefs } from 'pinia';
   import { uploadImg } from '/@/views/system/upload';
   import { ElMessage, UploadRequestOptions } from 'element-plus';
-  import { generateUUID } from '/@/utils/mms';
+  import { generateUUID, getEnv } from '/@/utils/mms';
+  import { SysEnum } from '/@/enums/SysEnum';
   import { smsCode, emailCode } from '/@/views/system/init';
   import { userApi } from '/@/views/system/user';
   import { Session } from '/@/utils/storage';
   import { elEmail, elPhone, email, phone } from '/@/utils/toolsValidate';
+  import PwdStrengthMeter from '/@/components/pwd-strength-meter/index.vue';
+  import type { FormInstance } from 'element-plus';
+
+  /** 刷新后沿用同一张绑定会话（与登录页 sessionStorage 策略一致） */
+  const WX_BIND_INLINE_UUID_KEY = 'mms_personal_wx_bind_inline_uuid';
+
+  const readStoredWxInlineUuid = (): string | null => {
+    try {
+      const s = sessionStorage.getItem(WX_BIND_INLINE_UUID_KEY);
+      return s && `${s}`.trim().length >= 16 ? s : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const persistWxInlineUuid = (uid: string) => {
+    try {
+      sessionStorage.setItem(WX_BIND_INLINE_UUID_KEY, uid);
+    } catch {
+      /* ignore */
+    }
+  };
+
+  const clearWxInlineUuidStorage = () => {
+    try {
+      sessionStorage.removeItem(WX_BIND_INLINE_UUID_KEY);
+    } catch {
+      /* ignore */
+    }
+  };
+
   const succeed = ref(false);
   const unCode = ref(false);
   const unCodeMsg = ref('二维码已失效');
@@ -411,9 +522,32 @@
   const { userInfos } = storeToRefs(stores);
   // 引入 api 请求接口
   const baseUserApi = userApi();
+
+  /** 最后登录时间展示为本地习惯格式（兼容接口返回的 Date 字符串 / ISO） */
+  const formatUserLoginDate = (raw: unknown) => {
+    if (raw === null || raw === undefined || `${raw}`.trim() === '') return '—';
+    const d = new Date(raw as string | number | Date);
+    if (Number.isNaN(d.getTime())) return `${raw}`;
+    return formatDate(d, 'YYYY-mm-dd HH:MM:SS');
+  };
   // 倒计时
   const exitTime = ref(60);
   let intervalId: ReturnType<typeof setInterval> | undefined;
+  /** 页内微信绑定：扫码结果经 SSE（/system/user/wxBind/stream），二维码仍由 getWxCode 获取 */
+  let intervalIdWxInline: ReturnType<typeof setInterval> | undefined;
+  let wxInlineBindEs: EventSource | null = null;
+  let wxDialogBindEs: EventSource | null = null;
+  const wxInlineQrUrl = ref('');
+  /** 生成二维码接口失败或图片加载失败时展示裂图占位 */
+  const wxInlineQrBroken = ref(false);
+  /** 接口/后端返回的失败原因，展示在裂图区域 */
+  const wxInlineQrFailDetail = ref('');
+  const wxDialogQrBroken = ref(false);
+  const wxDialogQrFailDetail = ref('');
+  const wxInlineUuid = ref('');
+  const wxInlineUnCode = ref(false);
+  const wxInlineUnMsg = ref('');
+  const wxInlineExitTime = ref(60);
   // 生成组件唯一id
   const uuid = ref('id-' + generateUUID());
   const pwdEmailForm = reactive({
@@ -421,16 +555,60 @@
     password: '',
     passwordTwo: '',
   });
+  /** 密码规则：短文案用于占位；完整说明放在 title 悬停 */
+  const pwdCompositionHintShort = '大小写、数字、符号至少含三种';
+  const pwdCompositionHintDetail =
+    '密码须由大写字母、小写字母、数字、符号中至少包含三种';
   const pwdEmailExitTime = ref(60);
   let intervalIdPwd: ReturnType<typeof setInterval> | undefined;
   const hasPwdResetEmailBound = computed(() => !!(userInfos.value.email && `${userInfos.value.email}`.trim()));
-  /** 验证码输入框占位：写明验证码将发往的绑定邮箱（与接口返回展示一致） */
-  const pwdResetCodePlaceholder = computed(() => {
+  /** 是否已绑定微信（有 openid） */
+  const isWxBound = computed(() => !!(userInfos.value.wxOpenid && `${userInfos.value.wxOpenid}`.trim()));
+
+  /** OpenID 脱敏 */
+  const maskWxOpenid = (openid: string | undefined) => {
+    const s = `${openid || ''}`.trim();
+    if (!s) return '—';
+    if (s.length <= 8) return `${s.slice(0, 2)}****`;
+    return `${s.slice(0, 4)}****${s.slice(-4)}`;
+  };
+
+  /** 邮箱脱敏展示：8**@qq.com，用于验证码「发送至」说明 */
+  const maskEmailForPwdHint = (email: string) => {
+    const s = `${email || ''}`.trim();
+    const at = s.indexOf('@');
+    if (at < 1) return s;
+    const local = s.slice(0, at);
+    const domain = s.slice(at + 1);
+    if (!domain) return s;
+    const head = local.slice(0, 1) || '*';
+    return `${head}**@${domain}`;
+  };
+
+  /** 显示在验证码输入框下方的「发送至 …」 */
+  const pwdResetCodeSendToLine = computed(() => {
     const em = `${userInfos.value.email || ''}`.trim();
-    if (!em) {
-      return '请输入6位验证码';
+    if (!em) return '';
+    return `发送至 ${maskEmailForPwdHint(em)}`;
+  });
+
+  /** 确认密码失焦后才显示与新密码是否一致 */
+  const pwdEmailConfirmBlurred = ref(false);
+  const onPwdEmailConfirmBlur = () => {
+    pwdEmailConfirmBlurred.value = true;
+  };
+
+  /** 失焦且已填写确认密码时：一致 / 不一致 */
+  const pwdEmailConfirmMatchLabel = computed(() => {
+    if (!pwdEmailConfirmBlurred.value) {
+      return '';
     }
-    return `发送至 ${em}，请输入6位验证码`;
+    const p1 = pwdEmailForm.password ?? '';
+    const p2 = pwdEmailForm.passwordTwo ?? '';
+    if (!p2) {
+      return '';
+    }
+    return p1 === p2 ? '一致' : '不一致';
   });
 
   // 新增：当前激活的菜单
@@ -444,6 +622,7 @@
     pwdEmailForm.code = '';
     pwdEmailForm.password = '';
     pwdEmailForm.passwordTwo = '';
+    pwdEmailConfirmBlurred.value = false;
   };
   // 新增：菜单点击处理
   const handleMenuClick = (menu: string) => {
@@ -463,9 +642,6 @@
     code: string;
   }
   const state = reactive<VerifyType<TypeForm>>({
-    dialog: false,
-    key: generateUUID(),
-    title: '绑定手机号',
     form: {
       phone: '',
       code: '',
@@ -478,6 +654,18 @@
       ],
     },
   });
+
+  const bindPhoneExitTime = ref(60);
+  let intervalIdBindPhone: ReturnType<typeof setInterval> | undefined;
+
+  const clearBindPhoneCountdown = () => {
+    if (intervalIdBindPhone !== undefined) {
+      clearInterval(intervalIdBindPhone);
+      intervalIdBindPhone = undefined;
+    }
+    bindPhoneExitTime.value = 60;
+  };
+
   //解除手机号
   const confirmEvent = (type: number) => {
     baseUserApi
@@ -485,8 +673,10 @@
       .then((res) => {
         if (res.code === 200) {
           ElMessage.success(res.msg);
-          state.dialog = false;
           updateUserInfo();
+          if (type === 3) {
+            clearWxInlineUuidStorage();
+          }
         }
       })
       .catch((err) => {
@@ -494,10 +684,24 @@
       });
   };
 
-  // 发送短信
+  // 重置
+  const resetForm = (formEl: FormInstance | undefined) => {
+    if (!formEl) return;
+    formEl.resetFields();
+  };
+
+  const resetPhoneBindForm = (formEl: FormInstance | undefined) => {
+    resetForm(formEl);
+    clearBindPhoneCountdown();
+  };
+
+  // 发送短信（绑定/更换手机）
   const getSmsCode = () => {
     if (!phone(state.form.phone)) {
-      ElMessage.error('请正确输入手机号');
+      ElMessage.error('请正确输入新手机号');
+      return;
+    }
+    if (bindPhoneExitTime.value !== 60) {
       return;
     }
     smsCode({ ...state.form, ...{ type: 5 } })
@@ -505,13 +709,16 @@
         if (res.code === 200) {
           ElMessage.success(res.msg);
           state.form.code = '';
-          intervalId = setInterval(() => {
-            if (exitTime.value <= 0) {
-              clearInterval(intervalId);
-              exitTime.value = 60;
+          intervalIdBindPhone = setInterval(() => {
+            if (bindPhoneExitTime.value <= 0) {
+              if (intervalIdBindPhone !== undefined) {
+                clearInterval(intervalIdBindPhone);
+                intervalIdBindPhone = undefined;
+              }
+              bindPhoneExitTime.value = 60;
               return;
             }
-            exitTime.value--;
+            bindPhoneExitTime.value--;
           }, 1000);
         }
       })
@@ -519,7 +726,7 @@
         ElMessage.error(e);
       });
   };
-  // 验证
+
   const submitForm = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
     await formEl.validate((valid, fields) => {
@@ -529,8 +736,8 @@
           .then((res) => {
             if (res.code === 200) {
               ElMessage.success(res.msg);
-              state.dialog = false;
               updateUserInfo();
+              resetPhoneBindForm(formEl);
             }
           })
           .catch((err) => {
@@ -541,11 +748,6 @@
         console.log('error submit!', fields);
       }
     });
-  };
-  // 重置
-  const resetForm = (formEl: FormInstance | undefined) => {
-    if (!formEl) return;
-    formEl.resetFields();
   };
 
   const bindEmailExitTime = ref(60);
@@ -571,6 +773,15 @@
     }
     if (prev === 'email' && menu !== 'email') {
       clearBindEmailCountdown();
+    }
+    if (prev === 'phone' && menu !== 'phone') {
+      clearBindPhoneCountdown();
+    }
+    if (menu === 'wechat' && !isWxBound.value) {
+      startInlineWxBind();
+    }
+    if (prev === 'wechat' && menu !== 'wechat') {
+      stopInlineWxBind();
     }
   });
 
@@ -753,31 +964,242 @@
     });
   };
 
+  const buildWxBindSseUrl = (uid: string) => {
+    const baseApiPrefix = getEnv().replace(/\/$/, '');
+    const token = Session.get(SysEnum.TOKEN_KEY);
+    if (!token || !uid) return '';
+    return `${baseApiPrefix}/system/user/wxBind/stream?uuid=${encodeURIComponent(uid)}&Authorization=${encodeURIComponent(String(token))}`;
+  };
+
+  const stopWxDialogBindEs = () => {
+    try {
+      wxDialogBindEs?.close();
+    } catch (e) {
+      /* ignore */
+    }
+    wxDialogBindEs = null;
+  };
+
+  const startWxBindSse = (uid: string, mode: 'inline' | 'dialog') => {
+    if (mode === 'inline') {
+      try {
+        wxInlineBindEs?.close();
+      } catch (e) {
+        /* ignore */
+      }
+      wxInlineBindEs = null;
+    } else {
+      stopWxDialogBindEs();
+    }
+    const url = buildWxBindSseUrl(uid);
+    if (!url) {
+      ElMessage.warning('未获取到登录信息，无法监听扫码结果');
+      return;
+    }
+    if (!(window as unknown as { EventSource?: typeof EventSource }).EventSource) {
+      ElMessage.warning('当前浏览器不支持实时扫码推送（SSE），请使用 Chrome / Edge 等最新版本');
+      return;
+    }
+    const es = new EventSource(url);
+    if (mode === 'inline') wxInlineBindEs = es;
+    else wxDialogBindEs = es;
+
+    const finishEs = () => {
+      try {
+        es.close();
+      } catch (e) {
+        /* ignore */
+      }
+      if (mode === 'inline') wxInlineBindEs = null;
+      else wxDialogBindEs = null;
+    };
+
+    es.addEventListener('done', (evt: MessageEvent) => {
+      finishEs();
+      try {
+        const raw = (evt as MessageEvent).data;
+        const d = typeof raw === 'string' ? JSON.parse(raw || '{}') : {};
+        if (d.ok === true) {
+          if (mode === 'inline') {
+            clearWxInlineUuidStorage();
+            stopInlineWxBind();
+            updateUserInfo();
+          } else {
+            succeed.value = true;
+            unCode.value = false;
+            updateUserInfo();
+            if (intervalId !== undefined) {
+              clearInterval(intervalId);
+              intervalId = undefined;
+            }
+          }
+        } else {
+          const m = (d.msg as string) || '操作失败';
+          if (mode === 'inline') {
+            wxInlineUnMsg.value = m;
+            wxInlineUnCode.value = true;
+            wxInlineExitTime.value = 0;
+            stopInlineWxBind();
+          } else {
+            unCodeMsg.value = m;
+            succeed.value = false;
+            unCode.value = true;
+            exitTime.value = 0;
+            if (intervalId !== undefined) {
+              clearInterval(intervalId);
+              intervalId = undefined;
+            }
+          }
+        }
+      } catch (e) {
+        /* ignore */
+      }
+    });
+
+    es.onerror = () => {
+      finishEs();
+    };
+  };
+
+  const onWxInlineQrImgError = () => {
+    wxInlineQrBroken.value = true;
+    wxInlineExitTime.value = 0;
+    wxInlineQrFailDetail.value = wxInlineQrFailDetail.value || '二维码图片无法加载，请刷新重试';
+  };
+
+  const onWxDialogQrImgError = () => {
+    wxDialogQrBroken.value = true;
+    exitTime.value = 0;
+    wxDialogQrFailDetail.value = wxDialogQrFailDetail.value || '二维码图片无法加载，请刷新重试';
+  };
+
+  /** 停止页内微信二维码倒计时与 SSE */
+  const stopInlineWxBind = () => {
+    if (intervalIdWxInline !== undefined) {
+      clearInterval(intervalIdWxInline);
+      intervalIdWxInline = undefined;
+    }
+    try {
+      wxInlineBindEs?.close();
+    } catch (e) {
+      /* ignore */
+    }
+    wxInlineBindEs = null;
+  };
+
+  /** 未绑定：页内获取二维码并由 SSE 推送扫码结果；默认复用 sessionStorage 中的 uuid（刷新页面可续扫） */
+  const startInlineWxBind = (opts?: { newSession?: boolean }) => {
+    if (isWxBound.value) return;
+    stopInlineWxBind();
+    wxInlineUnCode.value = false;
+    wxInlineQrUrl.value = '';
+    wxInlineQrBroken.value = false;
+    wxInlineQrFailDetail.value = '';
+    wxInlineExitTime.value = 60;
+    if (opts?.newSession === true) {
+      wxInlineUuid.value = generateUUID() as string;
+      persistWxInlineUuid(wxInlineUuid.value);
+    } else {
+      const st = readStoredWxInlineUuid();
+      if (st) {
+        wxInlineUuid.value = st;
+      } else {
+        wxInlineUuid.value = generateUUID() as string;
+        persistWxInlineUuid(wxInlineUuid.value);
+      }
+    }
+    baseUserApi
+      .getWxCode(wxInlineUuid.value)
+      .then((res) => {
+        const url = `${res.data ?? ''}`.trim();
+        if (!url) {
+          wxInlineQrBroken.value = true;
+          wxInlineExitTime.value = 0;
+          wxInlineQrFailDetail.value = res.msg || '服务端未返回二维码地址，请检查微信相关配置';
+          ElMessage.error(wxInlineQrFailDetail.value);
+          return;
+        }
+        wxInlineQrUrl.value = url;
+        intervalIdWxInline = setInterval(() => {
+          if (wxInlineExitTime.value <= 0) {
+            wxInlineUnCode.value = true;
+            wxInlineUnMsg.value = '二维码已失效';
+            stopInlineWxBind();
+            return;
+          }
+          wxInlineExitTime.value--;
+        }, 1000);
+        startWxBindSse(wxInlineUuid.value, 'inline');
+      })
+      .catch((err: unknown) => {
+        wxInlineQrBroken.value = true;
+        wxInlineExitTime.value = 0;
+        const msg =
+          typeof err === 'string' && err
+            ? err
+            : '获取微信二维码失败，请检查后端微信（公众号）配置与网络';
+        wxInlineQrFailDetail.value = msg;
+        ElMessage.error(msg);
+      });
+  };
+
   // 绑定微信
   const wxUuid = ref(generateUUID() as string);
-  // 二维码
+  // 二维码（弹窗：更换绑定等）
   const openWxCode = () => {
-    // 获取二维码
+    stopInlineWxBind();
     wxUuid.value = generateUUID() as string;
     unCode.value = false;
     succeed.value = false;
+    wxDialogQrBroken.value = false;
+    wxDialogQrFailDetail.value = '';
     exitTime.value = 60;
-    baseUserApi.getWxCode(wxUuid.value).then((res) => {
-      stateWx.dialog = true;
-      stateWx.form.wxCode = res.data as string;
-      queryWxCodeState();
-      intervalId = setInterval(() => {
-        if (exitTime.value <= 0) {
-          unCode.value = true;
-          unCodeMsg.value = '二维码已失效';
-          succeed.value = false;
-          clearInterval(intervalId);
-          clearInterval(intervalIdWxState);
+    stopWxDialogBindEs();
+    if (intervalId !== undefined) {
+      clearInterval(intervalId);
+      intervalId = undefined;
+    }
+    baseUserApi
+      .getWxCode(wxUuid.value)
+      .then((res) => {
+        const url = `${res.data ?? ''}`.trim();
+        if (!url) {
+          wxDialogQrBroken.value = true;
+          exitTime.value = 0;
+          stateWx.form.wxCode = '';
+          stateWx.dialog = true;
+          wxDialogQrFailDetail.value = res.msg || '服务端未返回二维码地址，请检查微信相关配置';
+          ElMessage.error(wxDialogQrFailDetail.value);
           return;
         }
-        exitTime.value--;
-      }, 1000);
-    });
+        stateWx.dialog = true;
+        stateWx.form.wxCode = url;
+        startWxBindSse(wxUuid.value, 'dialog');
+        intervalId = setInterval(() => {
+          if (exitTime.value <= 0) {
+            unCode.value = true;
+            unCodeMsg.value = '二维码已失效';
+            succeed.value = false;
+            clearInterval(intervalId);
+            intervalId = undefined;
+            stopWxDialogBindEs();
+            return;
+          }
+          exitTime.value--;
+        }, 1000);
+      })
+      .catch((err: unknown) => {
+        wxDialogQrBroken.value = true;
+        stateWx.form.wxCode = '';
+        stateWx.dialog = true;
+        exitTime.value = 0;
+        const msg =
+          typeof err === 'string' && err
+            ? err
+            : '获取微信二维码失败，请检查后端微信（公众号）配置与网络';
+        wxDialogQrFailDetail.value = msg;
+        ElMessage.error(msg);
+      });
   };
   interface TypeWxForm {
     wxCode: string;
@@ -793,43 +1215,30 @@
     },
     rules: {},
   });
-  let intervalIdWxState: ReturnType<typeof setInterval> | undefined;
-  // 查询二维码状态
-  const queryWxCodeState = () => {
-    intervalIdWxState = setInterval(() => {
-      baseUserApi.queryWxCodeState(wxUuid.value).then((res) => {
-        if (res.status == 0) {
-          succeed.value = true;
-          unCode.value = false;
-          updateUserInfo();
-          clearInterval(intervalIdWxState);
-          clearInterval(intervalId);
-        } else {
-          unCodeMsg.value = res.msg as string;
-          succeed.value = false;
-          unCode.value = true;
-          exitTime.value = 0;
-          clearInterval(intervalId);
-          clearInterval(intervalIdWxState);
-        }
-      });
-    }, 3000);
-  };
   const wxClose = () => {
     stateWx.dialog = false;
     stateWx.key = generateUUID();
-    clearInterval(intervalIdWxState);
-    clearInterval(intervalId);
+    stopWxDialogBindEs();
+    if (intervalId !== undefined) {
+      clearInterval(intervalId);
+      intervalId = undefined;
+    }
   };
   onUnmounted(() => {
     // 销毁事件
-    clearInterval(intervalIdWxState);
-    clearInterval(intervalId);
+    stopInlineWxBind();
+    stopWxDialogBindEs();
+    if (intervalId !== undefined) {
+      clearInterval(intervalId);
+    }
     if (intervalIdPwd !== undefined) {
       clearInterval(intervalIdPwd);
     }
     if (intervalIdBindEmail !== undefined) {
       clearInterval(intervalIdBindEmail);
+    }
+    if (intervalIdBindPhone !== undefined) {
+      clearInterval(intervalIdBindPhone);
     }
   });
   // 页面加载时
@@ -1016,10 +1425,14 @@
               margin-bottom: 60px;
 
               .form-label {
-                width: 80px;
+                width: 96px;
                 font-size: 14px;
                 color: #666;
                 flex-shrink: 0;
+                text-align: right;
+                padding-right: 8px;
+                box-sizing: border-box;
+                line-height: 22px;
               }
 
               :deep(.el-input) {
@@ -1028,8 +1441,8 @@
 
               &.form-btn {
                 margin-top: 40px;
-                /* 与同表单 .form-label(80px) 后的输入框左缘对齐 */
-                margin-left: 80px;
+                /* 与 .form-label 列宽（96px）后的主内容左缘对齐 */
+                margin-left: 96px;
                 align-items: center;
                 justify-content: flex-start;
                 flex-wrap: wrap;
@@ -1041,11 +1454,184 @@
                   height: 40px;
                   font-size: 14px;
                 }
+              }
 
-                &.bind-actions-top {
-                  margin-top: 12px;
-                  margin-bottom: 8px;
+              .current-field-with-action {
+                flex: 1;
+                display: flex;
+                flex-wrap: nowrap;
+                align-items: center;
+                justify-content: flex-start;
+                gap: 8px;
+                min-width: 0;
+
+                .current-field-text {
+                  flex: 0 1 auto;
+                  max-width: 280px;
+                  min-width: 0;
+                  font-size: 14px;
+                  line-height: 22px;
+                  color: #303133;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
                 }
+
+                .field-change-link,
+                .field-unbind-link {
+                  flex-shrink: 0;
+                  font-size: 14px;
+                  padding: 2px 0;
+                }
+              }
+            }
+
+            .wx-bind-inline {
+              width: 100%;
+              max-width: 360px;
+              padding: 8px 0 16px;
+              display: flex;
+              flex-direction: column;
+              align-items: flex-start;
+              gap: 12px;
+
+              &__qr {
+                width: 200px;
+                min-height: 200px;
+                align-self: center;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                background: var(--el-fill-color-lighter);
+                border-radius: 8px;
+                padding: 12px;
+                box-sizing: border-box;
+
+                img {
+                  width: 100%;
+                  max-width: 176px;
+                  height: auto;
+                  display: block;
+                }
+              }
+
+              &__qr-broken {
+                width: 100%;
+                min-height: 160px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+                font-size: 13px;
+                color: var(--el-text-color-secondary);
+                text-align: center;
+                line-height: 1.4;
+              }
+
+              &__qr-broken-visual {
+                width: 140px;
+                height: 140px;
+                position: relative;
+                border: 2px dashed var(--el-color-danger-light-5);
+                border-radius: 8px;
+                background: var(--el-fill-color);
+                box-sizing: border-box;
+              }
+
+              &__qr-broken-crack {
+                position: absolute;
+                left: 10%;
+                top: 50%;
+                width: 80%;
+                height: 0;
+                border-top: 3px solid var(--el-border-color-darker);
+                opacity: 0.45;
+                transform: rotate(38deg);
+                transform-origin: center;
+                pointer-events: none;
+              }
+
+              &__qr-broken-msg {
+                margin: 0;
+                max-width: 220px;
+                word-break: break-word;
+              }
+
+              &__loading {
+                font-size: 13px;
+                color: var(--el-text-color-secondary);
+              }
+
+              &__hint {
+                margin: 0;
+                font-size: 13px;
+                color: var(--el-text-color-regular);
+                line-height: 1.5;
+                align-self: stretch;
+                text-align: center;
+              }
+
+              &__refresh-wrap {
+                width: 100%;
+                display: flex;
+                justify-content: center;
+              }
+
+              &__time {
+                color: var(--el-text-color-secondary);
+                font-size: 12px;
+              }
+
+              &__fail {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 10px;
+                font-size: 14px;
+                color: var(--el-text-color-regular);
+                text-align: center;
+
+                p {
+                  margin: 0;
+                }
+              }
+            }
+
+            /* 与下方 el-form-item 共用标签列（密保手机 / 绑定邮箱首行） */
+            .setting-inline-el-form {
+              .current-field-with-action {
+                flex: 1;
+                display: flex;
+                flex-wrap: nowrap;
+                align-items: center;
+                justify-content: flex-start;
+                gap: 8px;
+                min-width: 0;
+
+                .current-field-text {
+                  flex: 0 1 auto;
+                  max-width: 300px;
+                  min-width: 0;
+                  font-size: 14px;
+                  line-height: 22px;
+                  color: #303133;
+                  overflow: hidden;
+                  text-overflow: ellipsis;
+                  white-space: nowrap;
+                }
+
+                .field-unbind-link {
+                  flex-shrink: 0;
+                  font-size: 14px;
+                  padding: 2px 0;
+                  margin-left: 2px;
+                }
+              }
+
+              /* 首行「当前手机/邮箱」与分区线间距：原独立 form-item 为 60px，现略收紧 */
+              & > :deep(.el-form-item:first-child) {
+                margin-bottom: 22px;
               }
             }
 
@@ -1062,20 +1648,102 @@
                 font-size: 14px;
               }
 
-              .inline-send-col {
-                display: flex;
-                align-items: flex-end;
-                padding-bottom: 18px;
-              }
-
               .inline-form-actions {
                 display: flex;
                 flex-wrap: wrap;
                 gap: 12px;
               }
 
-              .full-w-xs {
-                min-height: var(--el-component-size-default);
+              .code-with-send {
+                display: flex;
+                align-items: center;
+                gap: 12px;
+                width: 100%;
+                box-sizing: border-box;
+
+                :deep(.el-input) {
+                  flex: 1;
+                  min-width: 0;
+                }
+
+                .el-button {
+                  flex-shrink: 0;
+                  white-space: nowrap;
+                }
+              }
+
+              /* 邮箱改密：与「弱/中/高」右侧区同栅格列宽，两行主输入框右缘对齐 */
+              .setting-pwd-email-form {
+                $pwd-email-trailing: 140px;
+
+                .pwd-email-code-block {
+                  width: 100%;
+
+                  .pwd-email-code-sendto {
+                    margin: 8px 0 0;
+                    font-size: 12px;
+                    line-height: 1.5;
+                    color: var(--el-text-color-secondary);
+                  }
+                }
+
+                .code-with-send {
+                  display: grid;
+                  grid-template-columns: minmax(0, 1fr) $pwd-email-trailing;
+                  align-items: center;
+                  column-gap: 12px;
+
+                  :deep(.el-input) {
+                    min-width: 0;
+                  }
+
+                  .el-button {
+                    box-sizing: border-box;
+                    width: 100%;
+                    min-width: 0;
+                    padding-left: 10px;
+                    padding-right: 10px;
+                    white-space: nowrap;
+                  }
+                }
+
+                .pwd-with-strength {
+                  display: grid;
+                  grid-template-columns: minmax(0, 1fr) $pwd-email-trailing;
+                  align-items: center;
+                  column-gap: 12px;
+                  width: 100%;
+                  box-sizing: border-box;
+
+                  :deep(.el-input) {
+                    min-width: 0;
+                  }
+
+                  .pwd-email-trailing-spacer {
+                    min-height: 1px;
+                  }
+
+                  .pwd-email-confirm-match {
+                    width: 100%;
+                    min-height: 40px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    box-sizing: border-box;
+                    font-size: 12px;
+                    font-weight: 600;
+                    line-height: 1.2;
+                    text-align: center;
+
+                    .is-match {
+                      color: var(--el-color-success);
+                    }
+
+                    .is-mismatch {
+                      color: var(--el-color-danger);
+                    }
+                  }
+                }
               }
 
               :deep(.setting-inline-el-form .el-form-item:last-of-type) {
@@ -1127,6 +1795,8 @@
 
                 .form-label {
                   width: auto;
+                  text-align: left;
+                  padding-right: 0;
                 }
 
                 :deep(.el-input) {
@@ -1138,17 +1808,64 @@
                 }
               }
 
+              .setting-inline-el-form {
+                :deep(.el-form-item__label) {
+                  width: 100% !important;
+                  text-align: left;
+                  justify-content: flex-start;
+                  padding-right: 0;
+                }
+
+                :deep(.el-form-item__content) {
+                  margin-left: 0 !important;
+                  max-width: 100%;
+                }
+
+                :deep(.el-form-item) {
+                  display: block;
+                  margin-bottom: 18px;
+                }
+
+                .current-field-with-action {
+                  flex-direction: column;
+                  align-items: flex-start;
+                  width: 100%;
+                  gap: 8px;
+
+                  .current-field-text {
+                    flex: 1;
+                    max-width: 100%;
+                    white-space: normal;
+                    word-break: break-all;
+                  }
+                }
+              }
+
               .setting-inline-panel {
                 max-width: 100%;
 
-                .inline-send-col {
+                .code-with-send {
+                  flex-direction: column;
                   align-items: stretch;
-                  padding-bottom: 0;
-                  padding-top: 4px;
-                  width: 100%;
+                  gap: 10px;
+                }
 
-                  .full-w-xs {
+                .code-with-send .el-button {
+                  width: 100%;
+                }
+
+                .setting-pwd-email-form {
+                  .code-with-send,
+                  .pwd-with-strength {
+                    grid-template-columns: 1fr;
+                    row-gap: 10px;
+                  }
+
+                  .code-with-send .el-button,
+                  .pwd-with-strength .pwd-strength-meter,
+                  .pwd-with-strength .pwd-email-confirm-match {
                     width: 100%;
+                    flex: none;
                   }
                 }
 
@@ -1162,5 +1879,50 @@
         }
       }
     }
+  }
+</style>
+
+<style lang="scss">
+  /* el-dialog 内容挂到 body 时 scoped 不生效 */
+  .wx-dialog-qr-broken {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 14px;
+    color: var(--el-text-color-secondary);
+    text-align: center;
+    line-height: 1.4;
+    padding: 8px 0;
+  }
+
+  .wx-dialog-qr-broken__visual {
+    width: 160px;
+    height: 160px;
+    position: relative;
+    border: 2px dashed var(--el-color-danger-light-5);
+    border-radius: 8px;
+    background: var(--el-fill-color);
+    box-sizing: border-box;
+  }
+
+  .wx-dialog-qr-broken__crack {
+    position: absolute;
+    left: 10%;
+    top: 50%;
+    width: 80%;
+    height: 0;
+    border-top: 3px solid var(--el-border-color-darker);
+    opacity: 0.45;
+    transform: rotate(38deg);
+    transform-origin: center;
+    pointer-events: none;
+  }
+
+  .wx-dialog-qr-broken__msg {
+    margin: 0;
+    max-width: 360px;
+    word-break: break-word;
   }
 </style>

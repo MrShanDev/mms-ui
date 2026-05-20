@@ -3,49 +3,39 @@
     <div class="plugin-market__hero">
       <div class="plugin-market__hero-body">
         <h2 class="plugin-market__title">插件市场</h2>
-        <div class="plugin-market__intro">
-          <p class="plugin-market__subtitle">
-            <strong>插件市场</strong>是 MMS 管理端内统一管理 JAR 扩展的入口，在界面中完成上架、安装、激活与健康观测，减少纯脚本或手工改库的分散操作。开发/封装约定详见
-            <a
-              class="plugin-market__subtitle-link"
-              href="https://mmsadmin.cn/mms-plugins/plugin-develop.html"
-              target="_blank"
-              rel="noopener noreferrer"
-            >《MMS插件开发指南》</a>。<strong>好处</strong>：安装走向导并可预览依赖与
-            <code>schema.sql</code>；版本与激活状态集中可见；与宿主全量重载衔接清晰，降低漏表、漏菜单风险。本页汇总已登记/已安装的插件，可浏览能力、切换激活版本、查看日志与健康。安装须符合宿主与
-            <code>plugin.json</code>：通过「安装插件」<strong>向导</strong>（协议 → 本地上传或 URL 与预览 → 执行 → 结果与健康探针）完成落盘、版本登记、可选
-            <code>schema.sql</code>、菜单/权限写入与全量重载；日常可停用、卸载或仅清库表。卡片可进详情、日志与运行控制，封面可看完整信息。
-          </p>
-          <p class="plugin-market__intro-p plugin-market__intro-p--note">
-            <strong>注意事项</strong>：仅安装来源可信、包体完整的插件；生产库执行 DDL 前请<strong>备份</strong>并评估窗口与回滚。插件在宿主进程内运行，安全与合规需由贵方自行把关。
-          </p>
-        </div>
+        <p class="plugin-market__subtitle">
+          上传、安装、激活与健康检查。<a
+            class="plugin-market__subtitle-link"
+            href="https://mmsadmin.cn/mms-plugins/plugin-develop.html"
+            target="_blank"
+            rel="noopener noreferrer"
+          >插件开发指南</a>
+        </p>
+        <el-alert
+          type="warning"
+          :closable="false"
+          show-icon
+          class="plugin-market__hero-alert"
+          title="仅安装可信来源；生产库执行 DDL 前务必备份。"
+        />
         <p v-if="statusBody" class="plugin-market__meta text-gray">
-          宿主启用：<b :class="statusBody.enabled ? 'text-success' : 'text-warning'">{{
-            statusBody.enabled ? '是' : '否'
+          宿主：<b :class="statusBody.enabled ? 'text-success' : 'text-warning'">{{
+            statusBody.enabled ? '已启用' : '未启用'
           }}</b>
-          · MMS 版本：<b>{{ statusBody.hostMmsRevision ?? '—' }}</b>
+          · MMS：<b>{{ statusBody.hostMmsRevision ?? '—' }}</b>
           <template v-if="pluginRootConfigDiffers">
-            · 读盘路径（与启动日志「跳过加载」同源）：<code class="plugin-market__code">{{
-              statusBody.resolvedPluginsRoot || '—'
-            }}</code>
-            · <code>mms.plugin.root-dir</code>：<code class="plugin-market__code text-warning">{{
-              statusBody.rootDir || '—'
-            }}</code>
-            <span class="plugin-market__root-hint text-warning">
-              （不一致时请核对 MMS_PLUGIN_ROOT_DIR / 是否连错后端实例）
-            </span>
+            · 读盘：<code class="plugin-market__code">{{ statusBody.resolvedPluginsRoot || '—' }}</code>
+            · 配置：<code class="plugin-market__code text-warning">{{ statusBody.rootDir || '—' }}</code>
+            <span class="plugin-market__root-hint text-warning">（不一致请核对实例与环境变量）</span>
           </template>
           <template v-else>
-            · 插件根目录：<code class="plugin-market__code">{{
+            · 插件目录：<code class="plugin-market__code">{{
               statusBody.resolvedPluginsRoot || statusBody.rootDir || '—'
             }}</code>
-            <span class="plugin-market__root-hint">（读盘与配置相同；与日志中「跳过加载」路径一致）</span>
           </template>
           <template v-if="statusBody.activateVersionReloadScope === 'SINGLE_TARGET'">
-            · 激活版本重载：<b class="text-warning">仅目标插件</b>（多插件依赖请改
-            <code>mms.plugin.activate-version-reload-scope=FULL</code>
-            或页顶「全量重载」）
+            · 激活重载：<b class="text-warning">单插件</b>（多依赖请
+            <code>mms.plugin.activate-version-reload-scope=FULL</code> 或「全量重载」）
           </template>
         </p>
       </div>
@@ -236,7 +226,7 @@
               日志
             </el-button>
             <el-button
-              v-if="row.runtimeState === 'NOT_INSTALLED'"
+              v-if="row.runtimeState === 'NOT_INSTALLED' && row.purgeAllowed !== false"
               type="danger"
               link
               title="仅移除库表登记（无本地安装目录时）"
@@ -276,6 +266,9 @@
               </div>
             </div>
             <el-descriptions :column="1" border size="small" class="mt-3">
+              <el-descriptions-item label="上架来源">{{
+                listingSourceLabel(detail.listingSource)
+              }}</el-descriptions-item>
               <el-descriptions-item label="插件 ID">{{ detail.pluginId }}</el-descriptions-item>
               <el-descriptions-item label="展示版本">{{ detail.displayVersion }}</el-descriptions-item>
               <el-descriptions-item label="库表激活版本">
@@ -618,6 +611,7 @@
       >
         <el-button @click="detailVisible = false">关闭</el-button>
         <el-button
+          v-if="detail.purgeAllowed !== false"
           type="danger"
           :loading="powerLoading(detail, 'purge')"
           :disabled="powerRowLocked(detail)"
@@ -1044,6 +1038,14 @@ function installLabel(s: string) {
   if (s === 'LOADED') return '运行中';
   if (s === 'ON_DISK') return '已安装（未加载）';
   return '未安装';
+}
+
+function listingSourceLabel(src: number | null | undefined) {
+  if (src === 0) return '官方上架';
+  if (src === 1) return '用户安装登记';
+  if (src === 2) return '预留';
+  if (src == null) return '—（无库表登记或旧数据）';
+  return String(src);
 }
 
 function installTagType(s: string): 'success' | 'warning' | 'info' {
@@ -1818,16 +1820,16 @@ onMounted(() => loadAll());
   font-size: 22px;
   font-weight: 600;
 }
-.plugin-market__intro {
-  margin: 0;
+.plugin-market__hero-alert {
+  margin: 0 0 12px;
+  padding: 8px 12px;
 }
 .plugin-market__subtitle {
-  margin: 0 0 12px;
+  margin: 0 0 10px;
   color: var(--el-text-color-secondary);
   font-size: 13px;
   max-width: 100%;
-  line-height: 1.65;
-  text-indent: 2em;
+  line-height: 1.5;
 }
 .plugin-market__subtitle-link {
   color: var(--el-color-primary);
@@ -1837,21 +1839,8 @@ onMounted(() => loadAll());
     text-decoration: underline;
   }
 }
-.plugin-market__intro-p {
-  margin: 0 0 12px;
-  color: var(--el-text-color-secondary);
-  font-size: 13px;
-  line-height: 1.65;
-  max-width: 100%;
-  &:last-child {
-    margin-bottom: 0;
-  }
-}
-.plugin-market__intro-p--note {
-  color: var(--el-text-color-regular);
-}
 .plugin-market__meta {
-  margin: 18px 0 0;
+  margin: 10px 0 0;
   font-size: 12px;
 }
 .plugin-market__actions {

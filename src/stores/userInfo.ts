@@ -15,6 +15,7 @@ export const useUserInfo = defineStore('userInfo', {
       phoneNumber: '',
       sex: '',
       loginIp: '',
+      loginRegion: '',
       loginDate: '',
       roleName: '',
       roles: [],

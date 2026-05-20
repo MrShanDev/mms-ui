@@ -55,7 +55,7 @@
   </el-form>
 </template>
 <script setup lang="ts">
-  import { onMounted, reactive } from 'vue';
+  import { reactive } from 'vue';
   import { ElMessage } from 'element-plus';
   import { sysConfigApi } from '/@/views/system/config';
   const baseApi = sysConfigApi();
@@ -151,9 +151,6 @@
       configRuleForm[7].configValue = res.data[7].configValue;
     });
   };
-  onMounted(() => {
-    initData();
-  });
   // 暴露变量
   defineExpose({
     initData,

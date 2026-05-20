@@ -10,6 +10,7 @@ export default {
     systemDic: 'systemDic',
     systemNotice: 'systemNotice',
     systemSetting: 'systemSetting',
+    websiteConfig: 'Website configuration',
     sxpcwlkj: 'Pinchuang official',
     sxpcwlkjDoc: 'project documentation',
     limits: 'limits',

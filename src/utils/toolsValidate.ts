@@ -336,6 +336,51 @@ export function passwordStrength(val: string) {
   return v;
 }
 
+/** 密码强度档位：与 {@link computePasswordStrengthLevel} 一致 */
+export type PasswordStrengthLevel = 0 | 1 | 2 | 3;
+
+/**
+ * 按「小写 / 大写 / 数字 / 非字母数字符号」四类字符的覆盖数，并结合长度综合定档。
+ * 相较旧版正则 `passwordStrength`：短密码、单一字符集不会虚高；多类字符 + 长度更易稳定到中/强档。
+ *
+ * @returns 0 无输入；1 弱；2 中；3 强
+ */
+export function computePasswordStrengthLevel(password: string): PasswordStrengthLevel {
+  const p = password ?? '';
+  if (!p.length) {
+    return 0;
+  }
+
+  let types = 0;
+  if (/[a-z]/.test(p)) types++;
+  if (/[A-Z]/.test(p)) types++;
+  if (/\d/.test(p)) types++;
+  if (/[^a-zA-Z0-9]/.test(p)) types++;
+
+  const len = p.length;
+  if (len < 6 || types <= 1) {
+    return 1;
+  }
+
+  // 强：四类齐全并达长度，或三类且足够长
+  if (types >= 4 && len >= 8) {
+    return 3;
+  }
+  if (types >= 3 && len >= 10) {
+    return 3;
+  }
+
+  // 中：已含至少三类但未达强档长度；或仅两类但密码很长
+  if (types >= 3) {
+    return 2;
+  }
+  if (types === 2 && len >= 14) {
+    return 2;
+  }
+
+  return 1;
+}
+
 /**
  * 17.IP地址
  * @param val 当前值字符串
