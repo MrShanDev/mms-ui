@@ -6,6 +6,7 @@
 	"license": "MIT",
 	"scripts": {
 		"dev": "vite --mode development --open",
+		"plug": "vite --mode plug --open",
 		"build": "vite build --mode production",
 		"preview": "vite preview",
 		"lint": "eslint --ext .js,.jsx,.ts,.tsx,.vue src/",

@@ -5,7 +5,6 @@ import { defineConfig, loadEnv, ConfigEnv, UserConfigFnObject } from 'vite';
 import vueSetupExtend from 'vite-plugin-vue-setup-extend-plus';
 import viteCompression from 'vite-plugin-compression';
 import { buildConfig } from './src/utils/build';
-import { buildOriginjsFederationRemotes, PLUGIN_FEDERATION_SHARED } from './plugin-federation.host';
 import { lazyImport, VxeResolver } from 'vite-plugin-lazy-import'
 import WindiCSS from 'vite-plugin-windicss'
 import AutoImport from 'unplugin-auto-import/vite'
@@ -24,6 +23,22 @@ const alias: Record<string, string> = {
     /** 联邦子包源码根（pnpm workspace packages/*），宿主直出用 `@mms-packages/<dir>/src/...`，勿为每个插件单独配别名 */
     '@mms-packages': pathResolve('./packages'),
 };
+
+/** Host 侧联邦共享依赖版本线（与各插件 Remote 子包对齐）。 */
+const PLUGIN_FEDERATION_SHARED = {
+    vue: { singleton: true, requiredVersion: '^3.5.0' },
+    'vue-router': { singleton: true, requiredVersion: '^4.3.0' },
+    pinia: { singleton: true, requiredVersion: '^2.0.0' },
+    'element-plus': { singleton: true, requiredVersion: '^2.11.0' },
+} as const;
+
+/** 改为运行时按“已安装并已加载插件”动态注册 remote，不在构建期硬编码插件清单。 */
+function buildOriginjsFederationRemotes(
+    _env: Record<string, string>,
+    _command: 'build' | 'serve'
+): Record<string, string> {
+    return {};
+}
 
 const viteConfig: UserConfigFnObject = defineConfig((mode: ConfigEnv) => {
     const env: Record<string, string> = loadEnv(mode.mode, process.cwd());

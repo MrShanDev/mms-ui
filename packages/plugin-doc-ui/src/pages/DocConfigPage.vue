@@ -35,18 +35,17 @@
     <div class="layout-padding">
       <el-card shadow="hover" class="layout-padding-auto">
         <el-container>
-          <el-header>
-            <TableTool
-              ref="tableToolRef"
-              table-comment="文档配置"
-              function-name="docConfig"
-              model-name="doc"
-              :key="componentKey"
-              :param="state.tableData.param"
-              @close="componentKey = generateUUID()"
-              @insert="onCURD"
-              @deletes="onCURD"
-            />
+        <el-header>
+            <div class="doc-config-toolbar">
+              <el-button type="primary" @click="onCURD({ type: curdEnum.INSERT })">新增</el-button>
+              <el-button
+                type="danger"
+                :disabled="!state.tableData.param.selectIds"
+                @click="onCURD({ type: curdEnum.DELETE, ids: state.tableData.param.selectIds })"
+              >
+                批量删除
+              </el-button>
+            </div>
           </el-header>
           <el-main>
             <el-table
@@ -64,7 +63,7 @@
               <el-table-column prop="mtime" label="更新时间" min-width="160" />
               <el-table-column prop="status" label="状态" width="100">
                 <template #default="scope">
-                  <fast-switch v-model="scope.row.status" dict-type="SYS_STATE" placeholder="状态" />
+                  <el-switch v-model="scope.row.status" :active-value="1" :inactive-value="0" />
                 </template>
               </el-table-column>
               <el-table-column prop="sort" label="排序" width="80" align="center" />
@@ -141,7 +140,7 @@
           />
         </el-form-item>
         <el-form-item label="状态">
-          <fast-switch v-model="dialog.form.status" dict-type="SYS_STATE" placeholder="状态" />
+          <el-switch v-model="dialog.form.status" :active-value="1" :inactive-value="0" />
         </el-form-item>
         <el-form-item label="排序">
           <el-input-number v-model="dialog.form.sort" :min="0" />
@@ -159,20 +158,25 @@
 </template>
 
 <script setup lang="ts" name="DocConfigPage">
-  import { reactive, ref, onMounted } from 'vue';
-  import { ElMessage, ElMessageBox } from 'element-plus';
-  import { defineAsyncComponent } from 'vue';
-  import { CURDEnum } from '/@/enums/CURDEnum';
-  import { generateUUID } from '/@/utils/mms';
-  import { NextLoading } from '/@/utils/loading';
+  import { reactive, onMounted } from 'vue';
+  import { ElLoading, ElMessage, ElMessageBox } from 'element-plus';
   import { docCrudApi } from '../api/docCrudApi';
-  import FastSwitch from '/@/components/fast-switch/src/fast-switch.vue';
 
-  const TableTool = defineAsyncComponent(() => import('/@/components/table-tool/index.vue'));
   const baseApi = docCrudApi('docConfig');
-  const curdEnum = CURDEnum;
-  const componentKey = ref(generateUUID());
-  const formRef = ref();
+  const curdEnum = {
+    INSERT: 'insert',
+    EDIT: 'edit',
+    DELETE: 'delete',
+  } as const;
+
+  const withLoading = async (task: () => Promise<void>) => {
+    const loading = ElLoading.service({ text: '加载中请稍候...', background: 'rgba(0, 0, 0, 0.7)' });
+    try {
+      await task();
+    } finally {
+      loading.close();
+    }
+  };
 
   const state = reactive({
     tableData: {
@@ -242,7 +246,7 @@
     dialog.form.ctime = now;
     dialog.form.mtime = now;
     dialog.title = '新增文档配置';
-    dialog.mode = CURDEnum.INSERT;
+    dialog.mode = curdEnum.INSERT;
     dialog.visible = true;
   }
 
@@ -253,24 +257,24 @@
   }
 
   function onCURD(obj: { type: string; ids?: string }) {
-    if (obj.type === CURDEnum.INSERT) {
+    if (obj.type === curdEnum.INSERT) {
       openInsert();
       return;
     }
-    if (obj.type === CURDEnum.EDIT && obj.ids) {
+    if (obj.type === curdEnum.EDIT && obj.ids) {
       baseApi
         .query(obj.ids)
         .then((res: any) => {
           resetDialog();
           Object.assign(dialog.form, res.data || {});
           dialog.title = '编辑文档配置';
-          dialog.mode = CURDEnum.EDIT;
+          dialog.mode = curdEnum.EDIT;
           dialog.visible = true;
         })
         .catch((e) => ElMessage.warning(String(e)));
       return;
     }
-    if (obj.type === CURDEnum.DELETE && obj.ids) {
+    if (obj.type === curdEnum.DELETE && obj.ids) {
       ElMessageBox.confirm('此操作将永久删除，是否继续?', '提示', { type: 'warning' })
         .then(() => {
           baseApi
@@ -297,30 +301,24 @@
       dialog.visible = false;
       getTableData();
     };
-    if (dialog.mode === CURDEnum.INSERT) {
-      NextLoading.open();
-      baseApi
-        .insert(payload)
-        .then((r: any) => {
-          ElMessage.success(r.msg || '保存成功');
-          done();
-        })
+    if (dialog.mode === curdEnum.INSERT) {
+      withLoading(async () => {
+        const r: any = await baseApi.insert(payload);
+        ElMessage.success(r.msg || '保存成功');
+        done();
+      })
         .catch((e) => ElMessage.warning(String(e)))
         .finally(() => {
-          NextLoading.close();
           dialog.saving = false;
         });
     } else {
-      NextLoading.open();
-      baseApi
-        .edit(payload)
-        .then((r: any) => {
-          ElMessage.success(r.msg || '保存成功');
-          done();
-        })
+      withLoading(async () => {
+        const r: any = await baseApi.edit(payload);
+        ElMessage.success(r.msg || '保存成功');
+        done();
+      })
         .catch((e) => ElMessage.warning(String(e)))
         .finally(() => {
-          NextLoading.close();
           dialog.saving = false;
         });
     }

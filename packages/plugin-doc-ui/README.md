@@ -6,7 +6,7 @@ MMS **文档站插件**（`mms.plugin.doc`）管理端联邦子包：文档配�
 
 主站对**所有**带联邦前端的插件采用同一套扩展方式（doc 仅为其中一例）：
 
-1. **`plugin-federation.host.ts`**（mms-ui 根目录）：在 **`PLUGIN_FEDERATION_REMOTES`** 增加 `scope`（与本子包 `vite.config` 的 `federation.name` 一致）、`envVar`、dev/prod 默认 **remoteEntry** URL。
+1. **`vite.config.ts`**（mms-ui 根目录）：在 `federation({...})` 里维护 `shared` 版本线；`remotes` 已改为运行时按“已安装并已加载插件”动态注册，不再在构建期硬编码插件清单。
 2. **`src/types/plugin-federation-scopes.d.ts`**：为同一 `scope` 追加 `declare module '<scope>/*'`。
 3. **`src/router/pluginFederation/plugins/doc.ts`**：用 **`registerPluginFederationRoutes`** 注册菜单 `component` → **`import('<scope>/Expose')`**；并在 **`src/router/pluginFederation/index.ts`** 中 **`import './plugins/doc'`**。
 4. **`backEnd.ts`** 已统一先走 **`resolvePluginFederatedView`**，无需再改。

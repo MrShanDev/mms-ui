@@ -29,10 +29,10 @@ export default defineConfig(({ command }) => ({
         './DocAuthorizeUserPage': './src/pages/DocAuthorizeUserPage.vue',
       },
       shared: {
-        vue: { singleton: true, requiredVersion: '^3.5.0' },
-        'vue-router': { singleton: true, requiredVersion: '^4.3.0' },
-        pinia: { singleton: true, requiredVersion: '^2.0.0' },
-        'element-plus': { singleton: true, requiredVersion: '^2.11.0' },
+        vue: { singleton: true, requiredVersion: '^3.5.0', import: false, generate: false },
+        'vue-router': { singleton: true, requiredVersion: '^4.3.0', import: false, generate: false },
+        pinia: { singleton: true, requiredVersion: '^2.0.0', import: false, generate: false },
+        'element-plus': { singleton: true, requiredVersion: '^2.11.0', import: false, generate: false },
       },
     }),
   ],
@@ -55,6 +55,16 @@ export default defineConfig(({ command }) => ({
     rollupOptions: {
       output: {
         minifyInternalExports: false,
+      },
+      onwarn(warning, warn) {
+        // 忽略第三方预打包产物中的 #__PURE__ 位置不当警告（无实际影响）
+        if (
+          warning.code === 'THIS_IS_UNDEFINED' ||
+          (warning.message != null && warning.message.includes('contains an annotation that Rollup cannot interpret'))
+        ) {
+          return;
+        }
+        warn(warning);
       },
     },
   },

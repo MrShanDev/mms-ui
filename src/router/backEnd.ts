@@ -1,3 +1,4 @@
+import { defineComponent, h } from 'vue';
 import { RouteRecordRaw } from 'vue-router';
 import { storeToRefs } from 'pinia';
 import pinia from '/@/stores/index';
@@ -12,6 +13,7 @@ import { useTagsViewRoutes } from '/@/stores/tagsViewRoutes';
 import { getMenu } from '/@/views/system/init';
 import { useAppStore } from '/@/stores/app';
 import { resolvePluginFederatedView } from '/@/router/pluginFederation';
+import { loadFederationComponent, parseFederationComponentRef } from '/@/router/pluginFederation/runtime';
 
 // 后端控制路由
 
@@ -169,15 +171,53 @@ function normalizeViewGlobKey(key: string): string {
   return key.replace(/^(?:\.\.\/)+views\//, '');
 }
 
+/** 联邦远程加载失败时返回一个错误提示组件 */
+function wrapFederationErrorComponent(component: string) {
+  return defineComponent({
+    setup() {
+      return () =>
+        h('div', { style: { padding: '40px', textAlign: 'center' } }, [
+          h('h2', { style: { color: '#e6a23c', marginBottom: '16px' } }, '插件页面加载失败'),
+          h('p', { style: { color: '#909399', marginBottom: '8px' } }, `页面: ${component}`),
+          h(
+            'p',
+            { style: { color: '#606266', fontSize: '14px' } },
+            '请确认: ① 插件已安装  ② 若在本地联调插件联邦，请使用 pnpm plug 模式并启动插件子包 dev server'
+          ),
+        ]);
+    },
+  });
+}
+
 export function dynamicImport(dynamicViewsModules: Record<string, Function>, component: string) {
   // 与 views 下 glob 键一致：去掉前导 /（库内脚本曾写入 '/system/user/index'，会导致无法匹配、组件为 undefined）
   const comp = String(component ?? '')
     .trim()
     .replace(/^\/+/, '');
   if (!comp) return;
+
+  const federationRef = parseFederationComponentRef(comp);
+  if (federationRef) {
+    return async () => {
+      try {
+        return await loadFederationComponent(federationRef.scope, federationRef.expose);
+      } catch (e) {
+        console.error(`[插件联邦] 运行时加载失败: ${comp}`, e);
+        return wrapFederationErrorComponent(comp);
+      }
+    };
+  }
+
   const pluginFed = resolvePluginFederatedView(comp);
   if (pluginFed) {
-    return pluginFed;
+    return async () => {
+      try {
+        return await pluginFed();
+      } catch (e) {
+        console.error(`[插件联邦] 加载失败: ${comp}`, e);
+        return wrapFederationErrorComponent(comp);
+      }
+    };
   }
   const keys = Object.keys(dynamicViewsModules);
   const matchKeys = keys.filter((key) => {

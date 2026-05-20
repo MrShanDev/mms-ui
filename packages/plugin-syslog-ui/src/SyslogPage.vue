@@ -85,15 +85,43 @@
 </template>
 
 <script setup lang="ts">
+import axios from 'axios';
 import { saveAs } from 'file-saver';
 import { usePluginLogViewer } from '/@/composables/usePluginLogViewer';
 import { ElButton, ElCard, ElForm, ElFormItem, ElInputNumber, ElMessage, ElOption, ElRadioButton, ElRadioGroup, ElSelect, ElSwitch } from 'element-plus';
 import { onUnmounted, ref, watch } from 'vue';
-import request from '/@/utils/request';
-import { pluginHostMvcPrefix } from '/@/utils/mms';
+import { Session } from '/@/utils/storage';
+import { SysEnum } from '/@/enums/SysEnum';
 
 const PLUGIN_ID = 'mms.plugin.syslog';
-const API = `${pluginHostMvcPrefix()}/${PLUGIN_ID}/syslog`;
+const RAW_BASE_API = ((import.meta as any).env?.VITE_APP_BASE_API ?? '').toString().trim();
+const API_BASE = RAW_BASE_API
+  ? RAW_BASE_API.replace(/\/$/, '')
+  : (typeof window !== 'undefined' && /^(localhost|127\.0\.0\.1)$/i.test(window.location.hostname) ? '/prod-api' : '');
+const API = `${API_BASE}/plugin/${PLUGIN_ID}/syslog`;
+
+const http = axios.create({
+  baseURL: ((import.meta as any).env?.VITE_APP_BASE ?? '').toString(),
+  timeout: 50000,
+  headers: { 'Content-Type': 'application/json' },
+});
+
+http.interceptors.request.use((config) => {
+  const token = Session.get(SysEnum.TOKEN_KEY);
+  if (token) {
+    config.headers = config.headers ?? {};
+    (config.headers as any).Authorization = String(token);
+  }
+  return config;
+});
+
+async function apiGet(url: string, params?: Record<string, any>) {
+  const { data } = await http.get(url, { params });
+  if (data?.code != null && data.code !== 200) {
+    throw new Error(data?.msg || `HTTP ${data?.code}`);
+  }
+  return data?.data ?? data;
+}
 
 const panelActive = ref(true);
 const loading = ref(false);
@@ -120,8 +148,7 @@ const {
 async function refreshFiles() {
   loading.value = true;
   try {
-    const res: any = await request({ url: `${API}/files`, method: 'get' });
-    const data = res?.data != null && res?.files === undefined ? res.data : res;
+    const data: any = await apiGet(`${API}/files`);
     logsDir.value = data?.logsDir ?? '';
     files.value = Array.isArray(data?.files) ? data.files : [];
     if (files.value.length && !selectedFile.value) {
@@ -137,12 +164,7 @@ async function refreshFiles() {
 async function loadTail() {
   if (!selectedFile.value) return;
   try {
-    const res: any = await request({
-      url: `${API}/tail`,
-      method: 'get',
-      params: { file: selectedFile.value, maxBytes: 131072 },
-    });
-    const data = res?.data != null && res?.text === undefined ? res.data : res;
+    const data: any = await apiGet(`${API}/tail`, { file: selectedFile.value, maxBytes: 131072 });
     tailText.value = data?.text ?? '';
   } catch {
     /* */
@@ -158,12 +180,7 @@ function stopLivePoll() {
 
 async function pollLive() {
   try {
-    const res: any = await request({
-      url: `${API}/live/poll`,
-      method: 'get',
-      params: { sinceSeq: sinceSeq.value },
-    });
-    const data = res?.data != null && res?.lines === undefined ? res.data : res;
+    const data: any = await apiGet(`${API}/live/poll`, { sinceSeq: sinceSeq.value });
     const lines: string[] = data?.lines ?? [];
     const next = data?.nextSeq ?? sinceSeq.value;
     sinceSeq.value = typeof next === 'number' ? next : sinceSeq.value;

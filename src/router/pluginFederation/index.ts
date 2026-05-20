@@ -1,8 +1,6 @@
 /**
- * 插件联邦路由入口：导入各插件注册模块（副作用），并导出解析函数供 {@code backEnd.ts} 使用。
- * 新增插件：增加 ./plugins/<id>.ts，并在本文件追加 import './plugins/<id>'。
+ * 插件联邦路由入口：仅导出解析函数；远程插件改为运行时按已安装清单动态装载。
  */
-import './plugins/doc';
 
 export { resolvePluginFederatedView, registerPluginFederationRoutes } from './registry';
 export type { PluginFederationRouteReg } from './registry';
