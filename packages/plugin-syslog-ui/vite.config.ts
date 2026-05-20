@@ -54,9 +54,21 @@ export default defineConfig(({ command }) => ({
     outDir: 'dist',
     emptyOutDir: true,
     cssCodeSplit: true,
+    /**
+     * 联邦 `shared.element-plus` 单独成 chunk 约 1MB 属常态，提高阈值避免构建成功仍刷黄条。
+     * 真要减体积应在业务侧按需引入 EP 组件，而非压低该阈值。
+     */
+    chunkSizeWarningLimit: 1600,
     rollupOptions: {
       output: {
         minifyInternalExports: false,
+      },
+      onwarn(warning, defaultHandler) {
+        // Element Plus 依赖的 @vueuse 中部分 #__PURE__ 注释位置会触发 Rollup 提示，与产物无关
+        if (warning.message?.includes('annotation that Rollup cannot interpret')) {
+          return;
+        }
+        defaultHandler(warning);
       },
     },
   },

@@ -65,17 +65,25 @@ pnpm preview
 
 部分插件会把前端子包（通常在 `mms-ui/packages/plugin-*-ui`）构建产物打进插件 JAR 的 `META-INF/mms/web`，实现“插件安装即带 UI”。
 
-示例（以 syslog 插件为例）：
+示例（以 syslog 插件为例，**须在 `mms-ui` 仓库根**执行）：
 
 ```bash
+cd mms-ui
+pnpm install
 pnpm run fed:plugin-ui:build -- @mms-ui/plugin-syslog-ui
 ```
 
-与插件 Maven 构建联动（在插件目录执行）：
+与插件 Maven 构建联动（**`-Pfed-web` 会在 `prepare-package` 自动调用上述 pnpm 命令**；需已安装 Node/pnpm）：
 
 ```bash
+# 在 mms-plus/mms-plugins 目录：
 mvn -pl mms-plugin-tool-syslog -am package -Pfed-web -DskipTests
+
+# 或在单插件目录 mms-plugins/mms-plugin-tool-syslog：
+mvn -pl . -am package -Pfed-web -DskipTests
 ```
+
+已打好 `dist` 且仅需打 JAR 时：`-Dskip.fed.syslog.ui.build=true`。构建告警与体积说明见 **`packages/plugin-syslog-ui/README.md`**（CI 一节）。
 
 详细规范与自检清单：
 

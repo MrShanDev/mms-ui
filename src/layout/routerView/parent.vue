@@ -60,9 +60,10 @@
     iframeList: [],
   });
 
-  // 设置主界面切换动画
+  // 主题里 animation === 'none' 时映射为 transition name router-none（与 transition.scss 中类名一致）
   const setTransitionName = computed(() => {
-    return themeConfig.value.animation;
+    const a = themeConfig.value.animation;
+    return a === 'none' ? 'router-none' : a;
   });
   // 获取组件缓存列表(name值)
   const getKeepAliveNames = computed(() => {

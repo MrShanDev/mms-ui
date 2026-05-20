@@ -22,6 +22,23 @@ pnpm run fed:plugin-ui:build -- @mms-ui/plugin-syslog-ui # 产出 packages/plugi
 
 联调顺序：终端 A `pnpm run fed:plugin-ui:dev -- @mms-ui/plugin-syslog-ui`，终端 B `pnpm dev`；`.env.development` 中 **`VITE_SYSLOG_REMOTE_ENTRY=http://localhost:5175/assets/remoteEntry.js`**（与默认 `MMS_FED_REMOTE_BASE` 一致）。
 
+## CI / 其它机器打带联邦前端的 JAR
+
+前提：本机已装 **Node/pnpm**，且 **`mms-ui` 与 `mms-plugins` 相对位置与 monorepo 一致**（与 `mms-plugin-tool-syslog/pom.xml` 中 `mms.ui.root` 一致：`../../mms-ui`）。
+
+**推荐（一条命令，含联邦构建 + 拷贝 + 打 JAR）：** 在 **`mms-plus/mms-plugins/mms-plugin-tool-syslog`** 目录执行：
+
+```bash
+mvn -pl . -am package -Pfed-web -DskipTests
+```
+
+- **`-Pfed-web`**：在 `prepare-package` 阶段于 **`mms-ui` 根** 执行 `pnpm run fed:plugin-ui:build -- @mms-ui/plugin-syslog-ui`，再把 **`packages/plugin-syslog-ui/dist`** 复制到 **`target/classes/META-INF/mms/web`**。
+- 若你已手动打好 `dist`，可 **`mvn ... -Pfed-web -Dskip.fed.syslog.ui.build=true`** 跳过前端构建，仅打包。
+
+**仅前端产物（无 JAR）：** 始终在 **`mms-ui` 根** 执行上表 `fed:plugin-ui:build`，**包名与 pnpm 其它参数之间必须保留 `--`**（与 Maven `exec` 一致）。
+
+构建日志中 **`@vueuse`/`#__PURE__`** 的 Rollup 提示已在子包 `vite.config.ts` 中过滤；**`chunkSizeWarningLimit`** 已调高，因联邦 **shared 的 element-plus** 单列 chunk 约 1MB 为预期现象。
+
 ## 生产 publicPath
 
 打包进插件 JAR 时，`base` 须与 **`plugin.json` 的 id、version** 及 **`remoteEntryFile`** 一致，例如：

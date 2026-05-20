@@ -177,6 +177,7 @@
               style="width: 90px"
               @change="setLocalThemeConfig"
             >
+              <el-option label="无" value="none"></el-option>
               <el-option label="slide-right" value="slide-right"></el-option>
               <el-option label="slide-left" value="slide-left"></el-option>
               <el-option label="opacitys" value="opacitys"></el-option>
