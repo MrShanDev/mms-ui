@@ -33,13 +33,9 @@
       <el-card shadow="hover" class="layout-padding-auto">
         <el-container>
           <el-header>
-            <TableTool
-              table-comment="文档授权用户"
-              function-name="docAuthorizeUser"
-              model-name="doc"
-              :key="componentKey"
-              :param="state.tableData.param"
-              @close="componentKey = generateUUID()"
+            <PluginTableTool
+              :has-selection="state.tableData.param.selectIds !== ''"
+              :select-ids="state.tableData.param.selectIds"
               @insert="onCURD"
               @deletes="onCURD"
             />
@@ -62,7 +58,7 @@
               <el-table-column prop="mtime" label="更新时间" min-width="160" />
               <el-table-column prop="status" label="状态" width="90">
                 <template #default="scope">
-                  <fast-switch v-model="scope.row.status" dict-type="SYS_STATE" />
+                  <el-switch v-model="scope.row.status" :active-value="1" :inactive-value="0" />
                 </template>
               </el-table-column>
               <el-table-column fixed="right" label="操作" width="100">
@@ -138,7 +134,7 @@
           />
         </el-form-item>
         <el-form-item label="状态">
-          <fast-switch v-model="dialog.form.status" dict-type="SYS_STATE" />
+          <el-switch v-model="dialog.form.status" :active-value="1" :inactive-value="0" />
         </el-form-item>
         <el-form-item label="排序">
           <el-input-number v-model="dialog.form.sort" :min="0" />
@@ -156,18 +152,15 @@
 </template>
 
 <script setup lang="ts" name="DocAuthorizeUserPage">
-  import { reactive, ref, onMounted, defineAsyncComponent } from 'vue';
+  import { reactive, ref, onMounted } from 'vue';
   import { ElMessage, ElMessageBox } from 'element-plus';
-  import { CURDEnum } from '/@/enums/CURDEnum';
-  import { generateUUID } from '/@/utils/mms';
-  import { NextLoading } from '/@/utils/loading';
+  import { CURDEnum } from '@mms-ui/plugin-common-kit/utils/enums';
+  import { NextLoading } from '@mms-ui/plugin-common-kit/utils/loading';
   import { docCrudApi } from '../api/docCrudApi';
-  import FastSwitch from '/@/components/fast-switch/src/fast-switch.vue';
+  import { PluginTableTool } from '@mms-ui/plugin-common-kit';
 
-  const TableTool = defineAsyncComponent(() => import('/@/components/table-tool/index.vue'));
   const baseApi = docCrudApi('docAuthorizeUser');
   const curdEnum = CURDEnum;
-  const componentKey = ref(generateUUID());
 
   const state = reactive({
     tableData: {

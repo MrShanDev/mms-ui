@@ -87,11 +87,9 @@
 <script setup lang="ts">
 import axios from 'axios';
 import { saveAs } from 'file-saver';
-import { usePluginLogViewer } from '/@/composables/usePluginLogViewer';
+import { usePluginLogViewer, Session, SysEnum } from '@mms-ui/plugin-common-kit';
 import { ElButton, ElCard, ElForm, ElFormItem, ElInputNumber, ElMessage, ElOption, ElRadioButton, ElRadioGroup, ElSelect, ElSwitch } from 'element-plus';
 import { onUnmounted, ref, watch } from 'vue';
-import { Session } from '/@/utils/storage';
-import { SysEnum } from '/@/enums/SysEnum';
 
 const PLUGIN_ID = 'mms.plugin.syslog';
 const RAW_BASE_API = ((import.meta as any).env?.VITE_APP_BASE_API ?? '').toString().trim();

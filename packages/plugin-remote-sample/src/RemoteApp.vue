@@ -11,7 +11,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 // 来自主工程 src（由 vite alias /@ 解析）
-import { formatDate } from '/@/utils/formatTime';
+import { formatDate } from '@mms-ui/plugin-common-kit/utils/formatTime';
 
 const timeLabel = computed(() => formatDate(new Date(), 'YYYY-mm-dd HH:MM:SS'));
 </script>

@@ -33,13 +33,9 @@
       <el-card shadow="hover" class="layout-padding-auto">
         <el-container>
           <el-header>
-            <TableTool
-              table-comment="文档订单"
-              function-name="docOrder"
-              model-name="doc"
-              :key="componentKey"
-              :param="state.tableData.param"
-              @close="componentKey = generateUUID()"
+            <PluginTableTool
+              :has-selection="state.tableData.param.selectIds !== ''"
+              :select-ids="state.tableData.param.selectIds"
               @insert="onCURD"
               @deletes="onCURD"
             />
@@ -59,12 +55,11 @@
               <el-table-column prop="payNo" label="支付单号" min-width="120" show-overflow-tooltip />
               <el-table-column prop="transactionId" label="渠道流水" min-width="120" show-overflow-tooltip />
               <el-table-column prop="prodName" label="商品" min-width="120" show-overflow-tooltip />
-              <fast-table-column
-                prop="status"
-                label="订单状态"
-                width="120"
-                dict-type="mms_plugin_doc_order_status"
-              />
+              <el-table-column prop="status" label="订单状态" width="120">
+                <template #default="scope">
+                  {{ docOrderStatusLabel(scope.row.status) }}
+                </template>
+              </el-table-column>
               <el-table-column fixed="right" label="操作" width="100">
                 <template #default="scope">
                   <el-icon
@@ -156,12 +151,18 @@
           />
         </el-form-item>
         <el-form-item label="订单状态">
-          <fast-select
+          <el-select
             v-model="dialog.form.status"
-            dict-type="mms_plugin_doc_order_status"
             placeholder="请选择"
             class="w100"
-          />
+          >
+            <el-option
+              v-for="opt in DOC_ORDER_STATUS_OPTIONS"
+              :key="opt.value"
+              :label="opt.label"
+              :value="opt.value"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="排序">
           <el-input-number v-model="dialog.form.sort" :min="0" />
@@ -179,19 +180,16 @@
 </template>
 
 <script setup lang="ts" name="DocOrderPage">
-  import { reactive, ref, onMounted, defineAsyncComponent } from 'vue';
+  import { reactive, ref, onMounted } from 'vue';
   import { ElMessage, ElMessageBox } from 'element-plus';
-  import { CURDEnum } from '/@/enums/CURDEnum';
-  import { generateUUID } from '/@/utils/mms';
-  import { NextLoading } from '/@/utils/loading';
+  import { CURDEnum } from '@mms-ui/plugin-common-kit/utils/enums';
+  import { NextLoading } from '@mms-ui/plugin-common-kit/utils/loading';
   import { docCrudApi } from '../api/docCrudApi';
-  import FastSelect from '/@/components/fast-select/src/fast-select.vue';
-  import FastTableColumn from '/@/components/fast-table-column/src/fast-table-column.vue';
+  import { DOC_ORDER_STATUS_OPTIONS, docOrderStatusLabel } from '../utils/dict';
+  import { PluginTableTool } from '@mms-ui/plugin-common-kit';
 
-  const TableTool = defineAsyncComponent(() => import('/@/components/table-tool/index.vue'));
   const baseApi = docCrudApi('docOrder');
   const curdEnum = CURDEnum;
-  const componentKey = ref(generateUUID());
 
   const state = reactive({
     tableData: {

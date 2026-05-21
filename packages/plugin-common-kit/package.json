@@ -1,0 +1,30 @@
+{
+  "name": "@mms-ui/plugin-common-kit",
+  "version": "1.0.0",
+  "private": true,
+  "description": "MMS 插件 UI 通用工具包 — 请求封装、缓存、字典、事件总线、校验、组件，零重型宿主依赖",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./api/request": "./src/api/request.ts",
+    "./utils/uuid": "./src/utils/uuid.ts",
+    "./utils/dict": "./src/utils/dict.ts",
+    "./utils/storage": "./src/utils/storage.ts",
+    "./utils/loading": "./src/utils/loading.ts",
+    "./utils/enums": "./src/utils/enums.ts",
+    "./utils/errorCode": "./src/utils/errorCode.ts",
+    "./utils/formatTime": "./src/utils/formatTime.ts",
+    "./utils/arrayOperation": "./src/utils/arrayOperation.ts",
+    "./utils/toolsValidate": "./src/utils/toolsValidate.ts",
+    "./utils/mitt": "./src/utils/mitt.ts",
+    "./composables/usePluginLogViewer": "./src/composables/usePluginLogViewer.ts",
+    "./components/PluginTableTool": "./src/components/PluginTableTool.vue"
+  },
+  "dependencies": {
+    "axios": "^1.7.0"
+  },
+  "peerDependencies": {
+    "vue": "^3.5.0",
+    "element-plus": "^2.11.0"
+  }
+}
