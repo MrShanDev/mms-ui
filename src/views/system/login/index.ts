@@ -34,8 +34,8 @@ export function login(params: object) {
     url: getEnv() + '/system/auth/login',
     method: 'post',
     headers: {
-      encrypt: false,
-      repeatSubmit: true,
+      // 登录接口不加密；开启防重复提交（请求拦截器识别 isRepeatSubmit，命中后注入 nonce）
+      isRepeatSubmit: 'true',
     },
     data: params,
   });
@@ -46,8 +46,8 @@ export function loginByPhone(params: object) {
     url: getEnv() + '/system/auth/loginByPhone',
     method: 'post',
     headers: {
-      encrypt: false,
-      repeatSubmit: true,
+      // 登录接口不加密；开启防重复提交（请求拦截器识别 isRepeatSubmit，命中后注入 nonce）
+      isRepeatSubmit: 'true',
     },
     data: params,
   });

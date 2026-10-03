@@ -16,7 +16,8 @@ declare global {
     code: number;
     msg: string;
     data: T;
-    state: boolean;
+    /** 与后端 com.sxpcwlkj.common.utils.R#status 对齐 */
+    status: boolean;
   };
 
   /** 系统启动基础信息（/common/startBase） */
