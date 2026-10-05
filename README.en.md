@@ -5,7 +5,7 @@
    </a>
    <h1>Modular Management System (MMS)</h1>
    <p><strong>mms-ui · Admin Frontend</strong></p>
-   <p><a href="https://mmsadmin.cn/">📘 Online Docs · mmsadmin.cn</a> · <a href="https://gitee.com/LumeCode/mms-ui">Gitee</a> · <a href="https://github.com/MrShanDev/mms-ui">GitHub</a></p>
+   <p><a href="https://mmsadmin.cn/">📘 Online Docs · mmsadmin.cn</a> · <a href="https://gitee.com/MrShanDev/mms-ui">Gitee</a> · <a href="https://github.com/MrShanDev/mms-ui">GitHub</a></p>
    <br/>
 </div>
 
