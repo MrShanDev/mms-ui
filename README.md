@@ -1,8 +1,16 @@
-# mms-ui（管理端前端）
+<div align="center">
+   <br/>
+   <a href="https://mmsadmin.cn">
+     <img width="150" src="https://mmsadmin.cn/logo.png" alt="MMS logo">
+   </a>
+   <h1>MMS（模块化管理系统，Modular Management System）</h1>
+   <p><strong>mms-ui · 管理端前端</strong></p>
+   <br/>
+</div>
 
 [English](README.en.md) | 简体中文
 
-`mms-ui` 是 **MMS 管理端前端**，用于对接 `mms/mms-admin` 后端能力，同时支持将部分“插件前端子包”通过 **Module Federation** 的方式打包并随插件 JAR 一起交付（联邦章节见聚合仓 `mms-plus/mms-plugins/README.md`，在线文档见 [mmsadmin.cn](https://mmsadmin.cn) 的 `/mms-plugins/` 分册）。
+`mms-ui` 是 **MMS 管理端前端**，用于对接 `mms/mms-admin` 后端能力，同时支持将部分“插件前端子包”通过 **Module Federation** 的方式打包并随插件 JAR 一起交付（插件联邦规范见在线文档 [mmsadmin.cn](https://mmsadmin.cn) 的 `/mms-plugins/` 分册）。
 
 ---
 
@@ -76,7 +84,7 @@ pnpm run fed:plugin-ui:build -- @mms-ui/plugin-syslog-ui
 与插件 Maven 构建联动（**`-Pfed-web` 会在 `prepare-package` 自动调用上述 pnpm 命令**；需已安装 Node/pnpm）：
 
 ```bash
-# 在 mms-plus/mms-plugins 目录：
+# 在 mms-plugins 插件聚合目录：
 mvn -pl mms-plugin-tool-syslog -am package -Pfed-web -DskipTests
 
 # 或在单插件目录 mms-plugins/mms-plugin-tool-syslog：
@@ -85,10 +93,7 @@ mvn -pl . -am package -Pfed-web -DskipTests
 
 已打好 `dist` 且仅需打 JAR 时：`-Dskip.fed.syslog.ui.build=true`。构建告警与体积说明见 **`packages/plugin-syslog-ui/README.md`**（CI 一节）。
 
-详细规范与自检清单（位于聚合仓 `mms-plus`，不在本仓库内）：
-
-- `mms-plus/mms-plugins/README.md`（联邦章节）
-- `mms-plus/.skills/mms-plugin/SKILL.md`（联邦前端与插件 JAR 一键打包）
+详细规范与自检清单见在线文档 [mmsadmin.cn](https://mmsadmin.cn)（`/mms-plugins/` 分册与插件开发指南）。
 
 ---
 

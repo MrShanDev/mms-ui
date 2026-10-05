@@ -1,8 +1,16 @@
-# mms-ui (Admin UI)
+<div align="center">
+   <br/>
+   <a href="https://mmsadmin.cn">
+     <img width="150" src="https://mmsadmin.cn/logo.png" alt="MMS logo">
+   </a>
+   <h1>MMS (Modular Management System)</h1>
+   <p><strong>mms-ui · Admin Frontend</strong></p>
+   <br/>
+</div>
 
 English | [简体中文](README.md)
 
-`mms-ui` is the **admin frontend** for MMS. It connects to the backend (`mms/mms-admin`) and also supports shipping **federated plugin UI packages** (Module Federation) that can be bundled into plugin JARs (see `mms-plugins/README.md` in the `mms-plus` hub repository, or the `/mms-plugins/` section on [mmsadmin.cn](https://mmsadmin.cn)).
+`mms-ui` is the **admin frontend** for MMS. It connects to the backend (`mms/mms-admin`) and also supports shipping **federated plugin UI packages** (Module Federation) that can be bundled into plugin JARs (see the `/mms-plugins/` section on [mmsadmin.cn](https://mmsadmin.cn)).
 
 ---
 
@@ -46,8 +54,5 @@ Example:
 pnpm run fed:plugin-ui:build -- @mms-ui/plugin-syslog-ui
 ```
 
-For the end-to-end convention (Nuxt/Vite build + Maven copy into `META-INF/mms/web`), see:
-
-- `mms-plus/mms-plugins/README.md`
-- `mms-plus/.skills/mms-plugin/SKILL.md` (Chinese)
+For the end-to-end convention (Nuxt/Vite build + Maven copy into `META-INF/mms/web`), see the `/mms-plugins/` section on [mmsadmin.cn](https://mmsadmin.cn).
 
