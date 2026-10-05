@@ -3,7 +3,7 @@
    <a href="https://mmsadmin.cn">
      <img width="150" src="https://mmsadmin.cn/logo.png" alt="MMS logo">
    </a>
-   <h1>MMS (Modular Management System)</h1>
+   <h1>Modular Management System (MMS)</h1>
    <p><strong>mms-ui · Admin Frontend</strong></p>
    <br/>
 </div>
