@@ -4,12 +4,21 @@ node_modules/
 # 构建产出
 dist/
 **/dist/
+dist.zip
 
 # Vite / 工具缓存
 .vite/
 .cache/
 *.tsbuildinfo
 .eslintcache
+
+# 构建时自动生成的声明文件（unplugin-auto-import / unplugin-vue-components）
+auto-imports.d.ts
+components.d.ts
+
+# 锁文件（本项目统一使用 pnpm，pnpm-lock.yaml 为唯一权威锁文件）
+package-lock.json
+yarn.lock
 
 # 本地环境（仓库内若已跟踪 .env.development 等，勿用本机密钥覆盖提交）
 .env.local
