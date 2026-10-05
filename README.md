@@ -2,7 +2,7 @@
 
 [English](README.en.md) | 简体中文
 
-`mms-ui` 是 **MMS 管理端前端**，用于对接 `mms/mms-admin` 后端能力，同时支持将部分“插件前端子包”通过 **Module Federation** 的方式打包并随插件 JAR 一起交付（见 `mms-plugins/README.md` 中的联邦章节）。
+`mms-ui` 是 **MMS 管理端前端**，用于对接 `mms/mms-admin` 后端能力，同时支持将部分“插件前端子包”通过 **Module Federation** 的方式打包并随插件 JAR 一起交付（联邦章节见聚合仓 `mms-plus/mms-plugins/README.md`，在线文档见 [mmsadmin.cn](https://mmsadmin.cn) 的 `/mms-plugins/` 分册）。
 
 ---
 
@@ -85,10 +85,10 @@ mvn -pl . -am package -Pfed-web -DskipTests
 
 已打好 `dist` 且仅需打 JAR 时：`-Dskip.fed.syslog.ui.build=true`。构建告警与体积说明见 **`packages/plugin-syslog-ui/README.md`**（CI 一节）。
 
-详细规范与自检清单：
+详细规范与自检清单（位于聚合仓 `mms-plus`，不在本仓库内）：
 
-- `mms-plugins/README.md`（联邦章节）
-- `.cursor/skills/mms-plugin/SKILL.md`（联邦前端与插件 JAR 一键打包）
+- `mms-plus/mms-plugins/README.md`（联邦章节）
+- `mms-plus/.skills/mms-plugin/SKILL.md`（联邦前端与插件 JAR 一键打包）
 
 ---
 
