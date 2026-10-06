@@ -16,6 +16,87 @@
 
 ---
 
+## 页面展示
+
+当前管理端实景截图，展示登录、系统工作台、账户表单、权限管理、配置、代码生成和插件市场。每行两张，点击图片查看原图；也可右键在新窗口打开。
+
+<table>
+  <tr>
+    <td width="50%" align="center">
+      <strong>登录页面</strong><br>
+      <a href="https://gitee.com/LumeCode/mms/raw/master/script/img/preview-login.jpg" target="_blank" rel="noopener noreferrer">
+        <img src="https://gitee.com/LumeCode/mms/raw/master/script/img/preview-login.jpg" width="100%" alt="登录页面">
+      </a>
+    </td>
+    <td width="50%" align="center">
+      <strong>系统管理工作台</strong><br>
+      <a href="https://gitee.com/LumeCode/mms/raw/master/script/img/preview-dashboard.jpg" target="_blank" rel="noopener noreferrer">
+        <img src="https://gitee.com/LumeCode/mms/raw/master/script/img/preview-dashboard.jpg" width="100%" alt="系统管理工作台">
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center">
+      <strong>新增用户表单</strong><br>
+      <a href="https://gitee.com/LumeCode/mms/raw/master/script/img/preview-user-form.jpg" target="_blank" rel="noopener noreferrer">
+        <img src="https://gitee.com/LumeCode/mms/raw/master/script/img/preview-user-form.jpg" width="100%" alt="新增用户表单">
+      </a>
+    </td>
+    <td width="50%" align="center">
+      <strong>新增角色与菜单权限</strong><br>
+      <a href="https://gitee.com/LumeCode/mms/raw/master/script/img/preview-role-form.jpg" target="_blank" rel="noopener noreferrer">
+        <img src="https://gitee.com/LumeCode/mms/raw/master/script/img/preview-role-form.jpg" width="100%" alt="新增角色与菜单权限">
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center">
+      <strong>角色管理</strong><br>
+      <a href="https://gitee.com/LumeCode/mms/raw/master/script/img/preview-roles.jpg" target="_blank" rel="noopener noreferrer">
+        <img src="https://gitee.com/LumeCode/mms/raw/master/script/img/preview-roles.jpg" width="100%" alt="角色管理">
+      </a>
+    </td>
+    <td width="50%" align="center">
+      <strong>菜单管理</strong><br>
+      <a href="https://gitee.com/LumeCode/mms/raw/master/script/img/preview-menus.jpg" target="_blank" rel="noopener noreferrer">
+        <img src="https://gitee.com/LumeCode/mms/raw/master/script/img/preview-menus.jpg" width="100%" alt="菜单管理">
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center">
+      <strong>字典管理</strong><br>
+      <a href="https://gitee.com/LumeCode/mms/raw/master/script/img/preview-dictionaries.jpg" target="_blank" rel="noopener noreferrer">
+        <img src="https://gitee.com/LumeCode/mms/raw/master/script/img/preview-dictionaries.jpg" width="100%" alt="字典管理">
+      </a>
+    </td>
+    <td width="50%" align="center">
+      <strong>系统基础设置</strong><br>
+      <a href="https://gitee.com/LumeCode/mms/raw/master/script/img/preview-settings.jpg" target="_blank" rel="noopener noreferrer">
+        <img src="https://gitee.com/LumeCode/mms/raw/master/script/img/preview-settings.jpg" width="100%" alt="系统基础设置">
+      </a>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center">
+      <strong>代码生成</strong><br>
+      <a href="https://gitee.com/LumeCode/mms/raw/master/script/img/preview-generator.jpg" target="_blank" rel="noopener noreferrer">
+        <img src="https://gitee.com/LumeCode/mms/raw/master/script/img/preview-generator.jpg" width="100%" alt="代码生成">
+      </a>
+    </td>
+    <td width="50%" align="center">
+      <strong>插件市场</strong><br>
+      <a href="https://gitee.com/LumeCode/mms/raw/master/script/img/preview-plugins.jpg" target="_blank" rel="noopener noreferrer">
+        <img src="https://gitee.com/LumeCode/mms/raw/master/script/img/preview-plugins.jpg" width="100%" alt="插件市场">
+      </a>
+    </td>
+  </tr>
+</table>
+
+代码生成与插件市场截图为未导入表、未安装插件时的界面；用户与角色表单仅展示，未提交新增。
+
+截图统一维护在母仓 `mms-plus/mms/script/img/`，本地路径为 `../mms/script/img/`。此处引用后端仓原始图片地址，便于单独浏览 `mms-ui` 仓库；更新截图后需同步发布后端仓图片。
+
 ## 技术栈
 
 - Vue 3 + Vite + TypeScript
@@ -26,10 +107,36 @@
 
 ## 环境要求
 
-- Node.js：建议 **18+**（推荐 20 LTS）
-- pnpm：建议 8+（`npm i -g pnpm`）
+- Node.js：推荐 **22**（本教程使用的版本）
+- pnpm：本教程使用 **10**（先执行 `npm install -g pnpm@10`）
 
 ---
+
+安装 Node.js 通常会带上 npm，但不会自动安装 pnpm。nvm 用于安装和切换 Node.js 版本；Maven 是 Java 后端的构建工具，其命令为 `mvn`，需要单独安装。
+
+**macOS / Linux / WSL：安装 nvm、Node.js 和 pnpm**
+
+按照 [nvm 官方安装说明](https://github.com/nvm-sh/nvm#installing-and-updating)安装 nvm，然后重新打开终端。已有 Node.js 且无需切换版本时，可以跳过 nvm。
+
+```bash
+# 安装 nvm（官方安装脚本）
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.8/install.sh | bash
+```
+
+重新打开终端后执行：
+
+```bash
+command -v nvm
+nvm install 22
+nvm use 22
+nvm alias default 22
+node -v
+npm -v
+npm install -g pnpm@10
+pnpm -v
+```
+
+切换 nvm 管理的 Node.js 版本后，如果找不到 pnpm，需要在当前版本下重新安装。Node.js 25 起不再附带 Corepack，教程不依赖 Corepack 自动提供 pnpm。原生 Windows 使用 [nvm-windows](https://github.com/coreybutler/nvm-windows)或 Node.js 官方安装包，不运行上述 nvm Shell 安装脚本。
 
 ## 快速开始
 

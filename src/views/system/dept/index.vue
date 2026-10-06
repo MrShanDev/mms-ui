@@ -1,128 +1,142 @@
 <template>
-  <div class="block">
-    <!-- Table  -->
-    <div class="system-dept-container layout-padding">
-      <el-card shadow="hover" class="layout-padding-auto">
-        <el-container>
-          <el-header>
-            <!-- 功能栏 -->
-            <div class="system-dept-search">
-              <el-button size="small" type="primary" @click="clickExpand">
-                <el-icon><ele-Sort /></el-icon>
-                {{ expand.state ? '全部关闭' : '全部展开' }}
-              </el-button>
-              <el-button
-                size="small"
-                type="success"
-                class="ml10"
-                v-auth="'system:dept:insert'"
-                @click="onCURD({ type: curdEnum.INSERT, ids: '1' })"
+  <SystemPage feature="dept">
+    <div class="block">
+      <!-- Table  -->
+      <div class="system-dept-container layout-padding">
+        <el-card shadow="never" class="layout-padding-auto">
+          <el-container>
+            <el-header>
+              <!-- 功能栏 -->
+              <div class="system-dept-search">
+                <el-button size="small" type="primary" @click="clickExpand">
+                  <el-icon><ele-Sort /></el-icon>
+                  {{ expand.state ? '全部折叠' : '全部展开' }}
+                </el-button>
+                <el-button
+                  size="small"
+                  type="success"
+                  class="ml10"
+                  v-auth="'system:dept:insert'"
+                  @click="onCURD({ type: curdEnum.INSERT, ids: '1' })"
+                >
+                  <el-icon>
+                    <ele-DocumentAdd />
+                  </el-icon>
+                  新增
+                </el-button>
+                <TableTool
+                  functionName="dept"
+                  tableComment="部门管理"
+                  :param="state.tableData.param"
+                  @success="getTableData"
+                />
+              </div>
+            </el-header>
+            <el-main>
+              <!-- Table -->
+              <el-table
+                :data="state.tableData.data"
+                v-loading="state.tableData.loading"
+                style="width: 100%"
+                row-key="deptId"
+                :key="expand.key"
+                :default-expand-all="expand.state"
+                :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
               >
-                <el-icon>
-                  <ele-DocumentAdd />
-                </el-icon>
-                新增
-              </el-button>
-            </div>
-          </el-header>
-          <el-main>
-            <!-- Table -->
-            <el-table
-              :data="state.tableData.data"
-              v-loading="state.tableData.loading"
-              style="width: 100%"
-              row-key="deptId"
-              :key="expand.key"
-              :default-expand-all="expand.state"
-              :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
-            >
-              <el-table-column
-                prop="deptName"
-                label="部门名称"
-                header-align="center"
-                align="center"
-              ></el-table-column>
-              <el-table-column
-                prop="leader"
-                label="负责人"
-                header-align="center"
-                align="center"
-              ></el-table-column>
-              <el-table-column
-                prop="phone"
-                label="联系方式"
-                header-align="center"
-                align="center"
-              ></el-table-column>
-              <el-table-column
-                prop="email"
-                label="邮箱"
-                header-align="center"
-                align="center"
-              ></el-table-column>
-              <el-table-column prop="status" label="状态" dict-type="SYS_STATE">
-                <template #default="scope">
-                  <fast-switch
-                    v-model="scope.row.status"
-                    dict-type="SYS_STATE"
-                    placeholder="状态"
-                  ></fast-switch>
-                </template>
-              </el-table-column>
-              <el-table-column
-                prop="sort"
-                label="排序"
-                header-align="center"
-                align="center"
-              ></el-table-column>
-              <el-table-column fixed="right" label="操作" width=" 120 ">
-                <template #default="scope">
-                  <el-tooltip placement="top" :content="$t('message.form.insertSon')">
-                    <el-icon
-                      class="mr10"
-                      color="blue"
-                      v-auth="'system:dept:insert'"
-                      @click="onCURD({ type: curdEnum.INSERT, ids: scope.row.deptId })"
+                <el-table-column
+                  prop="deptName"
+                  label="部门名称"
+                  header-align="center"
+                  align="center"
+                  min-width="120"
+                ></el-table-column>
+                <el-table-column
+                  prop="leader"
+                  label="负责人"
+                  header-align="center"
+                  align="center"
+                  min-width="120"
+                ></el-table-column>
+                <el-table-column
+                  prop="phone"
+                  label="联系方式"
+                  header-align="center"
+                  align="center"
+                  min-width="120"
+                ></el-table-column>
+                <el-table-column
+                  prop="email"
+                  label="邮箱"
+                  header-align="center"
+                  align="center"
+                  min-width="120"
+                ></el-table-column>
+                <el-table-column prop="status" label="状态" dict-type="SYS_STATE">
+                  <template #default="scope">
+                    <fast-switch
+                      v-model="scope.row.status"
+                      dict-type="SYS_STATE"
+                      placeholder="状态"
+                    ></fast-switch>
+                  </template>
+                </el-table-column>
+                <el-table-column
+                  prop="sort"
+                  label="排序"
+                  header-align="center"
+                  align="center"
+                  min-width="120"
+                ></el-table-column>
+                <el-table-column fixed="right" label="操作" width=" 120 ">
+                  <template #default="scope">
+                    <el-tooltip placement="top" :content="$t('message.form.insertSon')">
+                      <el-icon
+                        class="mr10"
+                        color="blue"
+                        v-auth="'system:dept:insert'"
+                        @click="onCURD({ type: curdEnum.INSERT, ids: scope.row.deptId })"
+                      >
+                        <ele-FolderAdd />
+                      </el-icon>
+                    </el-tooltip>
+                    <el-tooltip placement="top" :content="$t('message.form.edit')">
+                      <el-icon
+                        class="mr10"
+                        color="blue"
+                        v-auths="['system:dept:query', 'system:dept:edit']"
+                        @click="onCURD({ type: curdEnum.EDIT, ids: scope.row.deptId })"
+                      >
+                        <ele-Edit />
+                      </el-icon>
+                    </el-tooltip>
+                    <el-tooltip
+                      v-if="scope.row.parentId != 0"
+                      placement="top"
+                      :content="$t('message.form.delete')"
                     >
-                      <ele-FolderAdd />
-                    </el-icon>
-                  </el-tooltip>
-                  <el-tooltip placement="top" :content="$t('message.form.edit')">
-                    <el-icon
-                      class="mr10"
-                      color="blue"
-                      v-auths="['system:dept:query', 'system:dept:edit']"
-                      @click="onCURD({ type: curdEnum.EDIT, ids: scope.row.deptId })"
-                    >
-                      <ele-Edit />
-                    </el-icon>
-                  </el-tooltip>
-                  <el-tooltip
-                    v-if="scope.row.parentId != 0"
-                    placement="top"
-                    :content="$t('message.form.delete')"
-                  >
-                    <el-icon
-                      class="mr10"
-                      color="blue"
-                      v-auth="'system:dept:delete'"
-                      @click="onCURD({ type: curdEnum.DELETE, ids: scope.row.deptId })"
-                    >
-                      <ele-Delete />
-                    </el-icon>
-                  </el-tooltip>
-                </template>
-              </el-table-column>
-            </el-table>
-          </el-main>
-        </el-container>
-      </el-card>
-      <DeptDialog ref="deptDialogRef" @refresh="formSubmit" />
+                      <el-icon
+                        class="mr10"
+                        color="blue"
+                        v-auth="'system:dept:delete'"
+                        @click="onCURD({ type: curdEnum.DELETE, ids: scope.row.deptId })"
+                      >
+                        <ele-Delete />
+                      </el-icon>
+                    </el-tooltip>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </el-main>
+          </el-container>
+        </el-card>
+        <DeptDialog ref="deptDialogRef" @refresh="formSubmit" />
+      </div>
     </div>
-  </div>
+  </SystemPage>
 </template>
 //ModuleName 系统部门
 <script setup lang="ts" name="systemDept">
+  import SystemPage from '/@/views/system/shared/SystemPage.vue';
   import { defineAsyncComponent, reactive, onMounted, ref } from 'vue';
   import { ElMessageBox, ElMessage } from 'element-plus';
   import { CURDEnum } from '/@/enums/CURDEnum';
@@ -132,8 +146,11 @@
   import FastSwitch from '/@/components/fast-switch/src/fast-switch.vue';
   import { DeptEntity, DeptState } from '/@/views/system/dept/type';
   import { NextLoading } from '/@/utils/loading';
+  const TableTool = defineAsyncComponent(() => import('/@/components/table-tool/index.vue'));
   const deptDialogRef = ref();
-  const DeptDialog = defineAsyncComponent(() => import('/@/views/system/dept/dialog.vue'));
+  const DeptDialog = defineAsyncComponent(
+    () => import('/@/views/system/dept/components/DepartmentDialog.vue')
+  );
   const baseApi = deptApi();
   const curdEnum = CURDEnum;
   const state = reactive<DeptState>({

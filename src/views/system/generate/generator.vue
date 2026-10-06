@@ -1,6 +1,6 @@
 <template>
   <el-dialog v-model="visible" title="生成代码" :close-on-click-modal="false" draggable>
-    <el-form ref="dataFormRef" :model="dataForm" :rules="dataRules" label-width="120px">
+    <el-form v-loading="loading" ref="dataFormRef" :model="dataForm" :rules="dataRules" label-width="120px">
       <el-row>
         <el-col :span="12">
           <el-form-item label="表名" prop="tableName">
@@ -79,10 +79,9 @@
           <el-form-item label="所属菜单" prop="menuId">
             <el-cascader
               :options="menuData"
-              :props="{ checkStrictly: true, value: 'id', label: 'name' }"
+              :props="{ checkStrictly: true, emitPath: false, value: 'id', label: 'name' }"
               placeholder="请选择菜单"
               clearable
-              @change="change"
               class="w100"
               v-model="dataForm.menuId"
             >
@@ -102,7 +101,7 @@
               clearable
             >
               <el-option
-                v-for="item in dataForm.fieldList"
+                v-for="item in dataForm.fieldList.filter(field => !field.primaryPk)"
                 :key="item.id"
                 :label="item.fieldName + ' | ' + item.fieldComment"
                 :value="item.attrName"
@@ -128,7 +127,7 @@
           </el-form-item>
         </el-col>
         <el-col :span="12">
-          <el-form-item label="布局排列" prop="type">
+          <el-form-item label="布局排列" prop="span">
             <el-radio-group v-model="dataForm.span">
               <el-radio :value="24">单列</el-radio>
               <el-radio :value="12">双列</el-radio>
@@ -141,20 +140,21 @@
         <el-col :span="12">
           <el-form-item label="生成方式" prop="generatorType">
             <el-radio-group v-model="dataForm.generatorType">
-              <el-radio :label="0">zip压缩包</el-radio>
-              <el-radio :label="1">自定义路径</el-radio>
+              <el-radio :value="0">zip压缩包</el-radio>
+              <el-radio :value="1">自定义路径</el-radio>
             </el-radio-group>
           </el-form-item>
         </el-col>
         <el-col :span="12">
           <el-form-item label="表单类型" prop="formLayout">
             <el-radio-group v-model="dataForm.formLayout" @change="formLayoutChange">
-              <el-radio :label="1">列表</el-radio>
-              <el-radio :label="2">
+              <el-radio :value="1">分页列表</el-radio>
+              <el-radio :value="2">
                 <el-tooltip placement="top" content="备注：需要有根节点‘id’和父节点‘parentId’字段">
-                  数结构
+                  树结构
                 </el-tooltip>
               </el-radio>
+              <el-radio :value="3">单页面表单</el-radio>
             </el-radio-group>
           </el-form-item>
         </el-col>
@@ -168,14 +168,15 @@
     </el-form>
     <template #footer>
       <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="submitHandle()">保存</el-button>
-      <el-button type="danger" @click="generatorHandle()">保存生成代码</el-button>
+      <el-button :disabled="loading || !ready" type="primary" @click="submitHandle()">保存</el-button>
+      <el-button :disabled="loading || !ready" type="danger" @click="generatorHandle()">保存生成代码</el-button>
     </template>
   </el-dialog>
 </template>
 
 <script setup lang="ts">
-  import { reactive, ref } from 'vue';
+  import { reactive, ref, nextTick } from 'vue';
+  import { normalizeConfig, normalizeMenus, recommendTreeFields } from './selection';
   import { ElMessageBox, ElMessage } from 'element-plus';
   import {
     useBaseClassListApi,
@@ -191,8 +192,11 @@
   const visible = ref(false);
   const dataFormRef = ref();
   const baseClassList = ref<any[]>([]);
-  const menuData = ref<RouteItems[]>([]);
-  const dataForm = reactive({
+  const menuData = ref<any[]>([]);
+  const loading = ref(false);
+  const ready = ref(false);
+  let loadVersion = 0;
+  const defaults = () => ({
     id: '',
     baseclassId: '',
     generatorType: 0,
@@ -209,63 +213,45 @@
     tableComment: '',
     tableName: '',
     span: 24,
-    menuId: 0,
+    menuId: '0',
     parentId: '',
     tableLabel: '',
-    fieldList: [{ fieldName: 0, attrName: '', fieldComment: '', id: '' }],
+    fieldList: [] as any[],
   });
-  // 获取菜单
-  // 引入 api 请求接口
+  const dataForm = reactive(defaults());
   const baseApi = useMenuApi();
-  const getMenuData = () => {
-    baseApi.list({ level: 2 }).then((res) => {
-      menuData.value = res.data;
-    });
-  };
-  const change = (arr: number[]) => {
-    dataForm.menuId = arr[arr.length - 1];
-  };
   const formLayoutChange = () => {
-    dataForm.parentId = '';
-  };
-  const init = (id: number) => {
-    visible.value = true;
-    dataForm.id = '';
-    getMenuData();
-    // 重置表单数据
-    if (dataFormRef.value) {
-      dataFormRef.value.resetFields();
+    if (dataForm.formLayout === 2) {
+      Object.assign(dataForm, recommendTreeFields(dataForm));
     }
-
-    getBaseClassList();
-    getTable(id);
-    NextLoading.close();
+    nextTick(() => dataFormRef.value?.clearValidate());
   };
-
-  const getBaseClassList = () => {
-    useBaseClassListApi()
-      .then((res) => {
-        baseClassList.value = res.data;
-      })
-      .catch(async (err) => {
-        ElMessage.warning(err);
-      })
-      .finally(() => {
-        NextLoading.close();
-      });
-  };
-
-  const getTable = (id: number) => {
-    useTableApi(id)
-      .then((res) => {
-        Object.assign(dataForm, res.data);
-      })
-      .catch(async (err) => {
-        ElMessage.warning(err);
-      })
-      .finally(() => {
-        NextLoading.close();
-      });
+  const init = async (id: number) => {
+    const version = ++loadVersion;
+    visible.value = true;
+    loading.value = true;
+    ready.value = false;
+    Object.assign(dataForm, defaults());
+    menuData.value = [];
+    baseClassList.value = [];
+    try {
+      const [table, menus, bases] = await Promise.all([
+        useTableApi(id), baseApi.list({ level: 0 }), useBaseClassListApi(),
+      ]);
+      if (version !== loadVersion) return;
+      menuData.value = normalizeMenus(menus.data);
+      baseClassList.value = (bases.data || []).map((item: any) => ({ ...item, id: String(item.id) }));
+      Object.assign(dataForm, normalizeConfig(table.data));
+      if (dataForm.formLayout === 2) Object.assign(dataForm, recommendTreeFields(dataForm));
+      ready.value = true;
+      await nextTick();
+      dataFormRef.value?.clearValidate();
+    } catch (err) {
+      if (version === loadVersion) ElMessage.warning('生成配置加载失败，请重新打开');
+    } finally {
+      if (version === loadVersion) loading.value = false;
+      NextLoading.close();
+    }
   };
 
   const dataRules = ref({
@@ -278,12 +264,20 @@
     functionName: [{ required: true, message: '必填项不能为空', trigger: 'blur' }],
     generatorType: [{ required: true, message: '必填项不能为空', trigger: 'blur' }],
     formLayout: [{ required: true, message: '必填项不能为空', trigger: 'blur' }],
-    backendPath: [{ required: true, message: '必填项不能为空', trigger: 'blur' }],
-    frontendPath: [{ required: true, message: '必填项不能为空', trigger: 'blur' }],
+    menuId: [{ validator: (_: any, value: string, done: any) => {
+      const contains = (items: any[]): boolean => items.some(item => item.id === value || contains(item.children || []));
+      done(contains(menuData.value) ? undefined : new Error('原菜单已不可用，请重新选择所属菜单'));
+    }, trigger: 'change' }],
+    span: [{ required: true, message: '请选择布局排列', trigger: 'change' }],
+    parentId: [{ validator: (_: any, value: string, done: any) => done(dataForm.formLayout === 2 && !dataForm.fieldList.some(f => f.attrName === value && !f.primaryPk) ? new Error('请选择有效的父级节点字段') : undefined), trigger: 'change' }],
+    tableLabel: [{ validator: (_: any, value: string, done: any) => done(dataForm.formLayout === 2 && !dataForm.fieldList.some(f => f.attrName === value) ? new Error('请选择节点名称字段') : undefined), trigger: 'change' }],
+    backendPath: [{ validator: (_: any, value: string, done: any) => done(dataForm.generatorType === 1 && !value?.trim() ? new Error('请输入后端生成路径') : undefined), trigger: 'blur' }],
+    frontendPath: [{ validator: (_: any, value: string, done: any) => done(dataForm.generatorType === 1 && !value?.trim() ? new Error('请输入前端生成路径') : undefined), trigger: 'blur' }],
   });
 
   // 保存
   const submitHandle = () => {
+    if (loading.value || !ready.value) return;
     dataFormRef.value.validate((valid: boolean) => {
       if (!valid) {
         return false;
@@ -311,6 +305,7 @@
 
   // 生成代码
   const generatorHandle = () => {
+    if (loading.value || !ready.value) return;
     dataFormRef.value.validate(async (valid: boolean) => {
       if (!valid) {
         return false;

@@ -1,0 +1,168 @@
+// Console effects stay within this workspace; no timers or global animation hooks.
+@keyframes mms-console-enter {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes mms-console-grow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+@keyframes mms-console-column {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+.console-shell {
+  --console-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  .console-hero {
+    animation: mms-console-enter 420ms var(--console-ease) both;
+  }
+  .metric-card,
+  .panel,
+  .base-dashboard .home-card-item {
+    animation: mms-console-enter 480ms var(--console-ease) both;
+    transition:
+      box-shadow 220ms ease,
+      border-color 220ms ease;
+  }
+  .metric-grid > :nth-child(2) {
+    animation-delay: 45ms;
+  }
+  .metric-grid > :nth-child(3) {
+    animation-delay: 90ms;
+  }
+  .metric-grid > :nth-child(4) {
+    animation-delay: 135ms;
+  }
+  .panel-grid > :nth-child(2) {
+    animation-delay: 80ms;
+  }
+  .task-card {
+    animation: mms-console-enter 420ms var(--console-ease) both;
+  }
+  .task-card:nth-of-type(2) {
+    animation-delay: 60ms;
+  }
+  .task-card,
+  .approval-row,
+  .activity-row,
+  .schedule-copy,
+  tbody tr {
+    transition:
+      background-color 180ms ease,
+      box-shadow 180ms ease,
+      border-color 180ms ease;
+  }
+  .metric-icon,
+  .art-card {
+    transition:
+      transform 260ms var(--console-ease),
+      box-shadow 260ms ease;
+  }
+  .progress-track > i {
+    transform-origin: left center;
+    animation: mms-console-grow 650ms var(--console-ease) both;
+    transition: width 350ms var(--console-ease);
+  }
+  .chart-column > i {
+    transform-origin: center bottom;
+    animation: mms-console-column 650ms var(--console-ease) both;
+    transition:
+      height 350ms var(--console-ease),
+      opacity 180ms ease;
+  }
+  @for $i from 1 through 7 {
+    .chart-column:nth-child(#{$i}) > i {
+      animation-delay: #{$i * 35}ms;
+    }
+  }
+  .scene-switch button {
+    transition:
+      background-color 180ms ease,
+      color 180ms ease,
+      box-shadow 180ms ease;
+  }
+  .scene-switch button:active {
+    transform: translateY(1px);
+  }
+  .quick-menu-item {
+    font: inherit;
+    border: 0;
+    background: transparent;
+    color: inherit;
+  }
+  .quick-menu-item:focus-visible,
+  .home-notice-sticky:focus-visible {
+    outline: 2px solid var(--scene-accent);
+    outline-offset: 3px;
+    border-radius: 8px;
+  }
+  .panel:focus-within {
+    border-color: var(--scene-accent);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .metric-card:hover,
+    .panel:hover,
+    .base-dashboard .home-card-item:hover {
+      border-color: var(--scene-accent);
+      box-shadow: 0 8px 24px rgb(28 45 76 / 8%);
+    }
+    .metric-card:hover .metric-icon {
+      transform: translateY(-2px) rotate(-6deg);
+    }
+    .console-hero:hover .art-card {
+      transform: rotate(-4deg) translateY(-4px);
+    }
+    .scene-switch button:not(.is-selected):hover {
+      background: var(--el-fill-color-light);
+      color: var(--scene-accent);
+    }
+    .task-card:hover {
+      border-color: var(--scene-accent);
+      box-shadow: 0 4px 12px rgb(28 45 76 / 7%);
+    }
+    .approval-row:hover,
+    .activity-row:hover,
+    tbody tr:hover {
+      background: var(--el-fill-color-light);
+    }
+    .schedule-copy:hover {
+      border-color: var(--scene-accent);
+      background: var(--el-fill-color-light);
+    }
+    .chart-column:hover > i {
+      opacity: 1;
+    }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .console-shell {
+    *,
+    *::before,
+    *::after {
+      animation: none !important;
+      transition: none !important;
+      scroll-behavior: auto !important;
+    }
+    .scene-switch button:active,
+    .metric-card:hover .metric-icon {
+      transform: none;
+    }
+    .console-hero:hover .art-card {
+      transform: rotate(-8deg);
+    }
+  }
+}

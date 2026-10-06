@@ -1,619 +1,327 @@
 <template>
-  <div class="login-container flex">
-    <div class="login-left">
-      <div class="login-left-img">
-        <Animate class="flex flex-center">
-          <img :src="loginIllustrationSrc" alt="loginMain" />
-        </Animate>
-      </div>
-    </div>
-    <div class="login-right flex">
-      <div class="login-right-warp flex-margin">
-        <div class="login-right-warp-mian">
-          <div class="login-right-warp-main-title flex login-right-brand-mobile">
-            <Animate>
-              <img :src="getThemeConfig.logo" alt="logo" />
-            </Animate>
-            <Animate>
-              <span class="ml10 shou">{{ getThemeConfig.globalTitle }}</span>
-            </Animate>
-          </div>
-          <div class="login-right-warp-main-form" v-if="getThemeConfig.loginType.length>0" >
-            <!-- 显示当前选中的登录表单 -->
-            <component :is="currentLoginFormComponent"
-                      :captchaState="getThemeConfig.captchaState"
-                      :demoMode="getThemeConfig.demoMode"
-                      :demoAccount="getThemeConfig.demoAccount"
-                      :demoPassword="getThemeConfig.demoPassword"
-                      class="login-form-component"/>
-
-            <div class="other-login">
-              <div class="other-login-title">其他登录方式</div>
-              <div class="other-login-content flex">
-                <!-- 渲染非当前选中的其他两种登录方式 -->
-                <div v-for="loginMethod in availableLoginMethods.filter(method => method.key !== state.currentLoginMethod && getThemeConfig.loginType.includes(method.key))"
-                     :key="loginMethod.key"
-                     class="other-login-content-item w-50"
-                     @click="switchLoginMethod(loginMethod.key)">
-                  <div class="other-login-content-item-icon">
-                    <i :class="loginMethod.icon"></i>
-                  </div>
-                  <div class="mt20 other-login-content-item-title">{{ loginMethod.title }}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="error mx-auto mt-20" v-else>
-            <el-empty :description="state.msg" />
-          </div>
+  <main class="login-page" :class="{ 'has-brand-background': config.loginBg && !backgroundFailed }">
+    <img
+      v-if="config.loginBg && !backgroundFailed"
+      class="brand-background"
+      :src="config.loginBg"
+      alt=""
+      aria-hidden="true"
+      @error="backgroundFailed = true"
+    />
+    <section class="login-panel" aria-label="登录">
+      <div class="login-card">
+        <div class="card-brand">
+          <img :src="displayLogo" :alt="config.globalTitle" @error="logoFailed = true" />
+        </div>
+        <h1>{{ config.globalTitle }}</h1>
+        <p class="card-subtitle" :title="config.globalDescription">
+          {{ config.globalDescription }}
+        </p>
+        <nav v-if="enabledMethods.length > 1" class="login-tabs" aria-label="登录方式">
+          <button
+            v-for="method in enabledMethods"
+            :key="method.key"
+            type="button"
+            :aria-pressed="current === method.key"
+            :class="{ active: current === method.key }"
+            @click="current = method.key"
+          >
+            {{ method.title }}
+          </button>
+        </nav>
+        <div v-if="loading" class="loading-state" role="status">正在连接服务…</div>
+        <div v-else-if="error || !enabledMethods.length" class="error-state" role="alert">
+          <p>{{ error || '当前未开放登录方式，请联系管理员。' }}</p>
+          <el-button @click="loadConfig">重新连接</el-button>
+        </div>
+        <component
+          v-else
+          :is="activeComponent"
+          :key="current"
+          :captchaState="config.captchaState"
+          :demoMode="config.demoMode"
+          :demoAccount="config.demoAccount"
+          :demoPassword="config.demoPassword"
+        />
+        <div class="login-security">
+          <el-icon><ele-Lock /></el-icon>
+          <span>请使用本人账号登录，勿向他人提供验证码</span>
         </div>
       </div>
-    </div>
-  </div>
+      <footer>登录遇到问题？请联系管理员</footer>
+    </section>
+  </main>
 </template>
-
 <script setup lang="ts" name="loginIndex">
-  import { defineAsyncComponent, onMounted, reactive, computed } from 'vue';
-  import { storeToRefs } from 'pinia';
-  import { useThemeConfig } from '/@/stores/themeConfig';
-  import { NextLoading } from '/@/utils/loading';
-  import logoMini from '/@/assets/image.svg';
-  import loginBgFallback from '/@/assets/loginbg.png';
+  import { ref, reactive, computed, onMounted, defineAsyncComponent } from 'vue';
   import { startBase } from '/@/views/system/init';
-
-  // 引入组件
-  const Animate = defineAsyncComponent(() => import('/@/components/animate/index.vue'));
-  // 账号登录
-  const Account = defineAsyncComponent(() => import('/@/views/system/login/component/account.vue'));
-  const Mobile = defineAsyncComponent(() => import('/@/views/system/login/component/mobile.vue'));
-  const Scan = defineAsyncComponent(() => import('/@/views/system/login/component/scan.vue'));
-
-  // 定义变量内容
-
-const storesThemeConfig = useThemeConfig();
-const { themeConfig } = storeToRefs(storesThemeConfig);
-const state = reactive({
-  tabsActiveName: "account",
-  isScan: false,
-  msg:"~ 后端接口异常！",
-  currentLoginMethod: "1" // 当前选中的登录方式，默认为账号密码登录
-});
-
-// 定义所有可能的登录方式
-const availableLoginMethods = [
-  { key: "1", value: "account", title: "账号密码登录", icon: "fa fa-user", component: Account },
-  { key: "2", value: "mobile", title: "手机验证码登录", icon: "fa fa-mobile", component: Mobile },
-  { key: "3", value: "scan", title: "微信二维码登录", icon: "fa fa-qrcode", component: Scan }
-];
-
-// 获取当前登录表单组件
-const currentLoginFormComponent = computed(() => {
-  // 根据数值匹配登录方式
-  const currentMethod = availableLoginMethods.find(method => method.key === state.currentLoginMethod);
-  if (!currentMethod) return null;
-
-  // 返回对应的组件
-  switch(currentMethod.value) {
-    case 'account':
-      return Account;
-    case 'mobile':
-      return Mobile;
-    case 'scan':
-      return Scan;
-    default:
-      return Account;
-  }
-});
-
-// 切换登录方式
-const switchLoginMethod = (method: string) => {
-  state.currentLoginMethod = method;
-};
-
-// 获取布局配置信息
-const getThemeConfig = reactive({
-  globalTitle: themeConfig.value.globalTitle,
-  globalDescription: themeConfig.value.globalViceTitleMsg,
-  logo: logoMini,
-  loginType: [] as Array<string>,
-  loginBg: '' as string,
-  captchaState: false,
-  codeUrl: '',
-  demoMode: false,
-  demoAccount: '',
-  demoPassword: ''
-});
-
-  const loginIllustrationSrc = computed(() => {
-    const u = getThemeConfig.loginBg;
-    if (u != null && String(u).trim().length > 0) return u;
-    return loginBgFallback;
+  import { NextLoading } from '/@/utils/loading';
+  import logo from '/@/assets/image.svg';
+  import { fallbackBrand, normalizeBrand } from './branding';
+  const logoFailed = ref(false),
+    backgroundFailed = ref(false);
+  const displayLogo = computed(() => (logoFailed.value ? logo : config.logo));
+  const methods = [
+    {
+      key: '1',
+      title: '账号密码',
+      component: defineAsyncComponent(() => import('./component/account.vue')),
+    },
+    {
+      key: '2',
+      title: '手机验证码',
+      component: defineAsyncComponent(() => import('./component/mobile.vue')),
+    },
+    {
+      key: '3',
+      title: '微信扫码',
+      component: defineAsyncComponent(() => import('./component/scan.vue')),
+    },
+  ];
+  const current = ref('1'),
+    loading = ref(true),
+    error = ref('');
+  const config = reactive({
+    ...fallbackBrand,
+    logo,
+    loginType: [] as string[],
+    captchaState: true,
+    demoMode: false,
+    demoAccount: '',
+    demoPassword: '',
   });
-
-  const baseStart = () => {
-    startBase()
-      .then((res) => {
-        if (res.code == 200) {
-          const d = res.data as {
-            globalTitle?: string;
-            globalDescription?: string;
-            logo?: string;
-            loginType?: string[];
-            captchaState?: boolean;
-            demoMode?: boolean;
-            demoAccount?: string;
-            demoPassword?: string;
-            loginBg?: string;
-            codeUrl?: string;
-          };
-          getThemeConfig.globalTitle = d.globalTitle ?? '';
-          getThemeConfig.globalDescription = d.globalDescription ?? '';
-          getThemeConfig.logo = d.logo ?? getThemeConfig.logo;
-          getThemeConfig.loginType = d.loginType ?? [];
-          getThemeConfig.captchaState = d.captchaState ?? false;
-          getThemeConfig.demoMode = d.demoMode ?? false;
-          getThemeConfig.demoAccount = d.demoAccount ?? '';
-          getThemeConfig.demoPassword = d.demoPassword ?? '';
-          if (Object.prototype.hasOwnProperty.call(d, 'loginBg')) {
-            getThemeConfig.loginBg = d.loginBg != null && d.loginBg.length > 0 ? d.loginBg : '';
-          }
-          if (d.codeUrl != null && d.codeUrl.length > 0) {
-            getThemeConfig.codeUrl = d.codeUrl;
-          }
-        }
-      })
-      .catch((err) => {
-        state.msg = '后端接口异常: ' + err;
-      });
-  };
-
-  const changeTab = (e: string) => {
-    if (e === 'code') {
-      state.isScan = true;
-    } else {
-      state.isScan = false;
+  const enabledMethods = computed(() => methods.filter((m) => config.loginType.includes(m.key)));
+  const activeComponent = computed(
+    () => enabledMethods.value.find((m) => m.key === current.value)?.component
+  );
+  async function loadConfig() {
+    loading.value = true;
+    error.value = '';
+    try {
+      const res = await startBase();
+      if (res.code !== 200 || !res.data) throw new Error();
+      const d = res.data;
+      Object.assign(config, normalizeBrand(d, logo));
+      logoFailed.value = false;
+      backgroundFailed.value = false;
+      config.loginType = Array.isArray(d.loginType) ? d.loginType.map(String) : [];
+      config.captchaState = d.captchaState !== false;
+      config.demoMode = d.demoMode === true;
+      config.demoAccount = typeof d.demoAccount === 'string' ? d.demoAccount : '';
+      config.demoPassword = typeof d.demoPassword === 'string' ? d.demoPassword : '';
+      if (!config.loginType.includes(current.value))
+        current.value = enabledMethods.value[0]?.key || '';
+    } catch {
+      Object.assign(config, fallbackBrand, { logo });
+      error.value = '暂时无法连接登录服务，请稍后重试。';
+    } finally {
+      loading.value = false;
     }
-  };
-  // 页面加载时
+  }
   onMounted(() => {
-    baseStart();
+    loadConfig();
     NextLoading.done();
   });
 </script>
-
 <style scoped lang="scss">
-.login-container {
-  height: 100%;
-  background: url("https://sxpcwlkj-test.oss-accelerate.aliyuncs.com/mmsMall/upload/696495e4f176d6c9a798a18c.png") no-repeat;
-  background-size: 100% 100%;
-  box-shadow: 20px 20px 39px #DEE1FF;
-  justify-content: flex-end;
-  position: relative;
-  .login-left {
-    flex: 1;
+  .login-page {
     position: relative;
-    .login-left-brand {
-      position: absolute;
-      z-index: 2;
-      left: 50%;
-      bottom: 8%;
-      transform: translateX(-50%);
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: center;
-      animation: logoAnimation 0.3s ease;
-      animation-delay: 0.15s;
-      img {
-        width: 52px;
-        height: 52px;
-        object-fit: contain;
-      }
-      .ml10 {
-        font-size: 27px;
-        letter-spacing: 3px;
-        color: #4487EC;
-        text-shadow: 0 0 12px rgba(255, 255, 255, 0.85);
-      }
-    }
-    .login-left-img {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
-      height: 100%;
-      > :deep(div) {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        max-width: 100%;
-        max-height: 100%;
-      }
-      img {
-        display: block;
-        width: auto;
-        max-width: 50%;
-        max-height: min(90vh, 100%);
-        height: auto;
-        object-fit: contain;
-        animation: error-num 0.6s ease;
-      }
-    }
-    .login-left-waves {
-      position: absolute;
-      top: 0;
-      right: -100px;
-    }
+    isolation: isolate;
+    min-height: 100vh;
+    min-height: 100dvh;
+    background: #f6f9fd url('/login-background.svg') center / cover no-repeat;
+    color: #24334c;
+    overflow: auto;
   }
-  .login-right {
-    width: 900px;
+  .brand-background {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    z-index: -1;
+    pointer-events: none;
+  }
+  .has-brand-background::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: #f6f9fd99;
+    z-index: -1;
+  }
+  .login-panel {
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    box-sizing: border-box;
+  }
+  .login-card {
+    width: 100%;
+    max-width: 420px;
+    padding: 36px 40px 28px;
+    box-sizing: border-box;
+    background: #ffffffed;
+    border: 1px solid #fff;
+    border-radius: 20px;
+    box-shadow:
+      0 16px 60px #27476c0c,
+      0 2px 8px #27476c04;
+    animation: card-enter 0.4s ease-out;
+  }
+  .card-brand {
     display: flex;
     justify-content: center;
-    align-items: center;
-    padding: 20px 0;
-    .login-right-warp {
-      border-radius: 16px;
-      width: 550px;
-      height: auto;
-      max-height: calc(100vh - 40px);
-      position: relative;
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      // background-color: var(--el-color-white);
-      background-color: rgba(255, 255, 255, 0.5);
-      .login-right-warp-mian {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-        max-height: calc(100vh - 40px);
-        overflow-y: auto;
-        .login-right-warp-main-title.login-right-brand-mobile {
-          display: none;
-          align-items: center;
-          justify-content: center;
-          width: 100%;
-          box-sizing: border-box;
-          font-size: 27px;
-          letter-spacing: 3px;
-          animation: logoAnimation 0.3s ease;
-          animation-delay: 0.3s;
-          color: #4487EC;
-          padding-top: 40px;
-          img {
-            width: 60px;
-            height: 60px;
-          }
-        }
-        .login-right-warp-main-form {
-          flex: 1;
-          padding: 10px 80px 50px;
-          .login-content-main-sacn {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 50px;
-            height: 50px;
-            overflow: hidden;
-            cursor: pointer;
-            transition: all ease 0.3s;
-            color: var(--el-color-primary);
-            &-delta {
-              position: absolute;
-              top: 0;
-              right: 0;
-              width: 50px;
-              height: 50px;
-              overflow: hidden;
-              cursor: pointer;
-              transition: all ease 0.3s;
-              color: var(--el-color-primary);
-              &-delta {
-                position: absolute;
-                width: 35px;
-                height: 70px;
-                z-index: 2;
-                top: 2px;
-                right: 21px;
-                background: var(--el-color-white);
-                transform: rotate(-45deg);
-              }
-              &:hover {
-                opacity: 1;
-                transition: all ease 0.3s;
-                color: var(--el-color-primary) !important;
-              }
-              i {
-                width: 47px;
-                height: 50px;
-                display: inline-block;
-                font-size: 48px;
-                position: absolute;
-                right: 1px;
-                top: 0px;
-              }
-            }
-          }
-        }
-      }
-    }
-    .other-login{
-      .other-login-title{
-        text-align: center;
-        margin: 50px 0 30px;
-      }
-      .other-login-content{
-        .other-login-content-item {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          transition: all 0.3s ease;
-
-          &:hover {
-            transform: translateY(-5px);
-          }
-
-          .other-login-content-item-icon{
-            padding: 10px 50px;
-            border-radius: 20px;
-            background-color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-
-            &:hover {
-              background-color: #f0f9ff;
-              border-color: #409eff;
-            }
-          }
-          .other-login-content-item-title{
-            font-size: 14px;
-            color: #838383;
-            transition: all 0.3s ease;
-
-            &:hover {
-              color: #409eff;
-            }
-          }
-        }
-      }
-    }
+    margin-bottom: 16px;
   }
-  .login-msg {
-    color: var(--el-text-color-placeholder);
+  .card-brand img {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
   }
-  .error{
-    font-size: 20px;
+  h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+    line-height: 1.5;
+    text-align: center;
+    overflow-wrap: anywhere;
   }
-  .fa{
-    font-size: 30px;
-    margin-right: 10px;
+  .card-subtitle {
+    margin: 10px 0 30px;
+    color: #8b96a7;
+    font-size: 12px;
+    line-height: 1.7;
+    text-align: center;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    overflow-wrap: anywhere;
   }
-
-  .login-form-component {
-    min-height: 300px;
-    height: auto;
+  .login-tabs {
+    display: flex;
+    gap: 6px;
+    border-bottom: 1px solid #edf1f6;
+    margin-bottom: 24px;
   }
-
-  // 响应式适配 - 大屏幕 (1920px+)
-  @media screen and (min-width: 1920px) {
-    .login-right {
-      width: 1000px;
-      .login-right-warp {
-        width: 650px;
-        .login-right-warp-mian {
-          .login-right-warp-main-form {
-            padding: 10px 100px 60px;
-          }
-        }
-      }
-    }
+  .login-tabs button {
+    flex: 1;
+    padding: 12px 0;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    font: inherit;
+    font-size: 12px;
+    color: #8b96a7;
+    cursor: pointer;
+    transition: color 0.2s;
   }
-
-  // 响应式适配 - 中等屏幕 (1366px - 1600px)
-  @media screen and (max-width: 1600px) {
-    .login-right {
-      width: 700px;
-      .login-right-warp {
-        width: 480px;
-        .login-right-warp-mian {
-          .login-right-warp-main-form {
-            padding: 10px 60px 40px;
-          }
-        }
-      }
-    }
-    .login-left {
-      .login-left-img {
-        img {
-          max-width: 55%;
-        }
-      }
-    }
+  .login-tabs button:hover,
+  .login-tabs button.active {
+    color: #1688ed;
   }
-
-  // 响应式适配 - 小屏幕 (1024px - 1366px)
-  @media screen and (max-width: 1366px) {
-    .login-right {
-      width: 600px;
-      .login-right-warp {
-        width: 420px;
-        .login-right-warp-mian {
-          .login-right-warp-main-form {
-            padding: 10px 50px 35px;
-          }
-        }
-      }
-    }
-    .other-login {
-      .other-login-title {
-        margin: 30px 0 20px;
-      }
-      .other-login-content {
-        .other-login-content-item {
-          .other-login-content-item-icon {
-            padding: 8px 40px;
-          }
-        }
-      }
-    }
+  .login-tabs button.active {
+    border-bottom-color: #1688ed;
+    font-weight: 600;
   }
-
-  // 响应式适配 - 平板横屏 (768px - 1024px)
-  @media screen and (max-width: 1200px) {
+  .login-tabs button:focus-visible {
+    outline: 2px solid #1688ed;
+    outline-offset: 2px;
+  }
+  .login-security {
+    display: flex;
     justify-content: center;
-    .login-left {
-      display: none;
+    align-items: flex-start;
+    gap: 6px;
+    margin-top: 24px;
+    font-size: 11px;
+    color: #9aa5b5;
+    line-height: 1.6;
+  }
+  .login-security .el-icon {
+    margin-top: 3px;
+    flex-shrink: 0;
+  }
+  .login-panel footer {
+    margin-top: 24px;
+    font-size: 12px;
+    color: #9aa5b5;
+    text-align: center;
+  }
+  .loading-state,
+  .error-state {
+    padding: 30px 0;
+    text-align: center;
+    font-size: 13px;
+    color: #687b96;
+  }
+  .error-state p {
+    margin-bottom: 18px;
+  }
+  :deep(.login-content-form) {
+    margin-top: 0;
+  }
+  :deep(.login-content-title) {
+    color: #637087 !important;
+    font-size: 13px;
+    margin-bottom: 8px;
+    width: 100%;
+  }
+  :deep(.el-input__wrapper) {
+    min-height: 44px;
+    background: #fbfcfe;
+    border-radius: 8px;
+  }
+  :deep(.login-content-submit) {
+    height: 46px;
+    border-radius: 8px;
+    letter-spacing: 2px !important;
+    background: #1688ed;
+    border-color: #1688ed;
+    transition:
+      background 0.2s,
+      box-shadow 0.2s;
+  }
+  :deep(.login-content-submit:hover) {
+    background: #0879dd;
+    box-shadow: 0 5px 14px #1688ed26;
+  }
+  :deep(.el-form-item) {
+    margin-bottom: 22px;
+  }
+  @keyframes card-enter {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
     }
-    .login-right-warp-main-title.login-right-brand-mobile {
-      display: flex !important;
-    }
-    .login-right {
-      width: 100%;
-      max-width: 500px;
-      padding: 15px;
-      .login-right-warp {
-        width: 90%;
-        max-width: 450px;
-        max-height: calc(100vh - 30px);
-        .login-right-warp-mian {
-          max-height: calc(100vh - 30px);
-          .login-right-warp-main-title.login-right-brand-mobile {
-            font-size: 20px;
-            padding: 40px 40px 15px;
-            img {
-              width: 40px;
-              height: 40px;
-            }
-          }
-          .login-right-warp-main-form {
-            padding: 0 40px 30px;
-          }
-        }
-      }
-    }
-    .other-login {
-      .other-login-title {
-        margin: 25px 0 15px;
-        font-size: 14px;
-      }
-      .other-login-content {
-        .other-login-content-item {
-          .other-login-content-item-icon {
-            padding: 6px 30px;
-          }
-          .other-login-content-item-title {
-            font-size: 12px;
-          }
-        }
-      }
-    }
-    .fa {
-      font-size: 24px;
+    to {
+      opacity: 1;
+      transform: translateY(0);
     }
   }
-
-  // 响应式适配 - 平板竖屏 (480px - 768px)
-  @media screen and (max-width: 768px) {
-    .login-right {
-      max-width: 420px;
-      padding: 10px;
-      .login-right-warp {
-        width: 95%;
-        max-height: calc(100vh - 20px);
-        .login-right-warp-mian {
-          max-height: calc(100vh - 20px);
-          .login-right-warp-main-title.login-right-brand-mobile {
-            font-size: 18px;
-            padding: 40px 30px 12px;
-            img {
-              width: 36px;
-              height: 36px;
-            }
-          }
-          .login-right-warp-main-form {
-            padding: 0 30px 25px;
-          }
-        }
-      }
+  @media (max-width: 480px) {
+    .login-panel {
+      padding: 28px 18px;
     }
-    .other-login {
-      .other-login-title {
-        margin: 20px 0 12px;
-      }
-      .other-login-content {
-        flex-wrap: wrap;
-        .other-login-content-item {
-          width: 100% !important;
-          margin-bottom: 15px;
-          .other-login-content-item-icon {
-            padding: 5px 25px;
-          }
-        }
-      }
+    .login-card {
+      padding: 30px 24px 24px;
+      border-radius: 16px;
     }
-    .fa {
-      font-size: 20px;
+    h1 {
+      font-size: 22px;
     }
   }
-
-  // 响应式适配 - 手机屏幕 (max-width: 480px)
-  @media screen and (max-width: 480px) {
-    .login-right {
-      padding: 10px;
-      .login-right-warp {
-        width: 100%;
-        border-radius: 12px;
-        max-height: calc(100vh - 20px);
-        .login-right-warp-mian {
-          max-height: calc(100vh - 20px);
-          .login-right-warp-main-title.login-right-brand-mobile {
-            font-size: 16px;
-            padding: 40px 20px 10px;
-            img {
-              width: 32px;
-              height: 32px;
-            }
-          }
-          .login-right-warp-main-form {
-            padding: 0 20px 20px;
-            overflow-y: auto;
-          }
-        }
-      }
+  @media (prefers-reduced-motion: reduce) {
+    .login-card {
+      animation: none;
     }
-    .other-login {
-      .other-login-title {
-        margin: 15px 0 10px;
-        font-size: 12px;
-      }
-      .other-login-content {
-        .other-login-content-item {
-          margin-bottom: 10px;
-          .other-login-content-item-icon {
-            padding: 4px 20px;
-            border-radius: 15px;
-          }
-          .other-login-content-item-title {
-            font-size: 11px;
-            margin-top: 8px;
-          }
-        }
-      }
-    }
-    .fa {
-      font-size: 18px;
-      margin-right: 5px;
-    }
-    .error {
-      font-size: 16px;
+    :deep(.login-content-submit),
+    .login-tabs button {
+      transition: none;
     }
   }
-}
 </style>

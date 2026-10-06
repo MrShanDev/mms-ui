@@ -7,6 +7,7 @@
         <el-button
           size="small"
           type="primary"
+          v-if="supportedActions.includes('insert')"
           @click="insert"
           :loading="state.loading.insert"
           v-auth="modelName + ':' + functionName + ':insert'"
@@ -18,6 +19,7 @@
         <el-button
           size="small"
           type="danger"
+          v-if="supportedActions.includes('delete')"
           @click="deletes"
           :loading="state.loading.delete"
           v-auth="modelName + ':' + functionName + ':delete'"
@@ -29,6 +31,7 @@
         <el-button
           size="small"
           type="success"
+          v-if="supportedActions.includes('import')"
           @click="openDialog"
           :loading="state.loading.import"
           v-auth="modelName + ':' + functionName + ':import'"
@@ -40,6 +43,7 @@
         <el-button
           size="small"
           type="warning"
+          v-if="supportedActions.includes('export')"
           @click="exportExcel"
           :loading="state.loading.export"
           v-auth="modelName + ':' + functionName + ':export'"
@@ -51,6 +55,7 @@
         <el-button
           size="small"
           type="info"
+          v-if="supportedActions.includes('print')"
           @click="print"
           :loading="state.loading.print"
           v-auth="modelName + ':' + functionName + ':print'"
@@ -64,7 +69,7 @@
     <el-dialog
       :title="state.dialog.title"
       v-model="state.dialog.isShowDialog"
-      width="450px"
+      width="min(450px, 94vw)"
       @close="closeDialog"
     >
       <el-upload
@@ -81,6 +86,15 @@
             <SvgIcon name="iconfont icon-daoru" />
             {{ $t('message.export.update') }}
           </el-button>
+          <p v-if="props.modelName === 'system' && props.functionName === 'user'">
+            仅新增账户，不覆盖已有用户；账户默认禁用且不分配角色，管理员重置密码、授权后再启用。
+          </p>
+          <p v-if="props.modelName === 'system' && props.functionName === 'notice'">
+            仅新增公告，默认禁用，审核后再启用。
+          </p>
+          <p v-if="props.modelName === 'system' && props.functionName === 'dept'">
+            部门编号必须唯一；父级编号须在系统或本次文件中存在。
+          </p>
           <div class="importMsg">{{ state.importMsg }}</div>
         </div>
 
@@ -97,7 +111,7 @@
   </div>
 </template>
 <script setup lang="ts">
-  import { ref, inject } from 'vue';
+  import { ref, inject, computed } from 'vue';
   import { NextLoading } from '/@/utils/loading';
   import {
     UploadProps,
@@ -131,6 +145,21 @@
     modelName: 'system',
     tableComment: '',
     param: () => {},
+  });
+
+  const supportedActions = computed(() => {
+    const capabilities: Record<string, string[]> = {
+      user: ['insert', 'delete', 'import', 'export', 'print'],
+      dept: ['import'],
+      role: ['insert', 'delete'],
+      dict: ['insert', 'delete'],
+      notice: ['insert', 'delete', 'import', 'export', 'print'],
+      config: ['insert', 'delete'],
+      sysLog: ['export', 'print'],
+    };
+    return props.modelName === 'system'
+      ? capabilities[props.functionName] || ['insert', 'delete', 'import', 'export', 'print']
+      : ['insert', 'delete', 'import', 'export', 'print'];
   });
 
   // emit 通信
@@ -170,6 +199,8 @@
   // 打开弹窗
   const openDialog = (type: string) => {
     state.loading.import = false;
+    state.dialog.title = `导入${props.tableComment}`;
+    state.importMsg = '';
     state.dialog.isShowDialog = true;
   };
   // 关闭弹窗
@@ -252,7 +283,10 @@
       state.loading.import = true;
       NextLoading.open();
       await importData(formData, props.modelName + '/' + props.functionName).then((res) => {
+        if (res.code !== 200) throw new Error(res.msg || '导入失败');
         state.importMsg = res.msg;
+        options.onSuccess(res);
+        emit('success', res);
         // 调用 el-form 内部的校验方法（可自动校验）
         formItemContext?.prop && formContext?.validateField([formItemContext.prop as string]);
 

@@ -1,130 +1,143 @@
 <template>
-  <div class="block">
-    <!-- Table  -->
-    <div class="system-sysLog-container layout-padding mt-15 p-t-0">
-      <el-card shadow="hover" class="layout-padding-auto">
-        <el-container>
-          <el-main>
-            <!-- Table -->
-            <el-table
-              :data="state.tableData.data"
-              v-loading="state.tableData.loading"
-              style="width: 100%"
-              @selection-change="handleSelectionChange"
-            >
-              <el-table-column
-                type="selection"
-                header-align="center"
-                align="center"
-                width="50"
-              ></el-table-column>
-              <!-- <el-table-column v-if="false" prop="operId" label="日志主键" header-align="center" align="center"></el-table-column> -->
-              <el-table-column
-                prop="module"
-                label="模块名称"
-                header-align="center"
-                align="center"
-              ></el-table-column>
-              <fast-table-column
-                prop="operType"
-                label="操作类型"
-                dict-type="operType"
-              ></fast-table-column>
-              <el-table-column
-                prop="description"
-                label="操作描述"
-                header-align="center"
-                align="center"
-              ></el-table-column>
-              <el-table-column
-                prop="requestMethod"
-                label="请求方法"
-                header-align="center"
-                align="center"
-              ></el-table-column>
-              <el-table-column
-                prop="operUrl"
-                label="请求URL"
-                header-align="center"
-                align="center"
-              ></el-table-column>
+  <SystemPage feature="sysLog">
+    <div class="block">
+      <!-- Table  -->
+      <div class="system-sysLog-container layout-padding mt-15 p-t-0">
+        <el-card shadow="never" class="layout-padding-auto">
+          <el-container>
+            <el-main>
+              <!-- Table -->
+              <el-table
+                :data="state.tableData.data"
+                v-loading="state.tableData.loading"
+                style="width: 100%"
+                @selection-change="handleSelectionChange"
+              >
+                <el-table-column
+                  type="selection"
+                  header-align="center"
+                  align="center"
+                  width="50"
+                ></el-table-column>
+                <!-- <el-table-column v-if="false" prop="operId" label="日志主键" header-align="center" align="center" min-width="180"></el-table-column> -->
+                <el-table-column
+                  prop="module"
+                  label="模块名称"
+                  header-align="center"
+                  align="center"
+                  min-width="180"
+                ></el-table-column>
+                <fast-table-column
+                  prop="operType"
+                  label="操作类型"
+                  dict-type="operType"
+                ></fast-table-column>
+                <el-table-column
+                  prop="description"
+                  label="操作描述"
+                  header-align="center"
+                  align="center"
+                  min-width="180"
+                ></el-table-column>
+                <el-table-column
+                  prop="requestMethod"
+                  label="请求方法"
+                  header-align="center"
+                  align="center"
+                  min-width="180"
+                ></el-table-column>
+                <el-table-column
+                  prop="operUrl"
+                  label="请求URL"
+                  header-align="center"
+                  align="center"
+                  min-width="180"
+                ></el-table-column>
 
-              <el-table-column
-                prop="userName"
-                label="操作人员账号"
-                header-align="center"
-                align="center"
-              ></el-table-column>
-              <el-table-column
-                prop="userRoles"
-                label="操作人员角色"
-                header-align="center"
-                align="center"
-              ></el-table-column>
-              <el-table-column
-                prop="operIp"
-                label="主机地址"
-                header-align="center"
-                align="center"
-              ></el-table-column>
-              <el-table-column
-                prop="operLocation"
-                label="操作地点"
-                header-align="center"
-                align="center"
-              ></el-table-column>
-              <el-table-column
-                prop="operTime"
-                label="操作时间"
-                header-align="center"
-                align="center"
-              ></el-table-column>
-              <el-table-column
-                prop="os"
-                label="操作系统"
-                header-align="center"
-                align="center"
-              ></el-table-column>
-              <el-table-column fixed="right" label="操作" width=" 100 ">
-                <template #default="scope">
-                  <el-tooltip placement="top" :content="$t('message.form.edit')">
-                    <el-icon
-                      class="mr10"
-                      color="blue"
-                      v-auths="['system:sysLog:query', 'system:sysLog:edit']"
-                      @click="onCURD({ type: curdEnum.EDIT, ids: scope.row.operId })"
-                    >
-                      <ele-Edit />
-                    </el-icon>
-                  </el-tooltip>
-                </template>
-              </el-table-column>
-            </el-table>
-          </el-main>
-          <el-footer>
-            <!-- 分页 -->
-            <el-pagination
-              @size-change="onHandleSizeChange"
-              @current-change="onHandleCurrentChange"
-              class="mt15"
-              :pager-count="5"
-              :page-sizes="[10, 20, 30, 50, 100, 500, 1000]"
-              v-model:current-page="state.tableData.param.pageNum"
-              background
-              size="default"
-              v-model:page-size="state.tableData.param.pageSize"
-              layout="total, sizes, prev, pager, next, jumper"
-              :total="state.tableData.total"
-            ></el-pagination>
-          </el-footer>
-        </el-container>
-      </el-card>
-      <SysLogDialog ref="sysLogDialogRef" @refresh="formSubmit" />
+                <el-table-column
+                  prop="userName"
+                  label="操作人员账号"
+                  header-align="center"
+                  align="center"
+                  min-width="180"
+                ></el-table-column>
+                <el-table-column
+                  prop="userRoles"
+                  label="操作人员角色"
+                  header-align="center"
+                  align="center"
+                  min-width="180"
+                ></el-table-column>
+                <el-table-column
+                  prop="operIp"
+                  label="主机地址"
+                  header-align="center"
+                  align="center"
+                  min-width="180"
+                ></el-table-column>
+                <el-table-column
+                  prop="operLocation"
+                  label="操作地点"
+                  header-align="center"
+                  align="center"
+                  min-width="180"
+                ></el-table-column>
+                <el-table-column
+                  prop="operTime"
+                  label="操作时间"
+                  header-align="center"
+                  align="center"
+                  min-width="180"
+                ></el-table-column>
+                <el-table-column
+                  prop="os"
+                  label="操作系统"
+                  header-align="center"
+                  align="center"
+                  min-width="180"
+                ></el-table-column>
+                <el-table-column fixed="right" label="操作" width=" 100 ">
+                  <template #default="scope">
+                    <el-tooltip placement="top" :content="$t('message.form.edit')">
+                      <el-icon
+                        class="mr10"
+                        color="blue"
+                        v-auth="'system:sysLog:query'"
+                        @click="onCURD({ type: curdEnum.EDIT, ids: scope.row.operId })"
+                      >
+                        <ele-View />
+                      </el-icon>
+                    </el-tooltip>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </el-main>
+            <el-footer>
+              <!-- 分页 -->
+              <el-pagination
+                @size-change="onHandleSizeChange"
+                @current-change="onHandleCurrentChange"
+                class="mt15"
+                :pager-count="5"
+                :page-sizes="[10, 20, 30, 50, 100, 500, 1000]"
+                v-model:current-page="state.tableData.param.pageNum"
+                background
+                size="default"
+                v-model:page-size="state.tableData.param.pageSize"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="state.tableData.total"
+              ></el-pagination>
+            </el-footer>
+          </el-container>
+        </el-card>
+        <SysLogDialog ref="sysLogDialogRef" @refresh="formSubmit" />
+      </div>
     </div>
-  </div>
+  </SystemPage>
 </template>
 //ModuleName 操作日志记录表
 <script setup lang="ts" name="systemSysLog">
+  import SystemPage from '/@/views/system/shared/SystemPage.vue';
   import { defineAsyncComponent, onMounted, reactive, ref } from 'vue';
   import { ElMessage, ElMessageBox } from 'element-plus';
   import { CURDEnum } from '/@/enums/CURDEnum';
@@ -136,7 +149,9 @@
   const baseApi = sysLogApi();
 
   const sysLogDialogRef = ref();
-  const SysLogDialog = defineAsyncComponent(() => import('/@/views/system/sysLog/dialog.vue'));
+  const SysLogDialog = defineAsyncComponent(
+    () => import('/@/views/system/sysLog/components/OperationLogDialog.vue')
+  );
   const TableTool = defineAsyncComponent(() => import('/@/components/table-tool/index.vue'));
 
   const curdEnum = CURDEnum;
@@ -256,6 +271,7 @@
   // 分页改变
   const onHandleSizeChange = (val: number) => {
     state.tableData.param.pageSize = val;
+    state.tableData.param.pageNum = 1;
     getTableData();
   };
   // 分页改变

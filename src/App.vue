@@ -30,6 +30,7 @@
   import { useI18n } from 'vue-i18n';
   import { storeToRefs } from 'pinia';
   import { useTagsViewRoutes } from '/@/stores/tagsViewRoutes';
+  import { loadThemePreferences } from '/@/utils/themePreferences';
   import { useThemeConfig } from '/@/stores/themeConfig';
   import other from '/@/utils/other';
   import { Local, Session } from '/@/utils/storage';
@@ -84,12 +85,13 @@
     // 设置批量第三方 js
     setIntroduction.jsCdn();
   });
+  const openSettingsDrawer = () => {
+    themeConfig.value.isDrawer = true;
+  };
   // 页面加载时：须先读本地缓存再合并进 store，禁止先用默认 store 覆盖写入 Local（否则刷新后配色永远回到默认）
   onMounted(() => {
     nextTick(() => {
-      mittBus.on('openSetingsDrawer', () => {
-        setingsRef.value.openDrawer();
-      });
+      mittBus.on('openSetingsDrawer', openSettingsDrawer);
       const cachedTheme = Local.get('themeConfig');
       if (cachedTheme) {
         storesThemeConfig.setThemeConfig({ themeConfig: cachedTheme });
@@ -98,6 +100,7 @@
           document.documentElement.style.cssText = cachedStyle;
         }
       }
+      loadThemePreferences();
       if (Session.get('isTagsViewCurrenFull')) {
         stores.setCurrenFullscreen(Session.get('isTagsViewCurrenFull'));
       }
@@ -105,8 +108,14 @@
   });
   // 页面销毁时，关闭监听布局配置/i18n监听
   onUnmounted(() => {
-    mittBus.off('openSetingsDrawer', () => {});
+    mittBus.off('openSetingsDrawer', openSettingsDrawer);
   });
+  watch(
+    () => route.path,
+    () => {
+      loadThemePreferences();
+    }
+  );
   // 监听路由的变化，设置网站标题
   watch(
     () => route.path,

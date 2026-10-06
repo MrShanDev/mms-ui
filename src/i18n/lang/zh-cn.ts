@@ -8,7 +8,7 @@ export default {
     systemUser: '用户管理',
     systemDept: '部门管理',
     systemDic: '字典管理',
-    systemNotice: '系统公告',
+    systemNotice: '通知公告',
     systemSetting: '系统配置',
     websiteConfig: '网站配置',
     sxpcwlkj: '品创官网',
@@ -80,7 +80,7 @@ export default {
     layoutIframeViewOne: '内嵌 iframe1',
     layoutIframeViewTwo: '内嵌 iframe2',
     oss: '对象存储',
-    ossinfo: '限制1个文件，新文件将覆盖旧文件',
+    ossinfo: '每次上传一个文件；重新选择仅替换待上传文件，不会覆盖已存储文件',
   },
   staticRoutes: {
     signIn: '登录',

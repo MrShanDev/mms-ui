@@ -124,11 +124,21 @@ export async function setAddRoute() {
  * @description isRequestRoutes 为 true，则开启后端控制路由
  * @returns 返回后端路由菜单数据
  */
-export function getBackEndControlRoutes() {
+export async function getBackEndControlRoutes() {
   // 字典加载
   useAppStore().getDictListAction();
   //返回当前登录用户权限菜单
-  return getMenu();
+  const response = await getMenu();
+  // 官网配置已迁入插件；过滤存量数据库中的基础框架旧入口。
+  const filterRetiredWebsitePage = (routes: any[]): any[] =>
+    routes
+      .filter((route) => route.path !== '/system/websiteConfig' && route.component !== 'system/websiteConfig/index')
+      .map((route) => ({
+        ...route,
+        ...(Array.isArray(route.children) ? { children: filterRetiredWebsitePage(route.children) } : {}),
+      }));
+  if (Array.isArray(response.data)) response.data = filterRetiredWebsitePage(response.data);
+  return response;
 }
 
 /**

@@ -12,97 +12,102 @@
     </div>
     <Search ref="searchRef" class="topbar-search-host" />
     <div class="layout-navbars-breadcrumb-user-extras">
-    <el-dropdown
-      :show-timeout="70"
-      :hide-timeout="50"
-      trigger="click"
-      @command="onComponentSizeChange"
-    >
-      <div class="layout-navbars-breadcrumb-user-icon">
-        <i class="iconfont icon-ziti" :title="$t('message.user.title0')"></i>
+      <el-dropdown
+        :show-timeout="70"
+        :hide-timeout="50"
+        trigger="click"
+        @command="onComponentSizeChange"
+      >
+        <div class="layout-navbars-breadcrumb-user-icon">
+          <i class="iconfont icon-ziti" :title="$t('message.user.title0')"></i>
+        </div>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item command="large" :disabled="state.disabledSize === 'large'">
+              {{ $t('message.user.dropdownLarge') }}
+            </el-dropdown-item>
+            <el-dropdown-item command="default" :disabled="state.disabledSize === 'default'">
+              {{ $t('message.user.dropdownDefault') }}
+            </el-dropdown-item>
+            <el-dropdown-item command="small" :disabled="state.disabledSize === 'small'">
+              {{ $t('message.user.dropdownSmall') }}
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
+      <el-dropdown
+        :show-timeout="70"
+        :hide-timeout="50"
+        trigger="click"
+        @command="onLanguageChange"
+      >
+        <div class="layout-navbars-breadcrumb-user-icon">
+          <i
+            class="iconfont"
+            :class="state.disabledI18n === 'en' ? 'icon-yuyanyingwen' : 'icon-zhongwen'"
+            :title="$t('message.user.title1')"
+          ></i>
+        </div>
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item command="zh-cn" :disabled="state.disabledI18n === 'zh-cn'">
+              简体中文
+            </el-dropdown-item>
+            <el-dropdown-item command="en" :disabled="state.disabledI18n === 'en'">
+              English
+            </el-dropdown-item>
+            <el-dropdown-item command="zh-tw" :disabled="state.disabledI18n === 'zh-tw'">
+              繁體中文
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
+      <div class="layout-navbars-breadcrumb-user-icon" @click="onSearchClick">
+        <el-icon :title="$t('message.user.title2')">
+          <ele-Search />
+        </el-icon>
       </div>
-      <template #dropdown>
-        <el-dropdown-menu>
-          <el-dropdown-item command="large" :disabled="state.disabledSize === 'large'">
-            {{ $t('message.user.dropdownLarge') }}
-          </el-dropdown-item>
-          <el-dropdown-item command="default" :disabled="state.disabledSize === 'default'">
-            {{ $t('message.user.dropdownDefault') }}
-          </el-dropdown-item>
-          <el-dropdown-item command="small" :disabled="state.disabledSize === 'small'">
-            {{ $t('message.user.dropdownSmall') }}
-          </el-dropdown-item>
-        </el-dropdown-menu>
-      </template>
-    </el-dropdown>
-    <el-dropdown :show-timeout="70" :hide-timeout="50" trigger="click" @command="onLanguageChange">
-      <div class="layout-navbars-breadcrumb-user-icon">
+      <div class="layout-navbars-breadcrumb-user-icon" @click="onLayoutSetingClick">
+        <i class="iconfont icon-zhutise" :title="$t('message.user.title3')"></i>
+      </div>
+      <div
+        class="layout-navbars-breadcrumb-user-icon"
+        ref="userNewsBadgeRef"
+        v-click-outside="onUserNewsClick"
+      >
+        <el-badge :is-dot="true">
+          <el-icon :title="$t('message.user.title4')">
+            <ele-Bell />
+          </el-icon>
+        </el-badge>
+      </div>
+      <el-popover
+        ref="userNewsRef"
+        :virtual-ref="userNewsBadgeRef"
+        placement="bottom"
+        trigger="click"
+        transition="el-zoom-in-top"
+        virtual-triggering
+        :width="300"
+        :persistent="false"
+      >
+        <UserNews />
+      </el-popover>
+      <div class="layout-navbars-breadcrumb-user-icon mr10" @click="onScreenfullClick">
         <i
           class="iconfont"
-          :class="state.disabledI18n === 'en' ? 'icon-yuyanyingwen' : 'icon-zhongwen'"
-          :title="$t('message.user.title1')"
+          :title="state.isScreenfull ? $t('message.user.title6') : $t('message.user.title5')"
+          :class="!state.isScreenfull ? 'icon-quanping' : 'icon-quxiaoquanping'"
         ></i>
       </div>
-      <template #dropdown>
-        <el-dropdown-menu>
-          <el-dropdown-item command="zh-cn" :disabled="state.disabledI18n === 'zh-cn'">
-            简体中文
-          </el-dropdown-item>
-          <el-dropdown-item command="en" :disabled="state.disabledI18n === 'en'">
-            English
-          </el-dropdown-item>
-          <el-dropdown-item command="zh-tw" :disabled="state.disabledI18n === 'zh-tw'">
-            繁體中文
-          </el-dropdown-item>
-        </el-dropdown-menu>
-      </template>
-    </el-dropdown>
-    <div class="layout-navbars-breadcrumb-user-icon" @click="onSearchClick">
-      <el-icon :title="$t('message.user.title2')">
-        <ele-Search />
-      </el-icon>
-    </div>
-    <div class="layout-navbars-breadcrumb-user-icon" @click="onLayoutSetingClick">
-      <i class="iconfont icon-zhutise" :title="$t('message.user.title3')"></i>
-    </div>
-    <div
-      class="layout-navbars-breadcrumb-user-icon"
-      ref="userNewsBadgeRef"
-      v-click-outside="onUserNewsClick"
-    >
-      <el-badge :is-dot="true">
-        <el-icon :title="$t('message.user.title4')">
-          <ele-Bell />
-        </el-icon>
-      </el-badge>
-    </div>
-    <el-popover
-      ref="userNewsRef"
-      :virtual-ref="userNewsBadgeRef"
-      placement="bottom"
-      trigger="click"
-      transition="el-zoom-in-top"
-      virtual-triggering
-      :width="300"
-      :persistent="false"
-    >
-      <UserNews />
-    </el-popover>
-    <div class="layout-navbars-breadcrumb-user-icon mr10" @click="onScreenfullClick">
-      <i
-        class="iconfont"
-        :title="state.isScreenfull ? $t('message.user.title6') : $t('message.user.title5')"
-        :class="!state.isScreenfull ? 'icon-quanping' : 'icon-quxiaoquanping'"
-      ></i>
-    </div>
     </div>
     <el-dropdown :show-timeout="70" :hide-timeout="50" @command="onHandleCommandClick">
       <span class="layout-navbars-breadcrumb-user-link">
         <img
-          :src="userInfos.photo || 'https://sxpcwlkj.oss-cn-beijing.aliyuncs.com/defimg.png'"
+          :src="userInfos?.photo || 'https://sxpcwlkj.oss-cn-beijing.aliyuncs.com/defimg.png'"
           class="layout-navbars-breadcrumb-user-link-photo mr5"
         />
-        {{ userInfos.userName === '' ? 'common' : userInfos.userName }}
+        {{ userInfos?.userName || '当前用户' }}
         <el-icon class="el-icon--right">
           <ele-ArrowDown />
         </el-icon>
@@ -182,7 +187,7 @@
   };
   // 消息通知点击时
   const onUserNewsClick = () => {
-    unref(userNewsRef).popperRef?.delayHide?.();
+    unref(userNewsRef)?.popperRef?.delayHide?.();
   };
   // 布局配置 icon 点击时
   const onLayoutSetingClick = () => {
@@ -216,12 +221,15 @@
         },
       })
         .then(async () => {
-          // 清除缓存/token等
-          logout().then((res) => {
+          // 服务不可用时仍释放当前浏览器的登录状态。
+          try {
+            await logout();
+          } catch {
+            ElMessage.warning('退出请求未完成，已清除本地登录状态');
+          } finally {
             Session.clear();
-            // 使用 reload 时，不需要调用 resetRoute() 重置路由
-            window.location.reload();
-          });
+            window.location.replace(`${window.location.pathname}#/login`);
+          }
         })
         .catch(() => {});
     } else if (path === 'wareHouse') {
@@ -258,9 +266,7 @@
   // 页面加载时
   onMounted(() => {
     //alert(JSON.stringify(userInfos.value.authBtnList));
-    if (userInfos == null || userInfos.value.userName.length < 1) {
-      onHandleCommandClick('logOut');
-    }
+
     if (Local.get('themeConfig')) {
       initI18nOrSize('globalComponentSize', 'disabledSize');
       initI18nOrSize('globalI18n', 'disabledI18n');

@@ -19,7 +19,7 @@ const pathResolve = (dir: string) => {
 // 路径解析函数，方便路径别名配置
 const alias: Record<string, string> = {
     '/@': pathResolve('./src/'),
-    'vue-i18n': 'vue-i18n/dist/vue-i18n.cjs.js',
+    'vue-i18n': 'vue-i18n/dist/vue-i18n.esm-bundler.js',
     /** 联邦子包源码根（pnpm workspace packages/*），宿主直出用 `@mms-packages/<dir>/src/...`，勿为每个插件单独配别名 */
     '@mms-packages': pathResolve('./packages'),
 };
@@ -90,7 +90,7 @@ const viteConfig: UserConfigFnObject = defineConfig((mode: ConfigEnv) => {
         root: process.cwd(),
         resolve: {
             alias,
-            dedupe: ['vue', 'vue-router', 'vue-demi', 'pinia', 'element-plus'],
+            dedupe: ['vue', '@vue/runtime-core', '@vue/runtime-dom', '@vue/reactivity', '@vue/shared', 'vue-router', 'vue-demi', 'pinia', 'element-plus'],
         },
         base: mode.command === 'serve' ? './' : env.VITE_PUBLIC_PATH,
         optimizeDeps: {
@@ -169,6 +169,13 @@ const viteConfig: UserConfigFnObject = defineConfig((mode: ConfigEnv) => {
             // 强制预构建，减少页面重新加载
             force: false,
             proxy: {
+                '/mms-job': {
+                    target: env.VITE_POWERJOB_SERVER_URL || 'http://127.0.0.1:7700',
+                    changeOrigin: true,
+                    timeout: 7000,
+                    proxyTimeout: 7000,
+                    rewrite: (path) => path.replace(/^\/mms-job/, ''),
+                },
                 [env.VITE_APP_BASE_API]: {
                     target: env.VITE_APP_API_URL,
                     ws: true,

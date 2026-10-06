@@ -1,4 +1,3 @@
-
 export declare interface SysOssState {
   tableData: SysOssTableType;
 }

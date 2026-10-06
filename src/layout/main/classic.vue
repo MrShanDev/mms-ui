@@ -45,7 +45,8 @@
       setTimeout(() => {
         updateScrollbar();
         // '!' not null 断言操作符，不执行运行时检查
-        if (layoutMainRef.value) layoutMainRef.value!.layoutMainScrollbarRef.wrapRef.scrollTop = 0;
+        if (layoutMainRef.value)
+          layoutMainRef.value?.layoutMainScrollbarRef?.wrapRef?.scrollTo({ top: 0 });
       }, 500);
     });
   };

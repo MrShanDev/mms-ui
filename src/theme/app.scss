@@ -250,8 +250,8 @@ body,
     // width: calc(100vw - 30px);;
     background-color: var(--next-color-white);
     padding: 20px;
-    margin: 15px 15px 0;
-    padding-bottom: 0;
+    margin: 15px 15px 16px;
+    align-items: center;
     display: flex;
     border-radius: 5px;
 
@@ -265,7 +265,39 @@ body,
     font-size: 18px;
     font-weight: 500;
     color: var(--el-color-disabled);
-    margin-bottom: 30px;
+    margin: 0 14px 0 0;
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .views-tool .tool-left,
+  .views-tool .el-form {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    min-width: 0;
+  }
+
+  .views-tool .tool-left .el-form .el-form-item,
+  .views-tool .tool-left .el-form .el-form-item:last-of-type {
+    // 全局表单末项的底部边距使用 !important，筛选栏统一覆盖。
+    margin: 0 !important;
+    max-width: 100%;
+  }
+
+  .views-tool + .layout-padding {
+    padding-top: 0;
+  }
+
+  @media (max-width: 600px) {
+    .views-tool .tool-left,
+    .views-tool .el-form {
+      width: 100%;
+    }
+    .views-tool .tool-left-title {
+      width: 100%;
+    }
   }
 
   .layout-padding-auto {

@@ -1,150 +1,175 @@
 <template>
-  <div class="black">
-    <!-- 功能栏 -->
-    <div class="views-tool">
-      <div class="tool-left">
-        <div class="tool-left-title">筛选查询</div>
-        <el-form
-          :inline="true"
-          size="default"
-          :model="state.tableData.param"
-          class="form-tool"
-          @keyup.enter="getTableData"
-        >
-          <el-form-item>
-            <el-input
-              size="default"
-              v-model="state.tableData.param.name"
-              placeholder="请输入角色名称"
-              style="max-width: 180px"
-              clearable
-            ></el-input>
-          </el-form-item>
-          <el-form-item>
-            <el-button
-              size="default"
-              type="primary"
-              :disabled="state.tableData.loading"
-              :loading-icon="Eleme"
-              :loading="state.tableData.loading"
-              @click="getTableData"
-              v-auth="'system:role:list'"
-            >
-              <SvgIcon name="iconfont icon-search1" />
-              {{ $t('message.form.search') }}
-            </el-button>
-          </el-form-item>
-        </el-form>
+  <SystemPage feature="role">
+    <div class="black">
+      <!-- 功能栏 -->
+      <div class="views-tool">
+        <div class="tool-left">
+          <div class="tool-left-title">筛选查询</div>
+          <el-form
+            :inline="true"
+            size="default"
+            :model="state.tableData.param"
+            class="form-tool"
+            @keyup.enter="onSearch"
+          >
+            <el-form-item>
+              <el-input
+                size="default"
+                v-model="state.tableData.param.name"
+                placeholder="请输入角色名称"
+                style="max-width: 180px"
+                clearable
+              ></el-input>
+            </el-form-item>
+            <el-form-item>
+              <el-button
+                size="default"
+                type="primary"
+                :disabled="state.tableData.loading"
+                :loading-icon="Eleme"
+                :loading="state.tableData.loading"
+                @click="onSearch"
+                v-auth="'system:role:list'"
+              >
+                <SvgIcon name="iconfont icon-search1" />
+                {{ $t('message.form.search') }}
+              </el-button>
+            </el-form-item>
+          </el-form>
+        </div>
+      </div>
+      <div class="system-role-container layout-padding">
+        <el-card shadow="never" class="layout-padding-auto">
+          <el-container>
+            <el-header>
+              <!-- 新增/导入/导出/打印 -->
+              <TableTool
+                v-show="!state.tableData.loading"
+                ref="tableToolRef"
+                tableComment="系统角色"
+                functionName="role"
+                :key="componentKey"
+                :param="state.tableData.param"
+                @close="componentKey = generateUUID()"
+                @insert="onCURD"
+                @deletes="onCURD"
+              />
+            </el-header>
+            <el-main>
+              <!-- Tbale -->
+              <el-table
+                :data="state.tableData.data"
+                v-loading="state.tableData.loading"
+                @selection-change="handleSelectionChange"
+                style="width: 100%"
+              >
+                <el-table-column type="selection" label="序号" width="50" />
+                <el-table-column
+                  prop="name"
+                  label="角色名称"
+                  show-overflow-tooltip
+                  min-width="120"
+                ></el-table-column>
+                <el-table-column
+                  prop="code"
+                  label="角色标识"
+                  show-overflow-tooltip
+                  min-width="120"
+                ></el-table-column>
+                <el-table-column
+                  prop="status"
+                  label="角色状态"
+                  show-overflow-tooltip
+                  min-width="120"
+                >
+                  <template #default="scope">
+                    <!-- <el-tag type="success" v-if="scope.row.status == 0">启用</el-tag>
+                  <el-tag type="info" v-else>禁用</el-tag> -->
+                    <fast-switch
+                      v-model="scope.row.status"
+                      dict-type="SYS_STATE"
+                      placeholder="角色状态"
+                    ></fast-switch>
+                  </template>
+                </el-table-column>
+                <el-table-column
+                  prop="remark"
+                  label="角色描述"
+                  show-overflow-tooltip
+                  min-width="120"
+                ></el-table-column>
+                <el-table-column
+                  prop="level"
+                  label="角色级别"
+                  show-overflow-tooltip
+                  min-width="120"
+                >
+                  <template #default="scope">
+                    <el-tag type="warning">{{ scope.row.level }}级</el-tag>
+                  </template>
+                </el-table-column>
+                <el-table-column
+                  prop="createdTime"
+                  label="创建时间"
+                  show-overflow-tooltip
+                  min-width="120"
+                ></el-table-column>
+                <el-table-column fixed="right" width="90" label="操作">
+                  <template #default="scope">
+                    <el-tooltip placement="top" :content="$t('message.form.edit')">
+                      <el-icon
+                        class="mr10"
+                        color="blue"
+                        v-auths="['system:role:query', 'system:role:edit']"
+                        @click="onCURD({ type: curdEnum.EDIT, ids: scope.row.id })"
+                      >
+                        <ele-Edit />
+                      </el-icon>
+                    </el-tooltip>
+                    <el-tooltip
+                      v-if="scope.row.code != 'super_admin'"
+                      placement="top"
+                      :content="$t('message.form.delete')"
+                    >
+                      <el-icon
+                        class="mr10"
+                        color="blue"
+                        v-auth="'system:role:delete'"
+                        @click="onCURD({ type: curdEnum.DELETE, ids: scope.row.id })"
+                      >
+                        <ele-Delete />
+                      </el-icon>
+                    </el-tooltip>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </el-main>
+            <el-footer>
+              <!-- 分页 -->
+              <el-pagination
+                @size-change="onHandleSizeChange"
+                @current-change="onHandleCurrentChange"
+                class="mt15"
+                :pager-count="5"
+                :page-sizes="[10, 20, 30, 50, 100]"
+                v-model:current-page="state.tableData.param.pageNum"
+                background
+                size="default"
+                v-model:page-size="state.tableData.param.pageSize"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="state.tableData.total"
+              ></el-pagination>
+            </el-footer>
+          </el-container>
+        </el-card>
+        <RoleDialog ref="dialogRef" @refresh="formSubmit" />
       </div>
     </div>
-    <div class="system-role-container layout-padding">
-      <el-card shadow="hover" class="layout-padding-auto">
-        <el-container>
-          <el-header>
-            <!-- 新增/导入/导出/打印 -->
-            <TableTool
-              v-show="!state.tableData.loading"
-              ref="tableToolRef"
-              tableComment="系统角色"
-              functionName="role"
-              :key="componentKey"
-              :param="state.tableData.param"
-              @close="componentKey = generateUUID()"
-              @insert="onCURD"
-              @deletes="onCURD"
-            />
-          </el-header>
-          <el-main>
-            <!-- Tbale -->
-            <el-table
-              :data="state.tableData.data"
-              v-loading="state.tableData.loading"
-              @selection-change="handleSelectionChange"
-              style="width: 100%"
-            >
-              <el-table-column type="selection" label="序号" width="50" />
-              <el-table-column prop="name" label="角色名称" show-overflow-tooltip></el-table-column>
-              <el-table-column prop="code" label="角色标识" show-overflow-tooltip></el-table-column>
-              <el-table-column prop="status" label="角色状态" show-overflow-tooltip>
-                <template #default="scope">
-                  <!-- <el-tag type="success" v-if="scope.row.status == 0">启用</el-tag>
-                  <el-tag type="info" v-else>禁用</el-tag> -->
-                  <fast-switch
-                    v-model="scope.row.status"
-                    dict-type="SYS_STATE"
-                    placeholder="角色状态"
-                  ></fast-switch>
-                </template>
-              </el-table-column>
-              <el-table-column
-                prop="remark"
-                label="角色描述"
-                show-overflow-tooltip
-              ></el-table-column>
-              <el-table-column prop="level" label="角色级别" show-overflow-tooltip>
-                <template #default="scope">
-                  <el-tag type="warning">{{ scope.row.level }}级</el-tag>
-                </template>
-              </el-table-column>
-              <el-table-column
-                prop="createdTime"
-                label="创建时间"
-                show-overflow-tooltip
-              ></el-table-column>
-              <el-table-column fixed="right" width="90" label="操作">
-                <template #default="scope">
-                  <el-tooltip placement="top" :content="$t('message.form.edit')">
-                    <el-icon
-                      class="mr10"
-                      color="blue"
-                      v-auths="['system:role:query', 'system:role:edit']"
-                      @click="onCURD({ type: curdEnum.EDIT, ids: scope.row.id })"
-                    >
-                      <ele-Edit />
-                    </el-icon>
-                  </el-tooltip>
-                  <el-tooltip
-                    v-if="scope.row.code != 'super_admin'"
-                    placement="top"
-                    :content="$t('message.form.delete')"
-                  >
-                    <el-icon
-                      class="mr10"
-                      color="blue"
-                      v-auth="'system:role:delete'"
-                      @click="onCURD({ type: curdEnum.DELETE, ids: scope.row.id })"
-                    >
-                      <ele-Delete />
-                    </el-icon>
-                  </el-tooltip>
-                </template>
-              </el-table-column>
-            </el-table>
-          </el-main>
-          <el-footer>
-            <!-- 分页 -->
-            <el-pagination
-              @size-change="onHandleSizeChange"
-              @current-change="onHandleCurrentChange"
-              class="mt15"
-              :pager-count="5"
-              :page-sizes="[10, 20, 30, 50, 100]"
-              v-model:current-page="state.tableData.param.pageNum"
-              background
-              size="default"
-              v-model:page-size="state.tableData.param.pageSize"
-              layout="total, sizes, prev, pager, next, jumper"
-              :total="state.tableData.total"
-            ></el-pagination>
-          </el-footer>
-        </el-container>
-      </el-card>
-      <RoleDialog ref="dialogRef" @refresh="formSubmit" />
-    </div>
-  </div>
+  </SystemPage>
 </template>
 
 <script setup lang="ts" name="systemRole">
+  import SystemPage from '/@/views/system/shared/SystemPage.vue';
   import { defineAsyncComponent, reactive, onMounted, ref } from 'vue';
   import { ElMessageBox, ElMessage, tabBarProps } from 'element-plus';
   import { roleApi } from '/@/views/system/role';
@@ -156,7 +181,9 @@
   import FastSwitch from '/@/components/fast-switch/src/fast-switch.vue';
 
   // 引入组件
-  const RoleDialog = defineAsyncComponent(() => import('/@/views/system/role/dialog.vue'));
+  const RoleDialog = defineAsyncComponent(
+    () => import('/@/views/system/role/components/RoleDialog.vue')
+  );
   const TableTool = defineAsyncComponent(() => import('/@/components/table-tool/index.vue'));
 
   // 定义变量内容
@@ -179,6 +206,10 @@
       },
     },
   });
+  const onSearch = () => {
+    state.tableData.param.pageNum = 1;
+    getTableData();
+  };
   // 初始化表格数据
   const getTableData = () => {
     state.tableData.loading = true;
@@ -277,6 +308,7 @@
   // 分页改变
   const onHandleSizeChange = (val: number) => {
     state.tableData.param.pageSize = val;
+    state.tableData.param.pageNum = 1;
     getTableData();
   };
   // 分页改变

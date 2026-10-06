@@ -1,14 +1,15 @@
 <template>
-  <div class="layout-padding layout-padding-unset layout-iframe">
+  <div class="layout-padding layout-padding-unset layout-iframe" :class="{ 'scheduler-container': getRoutePath === '/tools/powerjob' }">
     <div class="layout-padding-auto layout-padding-view">
       <div
         class="w100"
         v-for="v in setIframeList"
         :key="v.path"
-        v-loading="v.meta.loading"
+        v-loading="v.path !== '/tools/powerjob' && v.meta.loading"
         element-loading-background="white"
       >
-        <transition-group :name="name">
+        <Powerjob v-if="v.path === '/tools/powerjob'" v-show="getRoutePath === v.path" />
+        <transition-group v-else :name="name">
           <iframe
             :src="v.meta.isLink"
             :key="v.path"
@@ -29,6 +30,7 @@
 <script setup lang="ts" name="layoutIframeView">
   import { computed, watch, ref, nextTick } from 'vue';
   import { useRoute } from 'vue-router';
+  import Powerjob from '/@/views/tools/powerjob/index.vue';
 
   // 定义父组件传过来的值
   const props = defineProps({
@@ -105,3 +107,9 @@
     }
   );
 </script>
+
+<style scoped lang="scss">
+.scheduler-container .layout-padding-view {
+  background: var(--el-bg-color-page);
+}
+</style>

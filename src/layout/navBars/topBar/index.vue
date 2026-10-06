@@ -8,7 +8,7 @@
 </template>
 
 <script setup lang="ts" name="layoutBreadcrumbIndex">
-  import { defineAsyncComponent, computed, reactive, onMounted, onUnmounted } from 'vue';
+  import { computed, reactive, onMounted, onUnmounted } from 'vue';
   import { useRoute } from 'vue-router';
   import { storeToRefs } from 'pinia';
   import { useRoutesList } from '/@/stores/routesList';
@@ -18,10 +18,10 @@
   import { Session } from '/@/utils/storage';
   import { logout } from '/@/views/system/login';
   // 引入组件
-  const Breadcrumb = defineAsyncComponent(() => import('/@/layout/navBars/topBar/breadcrumb.vue'));
-  const User = defineAsyncComponent(() => import('/@/layout/navBars/topBar/user.vue'));
-  const Logo = defineAsyncComponent(() => import('/@/layout/logo/index.vue'));
-  const Horizontal = defineAsyncComponent(() => import('/@/layout/navMenu/horizontal.vue'));
+  import Breadcrumb from '/@/layout/navBars/topBar/breadcrumb.vue';
+  import User from '/@/layout/navBars/topBar/user.vue';
+  import Logo from '/@/layout/logo/index.vue';
+  import Horizontal from '/@/layout/navMenu/horizontal.vue';
 
   // 定义变量内容
   const stores = useRoutesList();

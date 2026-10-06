@@ -1,143 +1,147 @@
 <template>
-  <div class="block">
-    <div class="system-menu-container layout-padding ">
-      <el-card shadow="hover" class="layout-padding-auto">
-        <div class="system-menu-search">
-          <el-button size="small" type="primary" @click="clickExpand">
-            <el-icon><ele-Sort /></el-icon>
-            {{ expand.state ? '全部关闭' : '全部展开' }}
-          </el-button>
-          <el-button
-            size="small"
-            type="success"
-            class="ml10"
-            @click="onCURD({ type: curdEnum.INSERT, ids: '1' })"
+  <SystemPage feature="menu">
+    <div class="block">
+      <div class="system-menu-container layout-padding">
+        <el-card shadow="never" class="layout-padding-auto">
+          <div class="system-menu-search">
+            <el-button size="small" type="primary" @click="clickExpand">
+              <el-icon><ele-Sort /></el-icon>
+              {{ expand.state ? '全部折叠' : '全部展开' }}
+            </el-button>
+            <el-button
+              size="small"
+              type="success"
+              class="ml10"
+              v-auth="'system:function:insert'"
+              @click="onCURD({ type: curdEnum.INSERT, ids: '1' })"
+            >
+              <el-icon>
+                <ele-DocumentAdd />
+              </el-icon>
+              新增菜单
+            </el-button>
+          </div>
+          <el-table
+            :data="state.tableData.data"
+            v-loading="state.tableData.loading"
+            style="width: 100%"
+            row-key="id"
+            :key="expand.key"
+            :default-expand-all="expand.state"
+            :expand-row-keys="expandArr"
+            :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
           >
-            <el-icon>
-              <ele-DocumentAdd />
-            </el-icon>
-            新增菜单
-          </el-button>
-        </div>
-        <el-table
-          :data="state.tableData.data"
-          v-loading="state.tableData.loading"
-          style="width: 100%"
-          row-key="id"
-          :key="expand.key"
-          :default-expand-all="expand.state"
-          :expand-row-keys="expandArr"
-          :tree-props="{ children: 'children', hasChildren: 'hasChildren' }"
-        >
-          <el-table-column label="菜单名称" width="250" show-overflow-tooltip>
-            <template #default="scope">
-              <SvgIcon :name="scope.row.icon" />
-              <span class="ml10">{{ $t(scope.row.name) }}</span>
-            </template>
-          </el-table-column>
-          <el-table-column label="类型" width="100" show-overflow-tooltip>
-            <template #default="scope">
-              <el-tag
-                size="small"
-                v-if="scope.row.type == 1 && scope.row.parentId != 1"
-                :type="scope.row.parentId == 0 ? 'danger' : 'primary'"
-                effect="dark"
-              >
-                {{ scope.row.parentId == 0 ? '顶级' : '页面' }}
-              </el-tag>
-              <el-tag
-                size="small"
-                v-if="scope.row.type == 1 && scope.row.parentId == 1"
-                type="success"
-                effect="dark"
-              >
-                菜单
-              </el-tag>
-              <el-tag size="small" v-if="scope.row.type == 2" type="warning" effect="dark">
-                按钮
-              </el-tag>
-            </template>
-          </el-table-column>
-          <el-table-column
-            prop="path"
-            label="路由路径"
-            width="180"
-            show-overflow-tooltip
-          ></el-table-column>
-          <el-table-column label="组件路径" show-overflow-tooltip>
-            <template #default="scope">
-              <span v-if="scope.row.type == 1 && (scope.row.component?.length ?? 0) > 0">
-                <el-tag type="warning" size="small">/@/views/</el-tag>
-                <el-tag size="small">{{ scope.row.component }}</el-tag>
-                <el-tag type="warning" size="small">.vue</el-tag>
-              </span>
-            </template>
-          </el-table-column>
-          <el-table-column label="状态" show-overflow-tooltip width="80">
-            <template #default="scope">
-              <el-tag :type="scope.row.visible == -1 ? 'success' : 'danger'" size="small">
-                {{ scope.row.visible == -1 ? '显示' : '隐藏' }}
-              </el-tag>
-            </template>
-          </el-table-column>
-          <el-table-column label="快捷菜单" show-overflow-tooltip width="100">
-            <template #default="scope">
-              <el-tag :type="scope.row.isFast == 1 ? 'success' : 'danger'" size="small">
-                {{ scope.row.isFast == 1 ? '是' : '否' }}
-              </el-tag>
-            </template>
-          </el-table-column>
-          <el-table-column label="排序" show-overflow-tooltip width="80">
-            <template #default="scope">
-              {{ scope.row.sort }}
-            </template>
-          </el-table-column>
-          <el-table-column fixed="right" label="操作" show-overflow-tooltip width="110">
-            <template #default="scope">
-              <el-tooltip placement="top" :content="$t('message.form.insertSon')">
-                <el-icon
-                  class="mr10"
-                  color="blue"
-                  v-auth="'system:function:insert'"
-                  @click="onCURD({ type: curdEnum.INSERT, ids: scope.row.id })"
+            <el-table-column label="菜单名称" min-width="180" show-overflow-tooltip>
+              <template #default="scope">
+                <SvgIcon :name="scope.row.icon" />
+                <span class="ml10">{{ $t(scope.row.name) }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="类型" width="64" show-overflow-tooltip>
+              <template #default="scope">
+                <el-tag
+                  size="small"
+                  v-if="scope.row.type == 1 && scope.row.parentId != 1"
+                  :type="scope.row.parentId == 0 ? 'danger' : 'primary'"
+                  effect="dark"
                 >
-                  <ele-FolderAdd />
-                </el-icon>
-              </el-tooltip>
-              <el-tooltip placement="top" :content="$t('message.form.edit')">
-                <el-icon
-                  class="mr10"
-                  color="blue"
-                  v-auths="['system:function:query', 'system:function:edit']"
-                  @click="onCURD({ type: curdEnum.EDIT, ids: scope.row.id })"
+                  {{ scope.row.parentId == 0 ? '顶级' : '页面' }}
+                </el-tag>
+                <el-tag
+                  size="small"
+                  v-if="scope.row.type == 1 && scope.row.parentId == 1"
+                  type="success"
+                  effect="dark"
                 >
-                  <ele-Edit />
-                </el-icon>
-              </el-tooltip>
-              <el-tooltip
-                v-if="scope.row.parentId != 0"
-                placement="top"
-                :content="$t('message.form.delete')"
-              >
-                <el-icon
-                  class="mr10"
-                  color="blue"
-                  v-auth="'system:function:delete'"
-                  @click="onCURD({ type: curdEnum.DELETE, ids: scope.row.id })"
+                  菜单
+                </el-tag>
+                <el-tag size="small" v-if="scope.row.type == 2" type="warning" effect="dark">
+                  按钮
+                </el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column
+              prop="path"
+              label="路由路径"
+              min-width="160"
+              show-overflow-tooltip
+            ></el-table-column>
+            <el-table-column label="组件路径" show-overflow-tooltip min-width="300">
+              <template #default="scope">
+                <span
+                  v-if="scope.row.type == 1 && scope.row.component"
+                  class="menu-component-path"
+                >{{ formatComponentPath(scope.row.component) }}</span>
+              </template>
+            </el-table-column>
+            <el-table-column label="状态" show-overflow-tooltip width="64">
+              <template #default="scope">
+                <el-tag :type="scope.row.visible == -1 ? 'success' : 'danger'" size="small">
+                  {{ scope.row.visible == -1 ? '显示' : '隐藏' }}
+                </el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="快捷菜单" show-overflow-tooltip width="88">
+              <template #default="scope">
+                <el-tag :type="scope.row.isFast == 1 ? 'success' : 'danger'" size="small">
+                  {{ scope.row.isFast == 1 ? '是' : '否' }}
+                </el-tag>
+              </template>
+            </el-table-column>
+            <el-table-column label="排序" show-overflow-tooltip width="64">
+              <template #default="scope">
+                {{ scope.row.sort }}
+              </template>
+            </el-table-column>
+            <el-table-column fixed="right" label="操作" show-overflow-tooltip width="96">
+              <template #default="scope">
+                <el-tooltip placement="top" :content="$t('message.form.insertSon')">
+                  <el-icon
+                    class="mr10"
+                    color="blue"
+                    v-auth="'system:function:insert'"
+                    @click="onCURD({ type: curdEnum.INSERT, ids: scope.row.id })"
+                  >
+                    <ele-FolderAdd />
+                  </el-icon>
+                </el-tooltip>
+                <el-tooltip placement="top" :content="$t('message.form.edit')">
+                  <el-icon
+                    class="mr10"
+                    color="blue"
+                    v-auths="['system:function:query', 'system:function:edit']"
+                    @click="onCURD({ type: curdEnum.EDIT, ids: scope.row.id })"
+                  >
+                    <ele-Edit />
+                  </el-icon>
+                </el-tooltip>
+                <el-tooltip
+                  v-if="scope.row.parentId != 0"
+                  placement="top"
+                  :content="$t('message.form.delete')"
                 >
-                  <ele-Delete />
-                </el-icon>
-              </el-tooltip>
-            </template>
-          </el-table-column>
-        </el-table>
-      </el-card>
-      <MenuDialog ref="menuDialogRef" @refresh="formSubmit" />
+                  <el-icon
+                    class="mr10"
+                    color="blue"
+                    v-auth="'system:function:delete'"
+                    @click="onCURD({ type: curdEnum.DELETE, ids: scope.row.id })"
+                  >
+                    <ele-Delete />
+                  </el-icon>
+                </el-tooltip>
+              </template>
+            </el-table-column>
+          </el-table>
+        </el-card>
+        <MenuDialog ref="menuDialogRef" @refresh="formSubmit" />
+      </div>
     </div>
-  </div>
+  </SystemPage>
 </template>
 
 <script setup lang="ts" name="systemMenu">
+  import { initBackEndControlRoutes } from '/@/router/backEnd';
+  import SystemPage from '/@/views/system/shared/SystemPage.vue';
   import { defineAsyncComponent, ref, onMounted, reactive } from 'vue';
   import { RouteRecordRaw } from 'vue-router';
   import { ElMessageBox, ElMessage } from 'element-plus';
@@ -147,10 +151,17 @@
   import { NextLoading } from '/@/utils/loading';
   import { FunctionType } from '/@/views/system/menu/type';
   // 引入组件
-  const MenuDialog = defineAsyncComponent(() => import('/@/views/system/menu/dialog.vue'));
+  const MenuDialog = defineAsyncComponent(
+    () => import('/@/views/system/menu/components/MenuDialog.vue')
+  );
   // 引入 api 请求接口
   const baseApi = useMenuApi();
   const curdEnum = CURDEnum;
+  const formatComponentPath = (component: string) => {
+    if (component.startsWith('federation:')) return component;
+    const path = component.replace(/^\/?@\/views\//, '').replace(/^\/+/, '');
+    return `/@/views/${path}${/\.(vue|tsx)$/.test(path) ? '' : '.vue'}`;
+  };
   // 定义变量内容
   // 展开/合闭
   const expand = ref({
@@ -179,6 +190,7 @@
           ElMessage.success(row.msg);
           setTimeout(() => {
             getTableData();
+            initBackEndControlRoutes();
           }, 1000);
         })
         .catch(async (err) => {
@@ -198,6 +210,7 @@
           ElMessage.success(row.msg);
           setTimeout(() => {
             getTableData();
+            initBackEndControlRoutes();
           }, 1000);
         })
         .catch(async (err) => {
@@ -217,13 +230,17 @@
   };
 
   // 初始化表格数据
-  const getTableData = () => {
+  const getTableData = async () => {
     state.tableData.loading = true;
-    baseApi.list().then((res) => {
+    try {
+      const res = await baseApi.list({});
       state.tableData.data = Array.isArray(res.data) ? res.data : [];
+      expandArr.value = ['1'];
+    } catch {
+      /* 请求封装统一展示错误 */
+    } finally {
       state.tableData.loading = false;
-      expandArr.value.push(String(1));
-    });
+    }
   };
   // 打开新增菜单弹窗
   const onCURD = (obj: { type: CURDEnum; ids?: string }) => {
@@ -275,8 +292,16 @@
     getTableData();
   });
 </script>
-<style>
-.el-table .cell.el-tooltip {
-  display: flex !important;
-}
+<style scoped>
+  :deep(.el-table .cell.el-tooltip) {
+    display: flex !important;
+  }
+</style>
+
+<style scoped lang="scss">
+  .menu-component-path {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    white-space: nowrap;
+  }
 </style>

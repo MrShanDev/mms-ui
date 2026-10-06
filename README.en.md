@@ -25,10 +25,35 @@ English | [简体中文](README.md)
 
 ## Requirements
 
-- Node.js 18+ (20 LTS recommended)
-- pnpm 8+
+- Node.js 22 (used in this guide)
+- pnpm 10 (install with `npm install -g pnpm@10`)
 
 ---
+
+Node.js usually includes npm; pnpm must be installed separately. nvm manages Node.js versions. Maven is a separate Java build tool whose command is `mvn`.
+
+**macOS / Linux / WSL: nvm, Node.js and pnpm**
+
+Follow the [official nvm instructions](https://github.com/nvm-sh/nvm#installing-and-updating), then reopen your terminal. Skip nvm if you already have a suitable Node.js version and do not need version switching.
+
+```bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.8/install.sh | bash
+```
+
+In a new terminal:
+
+```bash
+command -v nvm
+nvm install 22
+nvm use 22
+nvm alias default 22
+node -v
+npm -v
+npm install -g pnpm@10
+pnpm -v
+```
+
+Reinstall pnpm for the active Node.js version if it is missing after switching versions. Node.js 25+ does not bundle Corepack. On native Windows, use [nvm-windows](https://github.com/coreybutler/nvm-windows) or the official Node.js installer instead of the Shell script above.
 
 ## Quick Start
 

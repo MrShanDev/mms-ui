@@ -1,170 +1,178 @@
 <template>
-  <div class="block">
-    <!-- 功能栏  -->
-    <div class="views-tool">
-      <div class="tool-left">
-        <div class="tool-left-title">筛选查询</div>
-        <el-form
-          :inline="true"
-          size="default"
-          :model="state.tableData.param"
-          class="form-tool"
-          @keyup.enter="getTableData"
-        >
-          <el-form-item>
-            <el-input
-              v-model="state.tableData.param.title"
-              size="default"
-              placeholder="公告标题"
-              style="max-width: 180px"
-              clearable
-            ></el-input>
-          </el-form-item>
-          <el-form-item>
-            <fast-select
-              v-model="state.tableData.param.type"
-              dict-type="NITICE_TYPE"
-              placeholder="公告类型"
-              clearable
-            ></fast-select>
-          </el-form-item>
-          <el-form-item>
-            <el-button
-              size="default"
-              type="primary"
-              :disabled="state.tableData.loading"
-              :loading-icon="Eleme"
-              :loading="state.tableData.loading"
-              @click="getTableData"
-              v-auth="'system:notice:list'"
-            >
-              <SvgIcon name="iconfont icon-search1" />
-              {{ $t('message.form.search') }}
-            </el-button>
-          </el-form-item>
-        </el-form>
+  <SystemPage feature="notice">
+    <div class="block">
+      <!-- 功能栏  -->
+      <div class="views-tool">
+        <div class="tool-left">
+          <div class="tool-left-title">筛选查询</div>
+          <el-form
+            :inline="true"
+            size="default"
+            :model="state.tableData.param"
+            class="form-tool"
+            @keyup.enter="onSearch"
+          >
+            <el-form-item>
+              <el-input
+                v-model="state.tableData.param.title"
+                size="default"
+                placeholder="公告标题"
+                style="max-width: 180px"
+                clearable
+              ></el-input>
+            </el-form-item>
+            <el-form-item>
+              <fast-select
+                v-model="state.tableData.param.type"
+                dict-type="NITICE_TYPE"
+                placeholder="公告类型"
+                clearable
+              ></fast-select>
+            </el-form-item>
+            <el-form-item>
+              <el-button
+                size="default"
+                type="primary"
+                :disabled="state.tableData.loading"
+                :loading-icon="Eleme"
+                :loading="state.tableData.loading"
+                @click="onSearch"
+                v-auth="'system:notice:list'"
+              >
+                <SvgIcon name="iconfont icon-search1" />
+                {{ $t('message.form.search') }}
+              </el-button>
+            </el-form-item>
+          </el-form>
+        </div>
+      </div>
+      <!-- Table  -->
+      <div class="system-notice-container layout-padding">
+        <el-card shadow="never" class="layout-padding-auto">
+          <el-container>
+            <el-header>
+              <!-- 新增/导入/导出/打印 -->
+              <TableTool
+                ref="tableToolRef"
+                tableComment="系统公告"
+                functionName="notice"
+                :key="componentKey"
+                :param="state.tableData.param"
+                @close="componentKey = generateUUID()"
+                @insert="onCURD"
+                @deletes="onCURD"
+                @success="getTableData"
+              />
+            </el-header>
+            <el-main>
+              <!-- Table -->
+              <el-table
+                :data="state.tableData.data"
+                v-loading="state.tableData.loading"
+                style="width: 100%"
+                @selection-change="handleSelectionChange"
+              >
+                <el-table-column
+                  type="selection"
+                  header-align="center"
+                  align="center"
+                  width="50"
+                ></el-table-column>
+                <el-table-column
+                  v-show="false"
+                  prop="id"
+                  label="公告ID"
+                  header-align="center"
+                  align="center"
+                  min-width="120"
+                ></el-table-column>
+                <el-table-column
+                  prop="title"
+                  label="公告标题"
+                  header-align="center"
+                  align="center"
+                  min-width="120"
+                ></el-table-column>
+                <fast-table-column
+                  prop="type"
+                  label="公告类型"
+                  dict-type="NITICE_TYPE"
+                ></fast-table-column>
+                <el-table-column prop="status" label="公告状态" dict-type="SYS_STATE">
+                  <template #default="scope">
+                    <fast-switch
+                      v-model="scope.row.status"
+                      dict-type="SYS_STATE"
+                      placeholder="状态"
+                    ></fast-switch>
+                  </template>
+                </el-table-column>
+                <el-table-column
+                  prop="remark"
+                  label="备注"
+                  header-align="center"
+                  align="center"
+                  min-width="120"
+                ></el-table-column>
+                <el-table-column
+                  prop="sort"
+                  label="排序"
+                  header-align="center"
+                  align="center"
+                  min-width="120"
+                ></el-table-column>
+                <el-table-column fixed="right" label="操作" width=" 100 ">
+                  <template #default="scope">
+                    <el-tooltip placement="top" :content="$t('message.form.edit')">
+                      <el-icon
+                        class="mr10"
+                        color="blue"
+                        v-auths="['system:notice:query', 'system:notice:edit']"
+                        @click="onCURD({ type: curdEnum.EDIT, ids: scope.row.id })"
+                      >
+                        <ele-Edit />
+                      </el-icon>
+                    </el-tooltip>
+                    <el-tooltip placement="top" :content="$t('message.form.delete')">
+                      <el-icon
+                        class="mr10"
+                        color="blue"
+                        v-auth="'system:notice:delete'"
+                        @click="onCURD({ type: curdEnum.DELETE, ids: scope.row.id })"
+                      >
+                        <ele-Delete />
+                      </el-icon>
+                    </el-tooltip>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </el-main>
+            <el-footer>
+              <!-- 分页 -->
+              <el-pagination
+                @size-change="onHandleSizeChange"
+                @current-change="onHandleCurrentChange"
+                class="mt15"
+                :pager-count="5"
+                :page-sizes="[10, 20, 30, 50, 100]"
+                v-model:current-page="state.tableData.param.pageNum"
+                background
+                size="default"
+                v-model:page-size="state.tableData.param.pageSize"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="state.tableData.total"
+              ></el-pagination>
+            </el-footer>
+          </el-container>
+        </el-card>
+        <NoticeDialog ref="noticeDialogRef" @refresh="formSubmit" />
       </div>
     </div>
-    <!-- Table  -->
-    <div class="system-notice-container layout-padding">
-      <el-card shadow="hover" class="layout-padding-auto">
-        <el-container>
-          <el-header>
-            <!-- 新增/导入/导出/打印 -->
-            <TableTool
-              ref="tableToolRef"
-              tableComment="系统公告"
-              functionName="notice"
-              :key="componentKey"
-              :param="state.tableData.param"
-              @close="componentKey = generateUUID()"
-              @insert="onCURD"
-              @deletes="onCURD"
-            />
-          </el-header>
-          <el-main>
-            <!-- Table -->
-            <el-table
-              :data="state.tableData.data"
-              v-loading="state.tableData.loading"
-              style="width: 100%"
-              @selection-change="handleSelectionChange"
-            >
-              <el-table-column
-                type="selection"
-                header-align="center"
-                align="center"
-                width="50"
-              ></el-table-column>
-              <el-table-column
-                v-show="false"
-                prop="id"
-                label="公告ID"
-                header-align="center"
-                align="center"
-              ></el-table-column>
-              <el-table-column
-                prop="title"
-                label="公告标题"
-                header-align="center"
-                align="center"
-              ></el-table-column>
-              <fast-table-column
-                prop="type"
-                label="公告类型"
-                dict-type="NITICE_TYPE"
-              ></fast-table-column>
-              <el-table-column prop="status" label="公告状态" dict-type="SYS_STATE">
-                <template #default="scope">
-                  <fast-switch
-                    v-model="scope.row.status"
-                    dict-type="SYS_STATE"
-                    placeholder="状态"
-                  ></fast-switch>
-                </template>
-              </el-table-column>
-              <el-table-column
-                prop="remark"
-                label="备注"
-                header-align="center"
-                align="center"
-              ></el-table-column>
-              <el-table-column
-                prop="sort"
-                label="排序"
-                header-align="center"
-                align="center"
-              ></el-table-column>
-              <el-table-column fixed="right" label="操作" width=" 100 ">
-                <template #default="scope">
-                  <el-tooltip placement="top" :content="$t('message.form.edit')">
-                    <el-icon
-                      class="mr10"
-                      color="blue"
-                      v-auths="['system:notice:query', 'system:notice:edit']"
-                      @click="onCURD({ type: curdEnum.EDIT, ids: scope.row.id })"
-                    >
-                      <ele-Edit />
-                    </el-icon>
-                  </el-tooltip>
-                  <el-tooltip placement="top" :content="$t('message.form.delete')">
-                    <el-icon
-                      class="mr10"
-                      color="blue"
-                      v-auth="'system:notice:delete'"
-                      @click="onCURD({ type: curdEnum.DELETE, ids: scope.row.id })"
-                    >
-                      <ele-Delete />
-                    </el-icon>
-                  </el-tooltip>
-                </template>
-              </el-table-column>
-            </el-table>
-          </el-main>
-          <el-footer>
-            <!-- 分页 -->
-            <el-pagination
-              @size-change="onHandleSizeChange"
-              @current-change="onHandleCurrentChange"
-              class="mt15"
-              :pager-count="5"
-              :page-sizes="[10, 20, 30, 50, 100]"
-              v-model:current-page="state.tableData.param.pageNum"
-              background
-              size="default"
-              v-model:page-size="state.tableData.param.pageSize"
-              layout="total, sizes, prev, pager, next, jumper"
-              :total="state.tableData.total"
-            ></el-pagination>
-          </el-footer>
-        </el-container>
-      </el-card>
-      <NoticeDialog ref="noticeDialogRef" @refresh="formSubmit" />
-    </div>
-  </div>
+  </SystemPage>
 </template>
 //ModuleName 系统公告
 <script setup lang="ts" name="systemNotice">
+  import SystemPage from '/@/views/system/shared/SystemPage.vue';
   import { defineAsyncComponent, reactive, onMounted, ref } from 'vue';
   import { ElMessageBox, ElMessage } from 'element-plus';
   import { CURDEnum } from '/@/enums/CURDEnum';
@@ -178,7 +186,9 @@
   import { Eleme } from '@element-plus/icons-vue';
   import { NextLoading } from '/@/utils/loading';
   const noticeDialogRef = ref();
-  const NoticeDialog = defineAsyncComponent(() => import('/@/views/system/notice/dialog.vue'));
+  const NoticeDialog = defineAsyncComponent(
+    () => import('/@/views/system/notice/components/NoticeDialog.vue')
+  );
   const TableTool = defineAsyncComponent(() => import('/@/components/table-tool/index.vue'));
   const baseApi = noticeApi();
   const curdEnum = CURDEnum;
@@ -199,6 +209,10 @@
       },
     },
   });
+  const onSearch = () => {
+    state.tableData.param.pageNum = 1;
+    getTableData();
+  };
   // 初始化表格数据
   const getTableData = () => {
     state.tableData.loading = true;
@@ -307,6 +321,7 @@
   // 分页改变
   const onHandleSizeChange = (val: number) => {
     state.tableData.param.pageSize = val;
+    state.tableData.param.pageNum = 1;
     getTableData();
   };
   // 分页改变

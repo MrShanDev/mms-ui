@@ -8,11 +8,10 @@ import { defineStore } from 'pinia';
  */
 export const useThemeConfig = defineStore('themeConfig', {
   state: (): ThemeConfigState => ({
-
     themeConfig: {
-
       // 是否开启布局配置抽屉
       isDrawer: false,
+      dashboardScene: 'base',
 
       /**
        * 全局主题
@@ -143,7 +142,8 @@ export const useThemeConfig = defineStore('themeConfig', {
       // 网站主标题（菜单导航、浏览器当前网页标题）；默认与产品约定文案一致，仍可由 env 覆盖构建
       globalTitle: import.meta.env.VITE_APP_TITLE || '模块化管理系统',
       globalViceTitle:
-        import.meta.env.VITE_APP_VICE_TITLE || '模块化管理系统（Modular management system），简称：MMS。',
+        import.meta.env.VITE_APP_VICE_TITLE ||
+        '模块化管理系统（Modular management system），简称：MMS。',
       // 登录页等长说明
       globalViceTitleMsg:
         import.meta.env.VITE_APP_VICE_TITLE_MSG ||
@@ -161,5 +161,3 @@ export const useThemeConfig = defineStore('themeConfig', {
     },
   },
 });
-
-

@@ -13,7 +13,8 @@
           :key="!v.meta.tagsViewName ? v.meta.title : v.meta.tagsViewName"
         >
           <span v-if="k === state.breadcrumbList.length - 1" class="layout-navbars-breadcrumb-span">
-            <SvgIcon :name="v.meta.icon"
+            <SvgIcon
+              :name="v.meta.icon"
               class="layout-navbars-breadcrumb-iconfont"
               v-if="themeConfig.isBreadcrumbIcon"
             />
@@ -21,7 +22,8 @@
             <div v-else>{{ v.meta.tagsViewName }}</div>
           </span>
           <a v-else @click.prevent="onBreadcrumbClick(v)">
-            <SvgIcon :name="v.meta.icon"
+            <SvgIcon
+              :name="v.meta.icon"
               class="layout-navbars-breadcrumb-iconfont"
               v-if="themeConfig.isBreadcrumbIcon"
             />
@@ -38,7 +40,7 @@
     @click="onWelcomeExpandMenu"
   >
     <span class="welcome-icon">👏</span>
-    <span class="welcome-text">欢迎回来，{{ userInfos.userName }}</span>
+    <span class="welcome-text">欢迎回来，{{ userInfos?.userName || '当前用户' }}</span>
   </div>
 </template>
 
@@ -53,7 +55,6 @@
   import { useRoutesList } from '/@/stores/routesList';
   import { useUserInfo } from '/@/stores/userInfo';
 
-
   const storesUserInfo = useUserInfo();
   const { userInfos } = storeToRefs(storesUserInfo);
 
@@ -63,7 +64,6 @@
   const storesThemeConfig = useThemeConfig();
   const { themeConfig } = storeToRefs(storesThemeConfig);
   const { routesList } = storeToRefs(stores);
-  
 
   const route = useRoute();
   const router = useRouter();
@@ -164,10 +164,14 @@
   });
 
   // 监听路由变化
-  watch(() => route.path, (newPath) => {
-    initRouteSplit(newPath);
-  }, { immediate: true });
-  
+  watch(
+    () => route.path,
+    (newPath) => {
+      initRouteSplit(newPath);
+    },
+    { immediate: true }
+  );
+
   // 路由更新时
   onBeforeRouteUpdate((to) => {
     initRouteSplit(to.path);
@@ -180,7 +184,7 @@
     height: inherit;
     display: flex;
     align-items: center;
-    
+
     .layout-navbars-breadcrumb-icon {
       cursor: pointer;
       font-size: 18px;

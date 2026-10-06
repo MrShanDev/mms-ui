@@ -43,6 +43,7 @@ declare interface RoutesListState<T = any> {
 declare interface ThemeConfigState {
   themeConfig: {
     isDrawer: boolean;
+    dashboardScene: 'base' | 'mall' | 'office' | 'task';
     primary: string;
     topBar: string;
     topBarColor: string;

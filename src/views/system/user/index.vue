@@ -1,262 +1,280 @@
 <template>
-  <div class="block">
-    <!-- 功能栏  -->
-    <div class="views-tool">
-      <div class="tool-left">
-        <div class="tool-left-title">筛选查询</div>
-        <el-form
-          :inline="true"
-          size="default"
-          :model="state.tableData.param"
-          class="form-tool"
-          @keyup.enter="getTableData"
-        >
-          <el-form-item>
-            <el-input
-              size="default"
-              v-model="state.tableData.param.userName"
-              placeholder="请输入账户名称"
-              style="max-width: 180px"
-              clearable
-            ></el-input>
-          </el-form-item>
-          <el-form-item>
-            <el-button
-              size="default"
-              type="primary"
-              :disabled="state.tableData.loading"
-              :loading-icon="Eleme"
-              :loading="state.tableData.loading"
-              @click="getTableData"
-              v-auth="'system:user:list'"
-            >
-              <SvgIcon name="iconfont icon-search1" />
-              {{ $t('message.form.search') }}
-            </el-button>
-          </el-form-item>
-        </el-form>
+  <SystemPage feature="user">
+    <div class="block">
+      <!-- 功能栏  -->
+      <div class="views-tool">
+        <div class="tool-left">
+          <div class="tool-left-title">筛选查询</div>
+          <el-form
+            :inline="true"
+            size="default"
+            :model="state.tableData.param"
+            class="form-tool"
+            @keyup.enter="onSearch"
+          >
+            <el-form-item>
+              <el-input
+                size="default"
+                v-model="state.tableData.param.userName"
+                placeholder="请输入账户名称"
+                style="max-width: 180px"
+                clearable
+              ></el-input>
+            </el-form-item>
+            <el-form-item>
+              <el-button
+                size="default"
+                type="primary"
+                :disabled="state.tableData.loading"
+                :loading-icon="Eleme"
+                :loading="state.tableData.loading"
+                @click="onSearch"
+                v-auth="'system:user:list'"
+              >
+                <SvgIcon name="iconfont icon-search1" />
+                {{ $t('message.form.search') }}
+              </el-button>
+            </el-form-item>
+          </el-form>
+        </div>
+      </div>
+      <div class="system-user-container layout-padding">
+        <el-card shadow="never" class="layout-padding-auto">
+          <el-container>
+            <el-header>
+              <!-- 新增/导入/导出/打印 -->
+              <TableTool
+                v-show="!state.tableData.loading"
+                ref="tableToolRef"
+                tableComment="系统用户"
+                functionName="user"
+                :key="componentKey"
+                :param="state.tableData.param"
+                @close="componentKey = generateUUID()"
+                @insert="onCURD"
+                @deletes="onCURD"
+                @success="getTableData"
+              />
+            </el-header>
+            <el-main>
+              <!-- Table -->
+              <el-table
+                :data="state.tableData.data"
+                v-loading="state.tableData.loading"
+                @selection-change="handleSelectionChange"
+                style="width: 100%"
+              >
+                <el-table-column type="selection" label="序号" width="50" />
+                <el-table-column
+                  prop="userName"
+                  label="账户名称"
+                  width="100"
+                  show-overflow-tooltip
+                ></el-table-column>
+                <el-table-column
+                  prop="nickName"
+                  label="用户昵称"
+                  show-overflow-tooltip
+                  min-width="120"
+                ></el-table-column>
+                <el-table-column prop="avatar" label="头像" width="100" show-overflow-tooltip>
+                  <template #default="scope">
+                    <el-image
+                      style="width: 50px; height: 50px"
+                      :src="scope.row.avatar"
+                      :zoom-rate="1.2"
+                      :max-scale="7"
+                      :min-scale="0.2"
+                      :preview-src-list="[scope.row.avatar]"
+                      :initial-index="1"
+                      preview-teleported
+                      fit="cover"
+                    />
+                  </template>
+                </el-table-column>
+                <el-table-column
+                  prop="roleName"
+                  label="关联角色"
+                  show-overflow-tooltip
+                  min-width="120"
+                ></el-table-column>
+                <el-table-column
+                  prop="department"
+                  label="部门"
+                  show-overflow-tooltip
+                  min-width="120"
+                ></el-table-column>
+                <el-table-column
+                  prop="phoneNumber"
+                  label="手机号"
+                  show-overflow-tooltip
+                  min-width="120"
+                ></el-table-column>
+                <el-table-column
+                  prop="email"
+                  label="邮箱"
+                  show-overflow-tooltip
+                  min-width="120"
+                ></el-table-column>
+                <el-table-column
+                  prop="status"
+                  label="用户状态"
+                  show-overflow-tooltip
+                  min-width="120"
+                >
+                  <template #default="scope">
+                    <!-- <el-tag type="success" v-if="scope.row.status == 0">启用</el-tag>
+									<el-tag type="info" v-else>禁用</el-tag> -->
+                    <fast-switch
+                      v-model="scope.row.status"
+                      dict-type="SYS_STATE"
+                      placeholder="用户状态"
+                      size="small"
+                      :disabled="$ut.isSuperAdmin(scope.row.roleCodes)"
+                      @change="updateStatus(scope.row, scope.row.status)"
+                    ></fast-switch>
+                  </template>
+                </el-table-column>
+                <el-table-column prop="remark" label="用户描述" min-width="120"></el-table-column>
+                <el-table-column
+                  prop="createdTime"
+                  width="170"
+                  label="创建时间"
+                  show-overflow-tooltip
+                ></el-table-column>
+                <el-table-column fixed="right" width="130" label="操作">
+                  <template #default="scope">
+                    <el-tooltip placement="top" :content="$t('message.form.edit')">
+                      <el-icon
+                        class="mr10"
+                        color="blue"
+                        v-auths="['system:user:query', 'system:user:edit']"
+                        @click="onCURD({ type: curdEnum.EDIT, ids: scope.row.userId })"
+                      >
+                        <ele-Edit />
+                      </el-icon>
+                    </el-tooltip>
+                    <el-tooltip
+                      v-if="!$ut.isSuperAdmin(scope.row.roleCodes)"
+                      placement="top"
+                      :content="$t('message.form.delete')"
+                    >
+                      <el-icon
+                        class="mr10"
+                        color="blue"
+                        v-auth="'system:user:delete'"
+                        @click="onCURD({ type: curdEnum.DELETE, ids: scope.row.userId })"
+                      >
+                        <ele-Delete />
+                      </el-icon>
+                    </el-tooltip>
+                    <el-tooltip
+                      v-if="!$ut.isSuperAdmin(scope.row.roleCodes)"
+                      placement="top"
+                      :content="$t('message.form.resetPasswords')"
+                    >
+                      <el-icon
+                        class="mr10"
+                        color="blue"
+                        v-auth="'system:user:edit'"
+                        @click="openResetPassword(scope.row)"
+                      >
+                        <ele-Key />
+                      </el-icon>
+                    </el-tooltip>
+                    <el-tooltip
+                      v-if="!$ut.isSuperAdmin(scope.row.roleCodes)"
+                      placement="top"
+                      :content="$t('message.form.rolesAllocation')"
+                    >
+                      <el-icon
+                        class="mr10"
+                        color="blue"
+                        v-auth="'system:user:delete'"
+                        @click="openUserRole(scope.row)"
+                      >
+                        <ele-CircleCheck />
+                      </el-icon>
+                    </el-tooltip>
+                  </template>
+                </el-table-column>
+              </el-table>
+            </el-main>
+            <el-footer>
+              <!-- 分页 -->
+              <el-pagination
+                @size-change="onHandleSizeChange"
+                @current-change="onHandleCurrentChange"
+                class="mt15"
+                :pager-count="5"
+                :page-sizes="[10, 20, 30, 50, 100]"
+                v-model:current-page="state.tableData.param.pageNum"
+                background
+                size="default"
+                v-model:page-size="state.tableData.param.pageSize"
+                layout="total, sizes, prev, pager, next, jumper"
+                :total="state.tableData.total"
+              ></el-pagination>
+            </el-footer>
+          </el-container>
+        </el-card>
+        <!-- 编辑 -->
+        <UserDialog ref="dialogRef" @refresh="formSubmit" />
+        <!-- 重置密码 -->
+        <el-dialog v-model="resetPassword.dialogState" :title="$t('message.form.hint')" width="500">
+          <div class="my-4">
+            {{ $t('message.form.pleaseInput') }} "{{ resetPassword.form.userName }}"
+            {{ $t('message.form.newPassword') }}
+          </div>
+          <el-input v-model="resetPassword.form.password" autocomplete="off" />
+          <template #footer>
+            <div class="dialog-footer">
+              <el-button @click="resetPassword.dialogState = false">
+                {{ $t('message.form.cancel') }}
+              </el-button>
+              <el-button type="primary" @click="primaryPasswordBut">
+                {{ $t('message.form.confirm') }}
+              </el-button>
+            </div>
+          </template>
+        </el-dialog>
+        <!--用户角色-->
+        <el-dialog v-model="userRole.dialogState" :title="$t('message.form.userRole')" width="500">
+          <div>
+            <div class="my-4">
+              {{ $t('message.form.setting') }} "{{ userRole.form.userName }}"
+              {{ $t('message.form.userRoles') }}
+            </div>
+            <el-checkbox-group v-model="userRole.form.roleCodes">
+              <el-checkbox
+                v-for="(item, index) in userRole.roleData"
+                :key="index"
+                :label="item.code"
+                :value="item.code"
+                :disabled="item.code === 'super_admin'"
+              >
+                {{ item.name }}
+              </el-checkbox>
+            </el-checkbox-group>
+          </div>
+          <template #footer>
+            <div class="dialog-footer">
+              <el-button @click="userRole.dialogState = false">
+                {{ $t('message.form.cancel') }}
+              </el-button>
+              <el-button type="primary" @click="primaryUserRoleBut">
+                {{ $t('message.form.confirm') }}
+              </el-button>
+            </div>
+          </template>
+        </el-dialog>
       </div>
     </div>
-    <div class="system-user-container layout-padding">
-      <el-card shadow="hover" class="layout-padding-auto">
-        <el-container>
-          <el-header>
-            <!-- 新增/导入/导出/打印 -->
-            <TableTool
-              v-show="!state.tableData.loading"
-              ref="tableToolRef"
-              tableComment="系统用户"
-              functionName="user"
-              :key="componentKey"
-              :param="state.tableData.param"
-              @close="componentKey = generateUUID()"
-              @insert="onCURD"
-              @deletes="onCURD"
-            />
-          </el-header>
-          <el-main>
-            <!-- Table -->
-            <el-table
-              :data="state.tableData.data"
-              v-loading="state.tableData.loading"
-              @selection-change="handleSelectionChange"
-              style="width: 100%"
-            >
-              <el-table-column type="selection" label="序号" width="50" />
-              <el-table-column
-                prop="userName"
-                label="账户名称"
-                width="100"
-                show-overflow-tooltip
-              ></el-table-column>
-              <el-table-column
-                prop="nickName"
-                label="用户昵称"
-                show-overflow-tooltip
-              ></el-table-column>
-              <el-table-column prop="avatar" label="头像" width="100" show-overflow-tooltip>
-                <template #default="scope">
-                  <el-image
-                    style="width: 50px; height: 50px"
-                    :src="scope.row.avatar"
-                    :zoom-rate="1.2"
-                    :max-scale="7"
-                    :min-scale="0.2"
-                    :preview-src-list="[scope.row.avatar]"
-                    :initial-index="1"
-                    preview-teleported
-                    fit="cover"
-                  />
-                </template>
-              </el-table-column>
-              <el-table-column
-                prop="roleName"
-                label="关联角色"
-                show-overflow-tooltip
-              ></el-table-column>
-              <el-table-column
-                prop="department"
-                label="部门"
-                show-overflow-tooltip
-              ></el-table-column>
-              <el-table-column
-                prop="phoneNumber"
-                label="手机号"
-                show-overflow-tooltip
-              ></el-table-column>
-              <el-table-column prop="email" label="邮箱" show-overflow-tooltip></el-table-column>
-              <el-table-column prop="status" label="用户状态" show-overflow-tooltip>
-                <template #default="scope">
-                  <!-- <el-tag type="success" v-if="scope.row.status == 0">启用</el-tag>
-									<el-tag type="info" v-else>禁用</el-tag> -->
-                  <fast-switch
-                    v-model="scope.row.status"
-                    dict-type="SYS_STATE"
-                    placeholder="用户状态"
-                    size="small"
-                    :disabled="$ut.isSuperAdmin(scope.row.roleCodes)"
-                    @change="updateStatus(scope.row, scope.row.status)"
-                  ></fast-switch>
-                </template>
-              </el-table-column>
-              <el-table-column prop="remark" label="用户描述"></el-table-column>
-              <el-table-column
-                prop="createdTime"
-                width="170"
-                label="创建时间"
-                show-overflow-tooltip
-              ></el-table-column>
-              <el-table-column fixed="right" width="130" label="操作">
-                <template #default="scope">
-                  <el-tooltip placement="top" :content="$t('message.form.edit')">
-                    <el-icon
-                      class="mr10"
-                      color="blue"
-                      v-auths="['system:user:query', 'system:user:edit']"
-                      @click="onCURD({ type: curdEnum.EDIT, ids: scope.row.userId })"
-                    >
-                      <ele-Edit />
-                    </el-icon>
-                  </el-tooltip>
-                  <el-tooltip
-                    v-if="!$ut.isSuperAdmin(scope.row.roleCodes)"
-                    placement="top"
-                    :content="$t('message.form.delete')"
-                  >
-                    <el-icon
-                      class="mr10"
-                      color="blue"
-                      v-auth="'system:user:delete'"
-                      @click="onCURD({ type: curdEnum.DELETE, ids: scope.row.userId })"
-                    >
-                      <ele-Delete />
-                    </el-icon>
-                  </el-tooltip>
-                  <el-tooltip
-                    v-if="!$ut.isSuperAdmin(scope.row.roleCodes)"
-                    placement="top"
-                    :content="$t('message.form.resetPasswords')"
-                  >
-                    <el-icon
-                      class="mr10"
-                      color="blue"
-                      v-auth="'system:user:edit'"
-                      @click="openResetPassword(scope.row)"
-                    >
-                      <ele-Key />
-                    </el-icon>
-                  </el-tooltip>
-                  <el-tooltip
-                    v-if="!$ut.isSuperAdmin(scope.row.roleCodes)"
-                    placement="top"
-                    :content="$t('message.form.rolesAllocation')"
-                  >
-                    <el-icon
-                      class="mr10"
-                      color="blue"
-                      v-auth="'system:user:delete'"
-                      @click="openUserRole(scope.row)"
-                    >
-                      <ele-CircleCheck />
-                    </el-icon>
-                  </el-tooltip>
-                </template>
-              </el-table-column>
-            </el-table>
-          </el-main>
-          <el-footer>
-            <!-- 分页 -->
-            <el-pagination
-              @size-change="onHandleSizeChange"
-              @current-change="onHandleCurrentChange"
-              class="mt15"
-              :pager-count="5"
-              :page-sizes="[10, 20, 30, 50, 100]"
-              v-model:current-page="state.tableData.param.pageNum"
-              background
-              size="default"
-              v-model:page-size="state.tableData.param.pageSize"
-              layout="total, sizes, prev, pager, next, jumper"
-              :total="state.tableData.total"
-            ></el-pagination>
-          </el-footer>
-        </el-container>
-      </el-card>
-      <!-- 编辑 -->
-      <UserDialog ref="dialogRef" @refresh="formSubmit" />
-      <!-- 重置密码 -->
-      <el-dialog v-model="resetPassword.dialogState" :title="$t('message.form.hint')" width="500">
-        <div class="my-4">
-          {{ $t('message.form.pleaseInput') }} "{{ resetPassword.form.userName }}"
-          {{ $t('message.form.newPassword') }}
-        </div>
-        <el-input v-model="resetPassword.form.password" autocomplete="off" />
-        <template #footer>
-          <div class="dialog-footer">
-            <el-button @click="resetPassword.dialogState = false">
-              {{ $t('message.form.cancel') }}
-            </el-button>
-            <el-button type="primary" @click="primaryPasswordBut">
-              {{ $t('message.form.confirm') }}
-            </el-button>
-          </div>
-        </template>
-      </el-dialog>
-      <!--用户角色-->
-      <el-dialog v-model="userRole.dialogState" :title="$t('message.form.userRole')" width="500">
-        <div>
-          <div class="my-4">
-            {{ $t('message.form.setting') }} "{{ userRole.form.userName }}"
-            {{ $t('message.form.userRoles') }}
-          </div>
-          <el-checkbox-group v-model="userRole.form.roleCodes">
-            <el-checkbox
-              v-for="(item, index) in userRole.roleData"
-              :key="index"
-              :label="item.code"
-              :value="item.code"
-              :disabled="item.code === 'super_admin'"
-            >
-              {{ item.name }}
-            </el-checkbox>
-          </el-checkbox-group>
-        </div>
-        <template #footer>
-          <div class="dialog-footer">
-            <el-button @click="userRole.dialogState = false">
-              {{ $t('message.form.cancel') }}
-            </el-button>
-            <el-button type="primary" @click="primaryUserRoleBut">
-              {{ $t('message.form.confirm') }}
-            </el-button>
-          </div>
-        </template>
-      </el-dialog>
-    </div>
-  </div>
+  </SystemPage>
 </template>
 
 <script setup lang="ts" name="systemUser">
+  import SystemPage from '/@/views/system/shared/SystemPage.vue';
   import { defineAsyncComponent, reactive, onMounted, ref } from 'vue';
   import { ElMessageBox, ElMessage } from 'element-plus';
   import { CURDEnum } from '/@/enums/CURDEnum';
@@ -270,7 +288,9 @@
   import FastSwitch from '/@/components/fast-switch/src/fast-switch.vue';
 
   // 引入组件
-  const UserDialog = defineAsyncComponent(() => import('/@/views/system/user/dialog.vue'));
+  const UserDialog = defineAsyncComponent(
+    () => import('/@/views/system/user/components/UserDialog.vue')
+  );
   const TableTool = defineAsyncComponent(() => import('/@/components/table-tool/index.vue'));
 
   // 定义变量内容
@@ -309,6 +329,10 @@
       userName: string;
     },
   });
+  const onSearch = () => {
+    state.tableData.param.pageNum = 1;
+    getTableData();
+  };
   // 初始化表格数据
   const getTableData = () => {
     state.tableData.loading = true;
@@ -431,6 +455,7 @@
   // 分页改变大小
   const onHandleSizeChange = (val: number) => {
     state.tableData.param.pageSize = val;
+    state.tableData.param.pageNum = 1;
     getTableData();
   };
   // 分页改变页码
