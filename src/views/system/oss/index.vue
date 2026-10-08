@@ -1,54 +1,63 @@
 <template>
   <SystemPage feature="oss">
+    <template #actions>
+      <div class="oss-actions">
+        <el-upload
+          ref="upload"
+          class="oss-file-picker"
+          :show-file-list="false"
+          :action="httpFileUrl"
+          :limit="1"
+          :headers="httpFileHeaders"
+          :on-exceed="handleExceed"
+          :on-success="onSuccess"
+          :on-error="onUploadError"
+          v-model:file-list="selectedFiles"
+          :auto-upload="false"
+        >
+          <template #trigger>
+            <el-button size="default" type="warning" v-auth="'system:oss:insert'">
+              选择文件
+            </el-button>
+          </template>
+        </el-upload>
+        <el-button
+          size="default"
+          type="success"
+          :loading="uploading"
+          :disabled="!selectedFiles.some((file) => file.status === 'ready')"
+          v-auth="'system:oss:insert'"
+          @click="submitUpload"
+        >
+          提交上传
+        </el-button>
+        <el-button
+          size="default"
+          :type="state.tableData.param.lookImg ? 'info' : 'primary'"
+          @click="updateLookImg"
+        >
+          <View
+            v-if="!state.tableData.param.lookImg"
+            style="width: 1em; height: 1em; margin-right: 8px"
+          />
+          <Hide v-else style="width: 1em; height: 1em; margin-right: 8px" />
+          {{ state.tableData.param.lookImg ? '隐藏图片' : '显示图片' }}
+        </el-button>
+        <el-tooltip :content="$t('message.router.ossinfo')" placement="bottom">
+          <el-icon class="oss-upload-help" tabindex="0" aria-label="上传说明">
+            <InfoFilled />
+          </el-icon>
+        </el-tooltip>
+      </div>
+    </template>
+    <div v-if="selectedFiles.length" class="oss-pending-file" role="status">
+      <span>待上传：{{ selectedFiles[0].name }}</span>
+      <el-button link type="primary" :disabled="uploading" @click="upload?.clearFiles()">
+        移除
+      </el-button>
+    </div>
     <div class="system-oss-container layout-padding">
       <el-card shadow="never" class="layout-padding-auto">
-        <div class="system-user-search mb15">
-          <el-upload
-            ref="upload"
-            class="ml5"
-            :action="httpFileUrl"
-            :limit="1"
-            :headers="httpFileHeaders"
-            :on-exceed="handleExceed"
-            :on-success="onSuccess"
-            :on-error="onUploadError"
-            v-model:file-list="selectedFiles"
-            :auto-upload="false"
-          >
-            <template #trigger>
-              <el-button size="small" type="warning" v-auth="'system:oss:insert'">
-                选择文件
-              </el-button>
-            </template>
-            <el-button
-              size="small"
-              class="ml10"
-              type="success"
-              :loading="uploading"
-              v-auth="'system:oss:insert'"
-              @click="submitUpload"
-            >
-              提交上传
-            </el-button>
-            <el-button
-              size="small"
-              :type="state.tableData.param.lookImg ? 'info' : 'primary'"
-              @click="updateLookImg"
-            >
-              <View
-                v-if="!state.tableData.param.lookImg"
-                style="width: 1em; height: 1em; margin-right: 8px"
-              />
-              <Hide v-else style="width: 1em; height: 1em; margin-right: 8px" />
-              {{ state.tableData.param.lookImg ? '隐藏图片' : '显示图片' }}
-            </el-button>
-            <template #tip>
-              <div class="el-upload__tip text-red">
-                {{ $t('message.router.ossinfo') }}
-              </div>
-            </template>
-          </el-upload>
-        </div>
         <el-table
           :data="state.tableData.data"
           v-loading="state.tableData.loading"
@@ -83,7 +92,7 @@
               <img
                 @click="handlePreview(scope.row.ossId)"
                 v-if="state.tableData.param.lookImg"
-                :src="scope.row.base64"
+                :src="scope.row.url"
                 style="height: 30px"
               />
               <p v-else ref="copyTextRef" @click="handlePreview(scope.row.ossId)">
@@ -168,7 +177,7 @@
   import { Session } from '/@/utils/storage';
   import type { UploadInstance, UploadProps, UploadRawFile, UploadUserFile } from 'element-plus';
   import FastTableColumn from '/@/components/fast-table-column/src/fast-table-column.vue';
-  import { Hide, Share, Tools, View } from '@element-plus/icons-vue';
+  import { Hide, Share, Tools, View, InfoFilled } from '@element-plus/icons-vue';
   import useClipboard from 'vue-clipboard3';
   import { SysOssState, RowOssType } from '/@/views/system/oss/type';
 
@@ -241,7 +250,7 @@
   const handlePreview = async (ossId: string) => {
     try {
       const res = await baseApi.query(ossId);
-      const image = res.data?.base64;
+      const image = res.data?.url;
       if (!image) {
         ElMessage.info('该文件暂无图片预览');
         return;
@@ -315,4 +324,32 @@
     getTableData();
   });
 </script>
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+  .oss-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .oss-file-picker {
+    display: flex;
+    align-items: center;
+  }
+  .oss-upload-help {
+    color: var(--el-text-color-secondary);
+    cursor: help;
+  }
+  .oss-pending-file {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-bottom: 12px;
+    color: var(--el-text-color-regular);
+    font-size: 14px;
+  }
+  .oss-pending-file span {
+    overflow-wrap: anywhere;
+  }
+</style>

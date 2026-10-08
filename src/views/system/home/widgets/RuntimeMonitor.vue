@@ -1,7 +1,18 @@
 <template>
   <div class="home-card-item mb15">
     <div class="home-card-item-title home-card-item-title--with-action">
-      <div>运行状态</div>
+      <div class="monitor-heading">
+        <SvgIcon name="ele-Histogram" :size="22" />
+        <div>
+          <strong>服务运行监控</strong>
+          <small>实时监控系统资源与服务状态</small>
+        </div>
+      </div>
+      <time class="runtime-updated">
+        最后更新：{{
+          info?.app?.serverTimeMs ? format.formatServerTime(info.app.serverTimeMs) : '等待数据'
+        }}
+      </time>
     </div>
     <div class="home-card-item-content home-runtime-card-content">
       <div v-loading="loading" class="runtime-wrap">
@@ -9,20 +20,19 @@
           <div class="runtime-metric">
             <div class="runtime-metric-title">
               <SvgIcon name="ele-Cpu" :size="16" color="#409eff" />
-              <span>CPU（趋势）</span>
+              <span>CPU 使用率</span>
             </div>
-            <div :ref="(el) => setChartRef('cpu', el)" class="runtime-spark"></div>
             <div class="runtime-metric-value">
               {{ format.percentText(info?.cpu?.systemLoad) }}
               <span class="runtime-metric-sub">· {{ format.safeText(info?.cpu?.cores) }}核</span>
             </div>
+            <div :ref="(el) => setChartRef('cpu', el)" class="runtime-spark"></div>
           </div>
           <div class="runtime-metric">
             <div class="runtime-metric-title">
-              <SvgIcon name="ele-Coin" :size="16" color="#67c23a" />
-              <span>物理内存（趋势）</span>
+              <SvgIcon name="ele-Coin" :size="16" color="#9254ff" />
+              <span>物理内存使用率</span>
             </div>
-            <div :ref="(el) => setChartRef('mem', el)" class="runtime-spark"></div>
             <div class="runtime-metric-value">
               {{ format.percentText(info?.memory?.usedPercent) }}
               <span class="runtime-metric-sub">
@@ -30,13 +40,13 @@
                 {{ format.bytesText(info?.memory?.total) }}
               </span>
             </div>
+            <div :ref="(el) => setChartRef('mem', el)" class="runtime-spark"></div>
           </div>
           <div class="runtime-metric">
             <div class="runtime-metric-title">
-              <SvgIcon name="ele-Platform" :size="16" color="#e6a23c" />
-              <span>JVM内存（趋势）</span>
+              <SvgIcon name="ele-Platform" :size="16" color="#00b8d9" />
+              <span>JVM 内存使用率</span>
             </div>
-            <div :ref="(el) => setChartRef('jvm', el)" class="runtime-spark"></div>
             <div class="runtime-metric-value">
               {{ format.percentText(info?.jvmMemory?.usedPercent) }}
               <span class="runtime-metric-sub">
@@ -44,10 +54,61 @@
                 {{ format.bytesText(info?.jvmMemory?.total) }}
               </span>
             </div>
+            <div :ref="(el) => setChartRef('jvm', el)" class="runtime-spark"></div>
           </div>
         </div>
 
-        <div class="runtime-kv-pack">
+        <div class="runtime-section-title service-strip-title">核心服务状态</div>
+        <div class="runtime-services">
+          <div>
+            <SvgIcon name="ele-Coin" :size="26" />
+            <span>
+              数据库
+              <strong>
+                {{
+                  info?.db?.available
+                    ? format.safeText(info.db.productName) +
+                      ' ' +
+                      format.safeText(info.db.productVersion, '')
+                    : '未获取'
+                }}
+              </strong>
+            </span>
+          </div>
+          <div>
+            <SvgIcon name="ele-Connection" :size="26" />
+            <span>
+              Redis
+              <strong>
+                {{ info?.redis ? (info.redis.connected ? '已连接' : '未连接') : '未获取' }}
+              </strong>
+              <small :class="{ 'is-ok': info?.redis?.connected }">
+                {{ info?.redis?.connected ? '● 连接正常' : '● 等待连接' }}
+              </small>
+            </span>
+          </div>
+          <div>
+            <SvgIcon name="ele-CoffeeCup" :size="26" />
+            <span>
+              JDK
+              <strong>{{ format.safeText(info?.app?.jdkVersion) }}</strong>
+              <small :class="{ 'is-ok': !!info?.app?.jdkVersion }">
+                {{ info?.app?.jdkVersion ? '● 运行正常' : '等待数据' }}
+              </small>
+            </span>
+          </div>
+          <div>
+            <SvgIcon name="ele-Timer" :size="26" />
+            <span>
+              运行时长
+              <strong>
+                {{ info?.app?.uptimeMs ? format.formatDuration(info.app.uptimeMs) : '-' }}
+              </strong>
+            </span>
+          </div>
+        </div>
+        <details class="runtime-kv-pack runtime-details">
+          <summary>运行快照 · 服务器与环境详情</summary>
           <div class="runtime-section-title">运行快照</div>
           <el-descriptions class="runtime-kv-desc" size="small" :column="3" border>
             <!-- 一行三列：宿主/负载 → 进程 → 环境 -->
@@ -98,10 +159,15 @@
               <span v-else>-</span>
             </el-descriptions-item>
           </el-descriptions>
-        </div>
+        </details>
 
         <div class="runtime-section runtime-db-section">
-          <div class="runtime-section-title">数据库</div>
+          <div class="runtime-section-title">
+            数据库连接池
+            <span class="pool-status" :class="{ 'is-ok': info?.db?.available }">
+              {{ info?.db?.available ? '数据库已连接' : '等待数据' }}
+            </span>
+          </div>
           <div class="db-grid">
             <div class="db-metric">
               <div class="db-metric-label">连接池</div>
@@ -121,25 +187,28 @@
             </div>
           </div>
 
-          <div class="runtime-section-subtitle">
-            慢 SQL（阈值：{{
-              format.safeText(info?.slowSqlRecent?.length ? slowSqlThresholdText : '')
-            }}）
-          </div>
-          <el-table
-            :data="Array.isArray(info?.slowSqlRecent) ? info.slowSqlRecent : []"
-            style="width: 100%"
-            height="148"
-          >
-            <el-table-column prop="elapsedMs" label="耗时(ms)" width="110" />
-            <el-table-column prop="datasource" label="数据源" width="120" show-overflow-tooltip />
-            <el-table-column prop="timeMs" label="时间" width="180">
-              <template #default="scope">
-                {{ scope.row.timeMs ? format.formatServerTime(scope.row.timeMs) : '-' }}
-              </template>
-            </el-table-column>
-            <el-table-column prop="sql" label="SQL" show-overflow-tooltip />
-          </el-table>
+          <details class="slow-sql-details">
+            <summary>慢 SQL 明细</summary>
+            <div class="runtime-section-subtitle">
+              慢 SQL（阈值：{{
+                format.safeText(info?.slowSqlRecent?.length ? slowSqlThresholdText : '')
+              }}）
+            </div>
+            <el-table
+              :data="Array.isArray(info?.slowSqlRecent) ? info.slowSqlRecent : []"
+              style="width: 100%"
+              height="148"
+            >
+              <el-table-column prop="elapsedMs" label="耗时(ms)" width="110" />
+              <el-table-column prop="datasource" label="数据源" width="120" show-overflow-tooltip />
+              <el-table-column prop="timeMs" label="时间" width="180">
+                <template #default="scope">
+                  {{ scope.row.timeMs ? format.formatServerTime(scope.row.timeMs) : '-' }}
+                </template>
+              </el-table-column>
+              <el-table-column prop="sql" label="SQL" show-overflow-tooltip />
+            </el-table>
+          </details>
         </div>
       </div>
     </div>
@@ -148,6 +217,7 @@
 <script setup lang="ts">
   defineProps<{
     info: any;
+    connected: boolean;
     loading: boolean;
     slowSqlThresholdText: string;
     format: Record<string, (...args: any[]) => string>;

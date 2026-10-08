@@ -1,15 +1,13 @@
 <template>
   <SystemPage feature="menu">
-    <div class="block">
-      <div class="system-menu-container layout-padding">
-        <el-card shadow="never" class="layout-padding-auto">
-          <div class="system-menu-search">
-            <el-button size="small" type="primary" @click="clickExpand">
+    <template #actions>
+<div class="system-menu-search">
+            <el-button size="default" type="primary" @click="clickExpand">
               <el-icon><ele-Sort /></el-icon>
               {{ expand.state ? '全部折叠' : '全部展开' }}
             </el-button>
             <el-button
-              size="small"
+              size="default"
               type="success"
               class="ml10"
               v-auth="'system:function:insert'"
@@ -21,6 +19,11 @@
               新增菜单
             </el-button>
           </div>
+    </template>
+    <div class="block">
+      <div class="system-menu-container layout-padding">
+        <el-card shadow="never" class="layout-padding-auto">
+
           <el-table
             :data="state.tableData.data"
             v-loading="state.tableData.loading"

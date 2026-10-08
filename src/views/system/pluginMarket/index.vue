@@ -213,7 +213,7 @@
               class="plugin-card__upload"
               :show-file-list="false"
               accept=".jar"
-              :http-request="(opt) => onUploadForRow(opt, row)"
+              :http-request="(opt: UploadRequestOptions) => onUploadForRow(opt, row)"
             >
               <el-button type="success" link>安装</el-button>
             </el-upload>
@@ -741,6 +741,8 @@ import type { UploadRequestOptions } from 'element-plus';
 import { saveAs } from 'file-saver';
 import { usePluginLogViewer } from '/@/composables/usePluginLogViewer';
 import { computed, onBeforeUnmount, onMounted, reactive, ref, watch } from 'vue';
+import { refreshPluginFederation } from '/@/router/pluginFederation/runtime';
+import { useKeepALiveNames } from '/@/stores/keepAliveNames';
 import { initBackEndControlRoutes } from '/@/router/backEnd';
 import { useUserInfo } from '/@/stores/userInfo';
 import { Session } from '/@/utils/storage';
@@ -1242,7 +1244,7 @@ async function loadPluginSysConfig(row: any) {
       }
     }
     if (schema.length > 0) {
-      const bySuffix = new Map(list.map((r: any) => [String(r.keySuffix ?? '').trim(), r]));
+      const bySuffix = new Map<string, Record<string, any>>(list.map((r: any) => [String(r.keySuffix ?? '').trim(), r]));
       pluginSysConfigItems.value = schema.map((def: any) => {
         const ks = String(def.keySuffix ?? '').trim();
         const hit = bySuffix.get(ks);
@@ -1551,7 +1553,7 @@ async function onRollback(row: any) {
     await activatePluginVersion(row.pluginId, rollbackVer.value);
     ElMessage.success('已切换激活版本并重载');
     detailVisible.value = false;
-    await loadAll();
+    await Promise.all([loadAll(), refreshCurrentUserPermissionContext()]);
   } catch {
     /* */
   } finally {
@@ -1588,9 +1590,14 @@ async function refreshCurrentUserPermissionContext() {
       await useUserInfo().setUserInfos();
     }
     // 重新拉取菜单并重建动态路由，避免 install.sql 后权限/菜单需重登才生效
+    await refreshPluginFederation();
+    const keepAlive = useKeepALiveNames();
+    await keepAlive.setCacheKeepAlive([]);
+    await keepAlive.delAllCachedViews();
     await initBackEndControlRoutes();
-  } catch {
-    // 不阻断安装流程，允许用户手动刷新页面兜底
+  } catch (error) {
+    console.error('插件变更后刷新权限与页面失败', error);
+    ElMessage.warning('插件操作已完成，但页面刷新失败，请刷新浏览器后检查菜单');
   }
 }
 
@@ -1644,7 +1651,7 @@ async function onReloadAll() {
   try {
     await reloadPlugins();
     ElMessage.success('已全量重载');
-    await loadAll();
+    await Promise.all([loadAll(), refreshCurrentUserPermissionContext()]);
   } finally {
     reloading.value = false;
   }

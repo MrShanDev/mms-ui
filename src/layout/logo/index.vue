@@ -9,7 +9,11 @@
     @keydown.enter.prevent="onThemeConfigChange"
     @keydown.space.prevent="onThemeConfigChange"
   >
-    <span class="brand-mark"><img :src="logoMini" class="layout-logo-medium-img" alt="" /></span>
+    <span class="brand-mark">
+      <img :src="logoMini" class="layout-logo-medium-img" alt="" />
+      <img class="workspace-brand-img" :src="workspaceMark" alt="" />
+    </span>
+    <span class="workspace-wordmark">MMS</span>
     <div class="brand-name" :title="themeConfig.globalTitle">{{ themeConfig.globalTitle }}</div>
   </div>
   <div
@@ -30,6 +34,7 @@
   import { computed } from 'vue';
   import { storeToRefs } from 'pinia';
   import { useThemeConfig } from '/@/stores/themeConfig';
+  import workspaceMark from '/@/assets/workspace-mark.svg';
   import logoMini from '/@/assets/logo-mini.png';
 
   // 定义变量内容
@@ -49,6 +54,12 @@
 </script>
 
 <style scoped lang="scss">
+  .workspace-brand-img {
+    display: none;
+  }
+  .workspace-wordmark {
+    display: none;
+  }
   .layout-logo,
   .layout-logo-size {
     width: 100%;

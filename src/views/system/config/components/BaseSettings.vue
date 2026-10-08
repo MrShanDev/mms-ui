@@ -1,5 +1,12 @@
 <template>
   <el-form ref="deptDialogFormRef" :model="configRuleForm" size="default" label-width="150px">
+    <div class="config-form-toolbar">
+      <SystemToolbar>
+        <el-button size="default" @click="onSubmitConfig" type="primary" class="ml10">
+          保存
+        </el-button>
+      </SystemToolbar>
+    </div>
     <el-row>
       <el-col :xs="24" :sm="24" :md="18" :lg="14" :offset="0">
         <el-form-item label="系统名称" prop="status">
@@ -51,16 +58,12 @@
           </el-checkbox-group>
           <el-text size="small" type="danger">手机短信验证，需要配置短信服务</el-text>
         </el-form-item>
-        <el-form-item>
-          <el-button size="default" @click="onSubmitConfig" type="primary" class="ml10">
-            保存
-          </el-button>
-        </el-form-item>
       </el-col>
     </el-row>
   </el-form>
 </template>
 <script setup lang="ts">
+  import SystemToolbar from '/@/views/system/shared/SystemToolbar.vue';
   import { onMounted, reactive } from 'vue';
   import { sysConfigApi } from '/@/views/system/config';
   const baseApi = sysConfigApi();

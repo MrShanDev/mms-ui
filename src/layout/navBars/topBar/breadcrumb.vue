@@ -1,5 +1,14 @@
 <template>
-  <div v-if="isShowBreadcrumb && !isCompactTopBar" class="layout-navbars-breadcrumb ml20">
+  <div v-if="isWorkspaceHome" class="workspace-breadcrumb">
+    <SvgIcon name="ele-House" :size="20" />
+    <span>控制台</span>
+    <i>/</i>
+    <strong>系统工作台</strong>
+  </div>
+  <div
+    v-if="!isWorkspaceHome && isShowBreadcrumb && !isCompactTopBar"
+    class="layout-navbars-breadcrumb ml20"
+  >
     <SvgIcon
       class="layout-navbars-breadcrumb-icon m-4"
       :name="themeConfig.isCollapse ? 'ele-Expand' : 'ele-Fold'"
@@ -35,7 +44,7 @@
   </div>
   <!-- 欢迎信息：点击展开左侧菜单（若在收起状态） -->
   <div
-    v-if="!isShowBreadcrumb || isCompactTopBar"
+    v-if="!isWorkspaceHome && (!isShowBreadcrumb || isCompactTopBar)"
     class="welcome-section hvr-pulse ml20"
     @click="onWelcomeExpandMenu"
   >
@@ -66,6 +75,11 @@
   const { routesList } = storeToRefs(stores);
 
   const route = useRoute();
+  const isWorkspaceHome = computed(
+    () =>
+      route.path === '/index' &&
+      (!themeConfig.value.dashboardScene || themeConfig.value.dashboardScene === 'base')
+  );
   const router = useRouter();
   const state = reactive<BreadcrumbState>({
     breadcrumbList: [],

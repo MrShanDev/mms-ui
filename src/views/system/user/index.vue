@@ -1,5 +1,19 @@
 <template>
   <SystemPage feature="user">
+    <template #actions>
+      <TableTool
+        v-show="!state.tableData.loading"
+        ref="tableToolRef"
+        tableComment="系统用户"
+        functionName="user"
+        :key="componentKey"
+        :param="state.tableData.param"
+        @close="componentKey = generateUUID()"
+        @insert="onCURD"
+        @deletes="onCURD"
+        @success="getTableData"
+      />
+    </template>
     <div class="block">
       <!-- 功能栏  -->
       <div class="views-tool">
@@ -41,21 +55,6 @@
       <div class="system-user-container layout-padding">
         <el-card shadow="never" class="layout-padding-auto">
           <el-container>
-            <el-header>
-              <!-- 新增/导入/导出/打印 -->
-              <TableTool
-                v-show="!state.tableData.loading"
-                ref="tableToolRef"
-                tableComment="系统用户"
-                functionName="user"
-                :key="componentKey"
-                :param="state.tableData.param"
-                @close="componentKey = generateUUID()"
-                @insert="onCURD"
-                @deletes="onCURD"
-                @success="getTableData"
-              />
-            </el-header>
             <el-main>
               <!-- Table -->
               <el-table
@@ -79,17 +78,7 @@
                 ></el-table-column>
                 <el-table-column prop="avatar" label="头像" width="100" show-overflow-tooltip>
                   <template #default="scope">
-                    <el-image
-                      style="width: 50px; height: 50px"
-                      :src="scope.row.avatar"
-                      :zoom-rate="1.2"
-                      :max-scale="7"
-                      :min-scale="0.2"
-                      :preview-src-list="[scope.row.avatar]"
-                      :initial-index="1"
-                      preview-teleported
-                      fit="cover"
-                    />
+                    <UserAvatar preview :src="scope.row.avatar" style="width: 50px; height: 50px" />
                   </template>
                 </el-table-column>
                 <el-table-column
@@ -274,6 +263,7 @@
 </template>
 
 <script setup lang="ts" name="systemUser">
+  import UserAvatar from '/@/components/user-avatar/index.vue';
   import SystemPage from '/@/views/system/shared/SystemPage.vue';
   import { defineAsyncComponent, reactive, onMounted, ref } from 'vue';
   import { ElMessageBox, ElMessage } from 'element-plus';

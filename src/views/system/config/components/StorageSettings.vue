@@ -26,6 +26,11 @@
       size="default"
       label-width="150px"
     >
+      <div class="config-form-toolbar">
+        <SystemToolbar>
+          <el-button type="primary" @click="onSubmitConfig">保存</el-button>
+        </SystemToolbar>
+      </div>
       <el-form-item label="是否启用" prop="status">
         <el-switch
           v-model="ossConfig.ruleForm.status"
@@ -93,13 +98,11 @@
           placeholder="基础路径 (首尾都不用加 /)"
         ></el-input>
       </el-form-item>
-      <el-form-item>
-        <el-button type="primary" @click="onSubmitConfig">保存</el-button>
-      </el-form-item>
     </el-form>
   </div>
 </template>
 <script setup lang="ts" name="systemSysConfigDialog">
+  import SystemToolbar from '/@/views/system/shared/SystemToolbar.vue';
   import { onMounted } from 'vue';
   import { reactive, defineAsyncComponent, ref } from 'vue';
   import FastImg from '/@/components/fast-upload/img.vue';

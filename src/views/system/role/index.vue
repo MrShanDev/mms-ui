@@ -1,5 +1,18 @@
 <template>
   <SystemPage feature="role">
+    <template #actions>
+      <TableTool
+                v-show="!state.tableData.loading"
+                ref="tableToolRef"
+                tableComment="系统角色"
+                functionName="role"
+                :key="componentKey"
+                :param="state.tableData.param"
+                @close="componentKey = generateUUID()"
+                @insert="onCURD"
+                @deletes="onCURD"
+              />
+    </template>
     <div class="black">
       <!-- 功能栏 -->
       <div class="views-tool">
@@ -41,20 +54,7 @@
       <div class="system-role-container layout-padding">
         <el-card shadow="never" class="layout-padding-auto">
           <el-container>
-            <el-header>
-              <!-- 新增/导入/导出/打印 -->
-              <TableTool
-                v-show="!state.tableData.loading"
-                ref="tableToolRef"
-                tableComment="系统角色"
-                functionName="role"
-                :key="componentKey"
-                :param="state.tableData.param"
-                @close="componentKey = generateUUID()"
-                @insert="onCURD"
-                @deletes="onCURD"
-              />
-            </el-header>
+
             <el-main>
               <!-- Tbale -->
               <el-table

@@ -12,6 +12,8 @@ export declare interface RowRoleType extends BaseEntity {
   code: string;
   sort: number;
   level: number;
+  dataScope: string;
+  dataScopeDeptIds: string;
   type: string;
   remark: string;
   defChecked: [];

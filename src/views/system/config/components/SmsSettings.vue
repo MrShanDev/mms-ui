@@ -9,6 +9,13 @@
     </div>
     <div class="m-t-10" v-if="smsConfigValue == 'test'">
       <el-form label-width="auto" label-position="top">
+        <div class="config-form-toolbar">
+          <SystemToolbar>
+            <el-button size="default" @click="onSubmitConfig" type="primary" class="ml10">
+              保存
+            </el-button>
+          </SystemToolbar>
+        </div>
         <el-form-item style="width: 200px" label="手机号" prop="phone">
           <el-input v-model="testPhone" placeholder="请输入手机号"></el-input>
         </el-form-item>
@@ -63,17 +70,13 @@
               placeholder="请设置AccessKeySecret"
             ></el-input>
           </el-form-item>
-          <el-form-item>
-            <el-button size="default" @click="onSubmitConfig" type="primary" class="ml10">
-              保存
-            </el-button>
-          </el-form-item>
         </el-col>
       </el-row>
     </el-form>
   </div>
 </template>
 <script setup lang="ts" name="systemSysConfigDialog">
+  import SystemToolbar from '/@/views/system/shared/SystemToolbar.vue';
   const props = defineProps({
     value: {
       type: Array,

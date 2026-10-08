@@ -13,6 +13,7 @@
  * @method onCurrentContextmenuClick tagsview 右键菜单每项点击时
  */
 declare type MittType<T = any> = {
+  themePreferencesLoaded: unknown;
   openSetingsDrawer?: string;
   restoreDefault?: string;
   setSendColumnsChildren: T;

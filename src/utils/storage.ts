@@ -1,4 +1,6 @@
 import Cookies from 'js-cookie';
+// Keep independent Docker-lab credentials separate from other localhost apps and tabs.
+const isolatedUpgradeLab = import.meta.env.MODE === 'upgrade';
 
 /**
  * window.localStorage 浏览器永久缓存
@@ -43,34 +45,47 @@ export const Local = {
 export const Session = {
   // 设置临时缓存
   set<T>(key: string, val: T) {
-    if (key === 'token') return Cookies.set(key, val as string);
+    if (key === 'token' && !isolatedUpgradeLab) return Cookies.set(key, val as string);
     window.sessionStorage.setItem(Local.setKey(key), JSON.stringify(val));
   },
   // 获取临时缓存
   get(key: string) {
-    if (key === 'token') return Cookies.get(key);
+    if (key === 'token' && !isolatedUpgradeLab) return Cookies.get(key);
     let json = <string>window.sessionStorage.getItem(Local.setKey(key));
     return JSON.parse(json);
   },
   // 移除临时缓存
   remove(key: string) {
-    if (key === 'token') return Cookies.remove(key);
+    if (key === 'token' && !isolatedUpgradeLab) return Cookies.remove(key);
     window.sessionStorage.removeItem(Local.setKey(key));
   },
   // 移除全部临时缓存
   clear() {
-    Cookies.remove('token');
+    if (!isolatedUpgradeLab) Cookies.remove('token');
     window.sessionStorage.clear();
   },
 };
 
 export const Cookie = {
+  captureLogin() {
+    if (isolatedUpgradeLab)
+      for (const key of ['App-Id', 'Secret-Key'])
+        Session.set(`lab-cookie:${key}`, Cookies.get(key));
+  },
   // 设置cookie
   set<T>(key: string, val: T, expires?: number) {
+    if (isolatedUpgradeLab) {
+      Session.set(`lab-cookie:${key}`, JSON.stringify(val));
+      return;
+    }
     return Cookies.set(key, JSON.stringify(val), { expires: expires ? expires : 1, path: '/' });
   },
   // 获取cookie
   get(key: string) {
+    if (isolatedUpgradeLab) {
+      const own = Session.get(`lab-cookie:${key}`);
+      if (own != null) return own;
+    }
     return Cookies.get(key);
   },
   // 移除cookie
@@ -81,7 +96,7 @@ export const Cookie = {
   clearAllCookie() {
     var keys = document.cookie.match(/[^ =;]+(?=\=)/g);
     if (keys) {
-      for (var i = keys.length; i--; ) {
+      for (var i = keys.length; i--;) {
         document.cookie = keys[i] + '=0;path=/;expires=' + new Date(0).toUTCString(); //清除当前域名下
         document.cookie =
           keys[i] + '=0;path=/;domain=' + document.domain + ';expires=' + new Date(0).toUTCString();

@@ -161,7 +161,7 @@ export function backEndComponent(routes: any) {
     if (item.component) {
       const resolved = dynamicImport(dynamicViewsModules, item.component as string);
       // false 表示多个 glob 匹配，Vue Router 无法挂载；置空避免 addRoute 内部空引用
-      item.component = resolved === false ? undefined : resolved;
+      item.component = resolved;
     }
     if (item.children) {
       item.children = backEndComponent(item.children);

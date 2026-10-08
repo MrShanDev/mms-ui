@@ -37,7 +37,9 @@ function buildOriginjsFederationRemotes(
     _env: Record<string, string>,
     _command: 'build' | 'serve'
 ): Record<string, string> {
-    return {};
+    // originjs 1.x 以 remotes 非空判断 Host，否则运行时共享作用域占位符不会替换。
+    // 此项仅使构建器生成 Host runtime，不会被 import；实际插件仍按清单动态注册。
+    return { mms_runtime_bootstrap: '/plugin-assets/__runtime__/unused.js' };
 }
 
 const viteConfig: UserConfigFnObject = defineConfig((mode: ConfigEnv) => {

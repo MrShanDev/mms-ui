@@ -1252,7 +1252,7 @@
 
   .personal {
     padding: 20px;
-    
+
     // 主内容区域
     .main-content {
       height: 600px;
@@ -1357,7 +1357,7 @@
             &:hover,
             &.active {
               background: #f0f7ff !important;
-              
+
               .menu-arrow {
                 color: var(--el-color-primary);
               }

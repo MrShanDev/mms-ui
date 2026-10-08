@@ -1,5 +1,17 @@
 <template>
   <SystemPage feature="dict">
+    <template #actions>
+      <TableTool
+                ref="tableToolRef"
+                tableComment="系统字典"
+                functionName="dict"
+                :key="componentKey"
+                :param="state.tableData.param"
+                @close="componentKey = generateUUID()"
+                @insert="onCURD"
+                @deletes="onCURD"
+              />
+    </template>
     <div class="block">
       <!-- 功能栏 -->
       <div class="views-tool">
@@ -41,19 +53,7 @@
       <div class="system-dict-container layout-padding">
         <el-card shadow="never" class="layout-padding-auto">
           <el-container>
-            <el-header>
-              <!-- 新增/导入/导出/打印 -->
-              <TableTool
-                ref="tableToolRef"
-                tableComment="系统字典"
-                functionName="dict"
-                :key="componentKey"
-                :param="state.tableData.param"
-                @close="componentKey = generateUUID()"
-                @insert="onCURD"
-                @deletes="onCURD"
-              />
-            </el-header>
+
             <el-main>
               <el-table
                 :data="state.tableData.data"

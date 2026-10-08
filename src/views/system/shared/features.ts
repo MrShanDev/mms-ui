@@ -1,4 +1,5 @@
 export const systemFeatures = {
+  tenant: { title: '租户管理', description: '查看平台租户、有效期与当前多租户隔离配置。' },
   user: { title: '用户管理', description: '管理系统账户、账户状态与角色分配。' },
   role: { title: '角色管理', description: '维护角色与菜单权限，按职级控制授权范围。' },
   menu: { title: '菜单管理', description: '维护导航层级、页面路由与按钮权限。' },

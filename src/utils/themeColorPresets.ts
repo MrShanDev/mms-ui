@@ -112,9 +112,9 @@ export const THEME_COLOR_PRESET_PATCHES: Record<ThemeColorPresetId, ThemeColorPr
 /** 与 setings.vue `setGraduaFun` 一致：menuBar → 变浅 0.5 的纵向渐变 */
 function presetMenuBarGridBackground(id: ThemeColorPresetId): string {
   const p = THEME_COLOR_PRESET_PATCHES[id];
-  if (!p.isMenuBarColorGradual) return p.menuBar;
-  const lighter = getLightColor(p.menuBar, 0.5);
-  return lighter ? `linear-gradient(to bottom, ${p.menuBar}, ${lighter})` : p.menuBar;
+  if (!p.isMenuBarColorGradual) return p.menuBar || '#ffffff';
+  const lighter = getLightColor(p.menuBar || '#ffffff', 0.5);
+  return lighter ? `linear-gradient(to bottom, ${p.menuBar}, ${lighter})` : p.menuBar || '#ffffff';
 }
 
 /**
@@ -126,18 +126,18 @@ export const THEME_COLOR_PRESET_GRID_SWATCH: Record<
 > = {
   blueWhite: {
     background: presetMenuBarGridBackground('blueWhite'),
-    color: THEME_COLOR_PRESET_PATCHES.blueWhite.menuBarColor,
+    color: THEME_COLOR_PRESET_PATCHES.blueWhite.menuBarColor || '#303133',
   },
   orangeWhite: {
     background: presetMenuBarGridBackground('orangeWhite'),
-    color: THEME_COLOR_PRESET_PATCHES.orangeWhite.menuBarColor,
+    color: THEME_COLOR_PRESET_PATCHES.orangeWhite.menuBarColor || '#303133',
   },
   navyWhite: {
     background: presetMenuBarGridBackground('navyWhite'),
-    color: THEME_COLOR_PRESET_PATCHES.navyWhite.menuBarColor,
+    color: THEME_COLOR_PRESET_PATCHES.navyWhite.menuBarColor || '#303133',
   },
   purpleWhite: {
     background: presetMenuBarGridBackground('purpleWhite'),
-    color: THEME_COLOR_PRESET_PATCHES.purpleWhite.menuBarColor,
+    color: THEME_COLOR_PRESET_PATCHES.purpleWhite.menuBarColor || '#303133',
   },
 };

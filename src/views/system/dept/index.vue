@@ -1,21 +1,15 @@
 <template>
-  <SystemPage feature="dept">
-    <div class="block">
-      <!-- Table  -->
-      <div class="system-dept-container layout-padding">
-        <el-card shadow="never" class="layout-padding-auto">
-          <el-container>
-            <el-header>
-              <!-- 功能栏 -->
+  <SystemPage feature="dept" compact class="dept-page">
+    <template #actions>
               <div class="system-dept-search">
-                <el-button size="small" type="primary" @click="clickExpand">
+                <el-button size="default" type="primary" @click="clickExpand">
                   <el-icon><ele-Sort /></el-icon>
                   {{ expand.state ? '全部折叠' : '全部展开' }}
                 </el-button>
                 <el-button
-                  size="small"
+                  size="default"
                   type="success"
-                  class="ml10"
+
                   v-auth="'system:dept:insert'"
                   @click="onCURD({ type: curdEnum.INSERT, ids: '1' })"
                 >
@@ -25,13 +19,19 @@
                   新增
                 </el-button>
                 <TableTool
+                  size="default"
                   functionName="dept"
                   tableComment="部门管理"
                   :param="state.tableData.param"
                   @success="getTableData"
                 />
               </div>
-            </el-header>
+    </template>
+    <div class="block">
+      <!-- Table  -->
+      <div class="system-dept-container layout-padding">
+        <el-card shadow="never" class="layout-padding-auto">
+          <el-container>
             <el-main>
               <!-- Table -->
               <el-table
@@ -293,4 +293,12 @@
   });
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.dept-page :deep(.system-admin-heading.is-compact) { margin-bottom: 18px; }
+.dept-page :deep(.system-admin-heading h1) { margin: 0; font-size: 22px; white-space: nowrap; }
+.system-dept-search { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.system-dept-search > :deep(.w-100) { width: auto !important; }
+.system-dept-search :deep(.table-tool) { margin: 0; padding: 0; }
+.system-dept-search > .el-button + .el-button { margin-left: 0; }
+@media (max-width: 600px) { .dept-page :deep(.system-admin-heading.is-compact) { flex-wrap: wrap; } }
+</style>

@@ -8,7 +8,6 @@ import { HttpStatus } from '/@/enums/RespEnum';
 import { encrypt, decrypt, tansParams, getFingerprint } from '/@/utils/mms';
 import { getEnv } from '/@/utils/mms';
 import { SysEnum } from '/@/enums/SysEnum';
-import { logout } from '/@/views/system/login';
 import { NextLoading } from '/@/utils/loading';
 axios.defaults.headers['Content-Type'] = 'application/json;charset=utf-8';
 // 设置浏览器指纹 / App-Id
@@ -94,6 +93,8 @@ request.interceptors.request.use(
   }
 );
 
+let sessionExpiredPromptOpen = false;
+
 // 添加响应拦截器
 request.interceptors.response.use(
   (response) => {
@@ -102,21 +103,20 @@ request.interceptors.response.use(
       // `token` 过期或者账号已在别处登录
       // 修改响应拦截器中的401处理
       if (res.code === 401 || res.code === 4001) {
-        ElMessageBox.confirm('登录状态已过期，您可以继续留在该页面，或者重新登录', '系统提示', {
-          confirmButtonText: '重新登录',
-          cancelButtonText: '取消',
-          type: 'warning',
-        })
-          .then(() => {
-            logout().then((res) => {
-              Session.clear();
-              // ✅ 使用原生跳转代替路由跳转
-              window.location.href = '/'; // 完全刷新页面
-              // 或者使用带hash的路由
-              // window.location.hash = '/login';
-            });
+        if (!sessionExpiredPromptOpen) {
+          sessionExpiredPromptOpen = true;
+          ElMessageBox.confirm('登录状态已过期，请重新登录', '系统提示', {
+            confirmButtonText: '重新登录',
+            cancelButtonText: '取消',
+            type: 'warning',
           })
-          .catch(() => {});
+            .then(() => {
+              Session.clear();
+              window.location.href = `${window.location.pathname}#/login`;
+            })
+            .catch(() => {})
+            .finally(() => { sessionExpiredPromptOpen = false; });
+        }
         return Promise.reject('无效的会话，或者会话已过期，请重新登录。');
       }
       if (res.code === 403) {

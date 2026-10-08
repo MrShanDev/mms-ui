@@ -42,9 +42,10 @@
 		// "noUncheckedIndexedAccess": true,      /* Include 'undefined' in index signature results */
 
 		/* Module Resolution Options */
-		"moduleResolution": "node" /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */,
+		"moduleResolution": "bundler" /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */,
 		"baseUrl": "." /* Base directory to resolve non-absolute module names. */,
 		"paths": {
+      "@wangeditor/editor-for-vue": ["./node_modules/@wangeditor/editor-for-vue/dist/src/index.d.ts"],
 			"/@/*": ["src/*"],
 			"@mms-packages/*": ["packages/*"]
 		} /* A series of entries which re-map imports to lookup locations relative to the 'baseUrl'. */,

@@ -15,7 +15,7 @@
       </el-input>
     </el-form-item>
     <el-form-item class="login-animation2">
-      <div class="login-content-title">密码</div>      
+      <div class="login-content-title">密码</div>
       <el-input
         :type="state.isShowPassword ? 'text' : 'password'"
         :placeholder="$t('message.account.accountPlaceholder2')"
@@ -58,14 +58,20 @@
         ></el-image>
       </el-col>
     </el-form-item>
+    <div class="account-options">
+      <el-checkbox v-model="state.ruleForm.rememberMe">记住账号</el-checkbox>
+      <button type="button" @click="ElMessage.info('请联系平台或所属租户管理员重置密码')">
+        忘记密码？
+      </button>
+    </div>
     <el-form-item class="login-animation4">
       <el-button
-          v-waves
-          type="primary"
-          class="login-content-submit"
-          @click="onSignIn"
-          @keydown.enter="keyDown"
-          :loading="state.loading.signIn"
+        v-waves
+        type="primary"
+        class="login-content-submit"
+        @click="onSignIn"
+        @keydown.enter="keyDown"
+        :loading="state.loading.signIn"
       >
         <span>{{ $t('message.account.accountBtnText') }}</span>
       </el-button>
@@ -83,14 +89,16 @@
   import { useThemeConfig } from '/@/stores/themeConfig';
   import { initFrontEndControlRoutes } from '/@/router/frontEnd';
   import { initBackEndControlRoutes } from '/@/router/backEnd';
-  import { Session } from '/@/utils/storage';
+  import { Session, Cookie } from '/@/utils/storage';
   import { formatAxis } from '/@/utils/formatTime';
   import { NextLoading } from '/@/utils/loading';
 
-  import { sysInfo, captcha, login } from '/@/views/system/login';
+  import { captcha, login } from '/@/views/system/login';
   import { SysEnum } from '/@/enums/SysEnum';
   // 接受父组件参数
   const props = defineProps({
+    loginContext: { type: Object, required: true },
+    serviceEnabled: { type: Boolean, default: true },
     captchaState: {
       type: Boolean,
       default: () => false,
@@ -124,6 +132,8 @@
       codeImg: '',
       uuid: '',
       rememberMe: true,
+      tenantId: '',
+      loginMode: 'platform',
     },
     loading: {
       signIn: false,
@@ -164,8 +174,25 @@
       return;
     }
     state.loading.signIn = true;
-    login(state.ruleForm)
+    if (props.loginContext.loginMode === 'tenant' && !props.loginContext.tenantId) {
+      ElMessage.warning('请输入租户编号');
+      state.loading.signIn = false;
+      return;
+    }
+    if (!props.serviceEnabled) {
+      ElMessage.warning('账号登录未启用，请联系管理员');
+      state.loading.signIn = false;
+      return;
+    }
+    login({
+      ...state.ruleForm,
+      ...props.loginContext,
+    })
       .then(async (res) => {
+        Cookie.captureLogin();
+        if (state.ruleForm.rememberMe)
+          localStorage.setItem('mms-login-account', state.ruleForm.username);
+        else localStorage.removeItem('mms-login-account');
         state.loading.signIn = true;
         Session.set(SysEnum.USER_INFO_KEY, res.data.userInfo);
         // 存储 token 到浏览器缓存
@@ -246,6 +273,7 @@
   });
   // 页面加载时
   onMounted(() => {
+    state.ruleForm.username = localStorage.getItem('mms-login-account') || '';
     // 绑定监听事件
     window.addEventListener('keydown', keyDown);
     if (props.captchaState) {
@@ -259,44 +287,60 @@
 </script>
 
 <style scoped lang="scss">
-.login-content-form {
-  margin-top: 20px;
-  .login-content-title{
-    color: #838383;
-  }
-  @for $i from 1 through 4 {
-    .login-animation#{$i} {
-      opacity: 0;
-      animation-name: error-num;
-      animation-duration: 0.5s;
-      animation-fill-mode: forwards;
-      animation-delay: calc($i/10) + s;
+  .account-options {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    button {
+      border: 0;
+      background: none;
+      color: #1687ff;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    :deep(.el-checkbox__label) {
+      font-size: 12px;
     }
   }
+  .login-content-form {
+    margin-top: 20px;
+    .login-content-title {
+      color: #838383;
+    }
+    @for $i from 1 through 4 {
+      .login-animation#{$i} {
+        opacity: 0;
+        animation-name: error-num;
+        animation-duration: 0.5s;
+        animation-fill-mode: forwards;
+        animation-delay: calc($i/10) + s;
+      }
+    }
 
-  .login-content-password {
-    display: inline-block;
-    width: 20px;
-    cursor: pointer;
+    .login-content-password {
+      display: inline-block;
+      width: 20px;
+      cursor: pointer;
 
-    &:hover {
-      color: #909399;
+      &:hover {
+        color: #909399;
+      }
+    }
+
+    .login-content-code {
+      width: 100%;
+      padding: 0;
+      font-weight: bold;
+      letter-spacing: 5px;
+    }
+
+    .login-content-submit {
+      width: 100%;
+      letter-spacing: 2px;
+      font-weight: 500;
+      margin-top: 15px;
+      font-size: 16px;
     }
   }
-
-  .login-content-code {
-    width: 100%;
-    padding: 0;
-    font-weight: bold;
-    letter-spacing: 5px;
-  }
-
-  .login-content-submit {
-    width: 100%;
-    letter-spacing: 2px;
-    font-weight: 500;
-    margin-top: 15px;
-    font-size: 16px;
-  }
-}
 </style>

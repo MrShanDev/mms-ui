@@ -55,6 +55,18 @@
               ></fast-switch>
             </el-form-item>
           </el-col>
+          <el-col :span="24" class="mb20">
+            <el-form-item label="数据范围">
+              <el-select v-model="state.ruleForm.dataScope">
+                <el-option label="全部数据" value="1" /><el-option label="指定部门" value="2" />
+                <el-option label="本部门" value="3" /><el-option label="本部门及下级" value="4" />
+                <el-option label="仅本人" value="5" />
+              </el-select>
+            </el-form-item>
+            <el-form-item v-if="state.ruleForm.dataScope === '2'" label="部门编号">
+              <el-input v-model="state.ruleForm.dataScopeDeptIds" placeholder="部门编号，以逗号分隔" />
+            </el-form-item>
+          </el-col>
           <el-col :xs="24" :sm="24" :md="24" :lg="24" :xl="24" class="mb20">
             <el-form-item label="角色描述">
               <el-input
@@ -122,6 +134,8 @@
       level: 1, // 角色级别
       sort: 0, // 排序
       status: 0, // 角色状态
+      dataScope: '5',
+      dataScopeDeptIds: '',
       remark: '', // 角色描述
       defChecked: <any>[], //选中节点id
     },
@@ -150,6 +164,8 @@
       sort: 0, // 排序
       level: 1, // 角色级别
       status: 0, // 角色状态
+      dataScope: '5',
+      dataScopeDeptIds: '',
       remark: '', // 角色描述
       defChecked: <any>[], //选中节点id
     };

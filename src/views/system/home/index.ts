@@ -10,6 +10,9 @@ import { EncryptTypeEnum } from '/@/enums/EncryptTypeEnum';
  */
 export function homeApi() {
   return {
+    notices: () => request({url: getEnv() + '/system/home/notices', method: 'get'}),
+    noticeDetail: (id: string | number) => request({url: getEnv() + '/system/home/notices/' + id, method: 'get'}),
+    markNoticeRead: (id: string | number) => request({url: getEnv() + '/system/home/notices/' + id + '/read', method: 'post'}),
     /** @deprecated 与 memberList 相同，保留兼容；文档用户已合并至 store_member */
     list: (params?: object): AxiosPromise<{ rows: any[]; total: number }> => {
       return request({
@@ -42,6 +45,7 @@ export function homeApi() {
       });
     },
     /** 系统运行信息（实时）：OS/CPU/内存/磁盘/JDK/JVM/数据库等 */
+    runtimeTicket: () => request({ url: getEnv() + '/system/home/runtimeTicket', method: 'post' }),
     runtimeInfo: <T = any>(params?: object): AxiosPromise<T> => {
       return request({
         url: getEnv() + '/system/home/runtimeInfo',

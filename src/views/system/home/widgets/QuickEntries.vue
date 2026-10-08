@@ -1,6 +1,6 @@
 <template>
   <div class="home-card-item mb15">
-    <div class="home-card-item-title">常用入口</div>
+    <div class="home-card-item-title">快捷入口</div>
     <div class="home-card-item-content quick-entry-grid">
       <button
         type="button"
@@ -12,7 +12,21 @@
         <div class="quick-menu-icon">
           <SvgIcon :name="item.icon" :size="24" :color="item.color" />
         </div>
-        <div class="quick-menu-text">{{ item.name }}</div>
+        <div class="quick-menu-text">
+          <strong>{{ item.name }}</strong>
+          <small>
+            {{
+              item.path.includes('user')
+                ? '管理系统用户'
+                : item.path.includes('role')
+                  ? '配置角色与权限'
+                  : item.path.includes('tenant')
+                    ? '管理多租户信息'
+                    : '发布及管理公告'
+            }}
+          </small>
+        </div>
+        <SvgIcon class="quick-entry-arrow" name="ele-ArrowRight" :size="14" />
       </button>
     </div>
   </div>

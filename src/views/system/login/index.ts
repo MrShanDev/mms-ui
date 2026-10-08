@@ -1,5 +1,8 @@
 import request from '/@/utils/request';
 import { getEnv } from '/@/utils/mms';
+export function tenantMode() {
+  return request({ url: getEnv() + '/system/visitor/tenantMode', method: 'get' });
+}
 
 /**
  * 系统详情

@@ -103,10 +103,7 @@
     </div>
     <el-dropdown :show-timeout="70" :hide-timeout="50" @command="onHandleCommandClick">
       <span class="layout-navbars-breadcrumb-user-link">
-        <img
-          :src="userInfos?.photo || 'https://sxpcwlkj.oss-cn-beijing.aliyuncs.com/defimg.png'"
-          class="layout-navbars-breadcrumb-user-link-photo mr5"
-        />
+        <UserAvatar :src="userInfos?.photo" class="layout-navbars-breadcrumb-user-link-photo mr5" />
         {{ userInfos?.userName || '当前用户' }}
         <el-icon class="el-icon--right">
           <ele-ArrowDown />
@@ -128,6 +125,7 @@
 </template>
 
 <script setup lang="ts" name="layoutBreadcrumbUser">
+  import UserAvatar from '/@/components/user-avatar/index.vue';
   import { defineAsyncComponent, ref, unref, computed, reactive, onMounted } from 'vue';
   import { Search as eleSearchIcon } from '@element-plus/icons-vue';
   import { useRouter } from 'vue-router';

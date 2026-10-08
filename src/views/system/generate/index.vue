@@ -1,146 +1,142 @@
 <template>
-  <div class="block">
-    <!-- 功能栏  -->
-    <div class="views-tool">
-      <div class="tool-left">
-        <div class="tool-left-title">筛选查询</div>
-        <el-form
-          size="default"
-          :inline="true"
-          :model="state.queryForm"
-          @keyup.enter="getDataList()"
-        >
-          <el-form-item>
-            <el-input v-model="state.queryForm.tableName" placeholder="表名"></el-input>
-          </el-form-item>
-          <el-form-item>
-            <el-button @click="getDataList()">查询</el-button>
-          </el-form-item>
-          <el-form-item>
-            <el-button type="primary" @click="importHandle()">导入</el-button>
-          </el-form-item>
-          <el-form-item>
-            <el-button type="success" @click="downloadBatchHandle()">生成代码</el-button>
-          </el-form-item>
-          <el-form-item>
-            <el-button type="danger" @click="deleteBatchHandle()">删除</el-button>
-          </el-form-item>
-          <el-form-item>
-            <el-button type="default" @click="settingBatchHandle()">配置</el-button>
-          </el-form-item>
-        </el-form>
-      </div>
-    </div>
-    <div class="layout-padding">
-      <el-card>
-        <el-table
-          v-loading="state.dataListLoading"
-          :data="state.dataList"
-          border
-          style="width: 100%"
-          @selection-change="selectionChangeHandle"
-        >
-          <el-table-column
-            type="selection"
-            header-align="center"
-            align="center"
-            width="50"
-          ></el-table-column>
-          <el-table-column
-            prop="tableName"
-            label="表名"
-            header-align="center"
-            align="center"
-          ></el-table-column>
-          <el-table-column
-            prop="tableComment"
-            label="表说明"
-            header-align="center"
-            align="center"
-          ></el-table-column>
-          <el-table-column
-            prop="className"
-            label="类名"
-            header-align="center"
-            align="center"
-          ></el-table-column>
-          <el-table-column
-            label="操作"
-            fixed="right"
-            header-align="center"
-            align="center"
-            width="320"
+  <SystemPage title="代码生成">
+    <template #actions>
+      <el-form size="default" :inline="true" :model="state.queryForm" @keyup.enter="getDataList()">
+        <el-form-item>
+          <el-input v-model="state.queryForm.tableName" placeholder="表名"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button @click="getDataList()">查询</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="importHandle()">导入</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="success" @click="downloadBatchHandle()">生成代码</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="danger" @click="deleteBatchHandle()">删除</el-button>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="default" @click="settingBatchHandle()">配置</el-button>
+        </el-form-item>
+      </el-form>
+    </template>
+    <div class="block">
+      <!-- 功能栏  -->
+
+      <div class="layout-padding">
+        <el-card>
+          <el-table
+            v-loading="state.dataListLoading"
+            :data="state.dataList"
+            border
+            style="width: 100%"
+            @selection-change="selectionChangeHandle"
           >
-            <template #default="scope">
-              <el-button
-                type="primary"
-                link
-                :loading="loadingRows[scope.row.id]?.preview"
-                @click="previewHandle(scope.row.id)"
-              >
-                预览
-              </el-button>
-              <el-button
-                type="primary"
-                link
-                :loading="loadingRows[scope.row.id]?.generator"
-                @click="generatorHandle(scope.row.id)"
-              >
-                基础信息
-              </el-button>
-              <el-button
-                type="primary"
-                link
-                :loading="loadingRows[scope.row.id]?.edit"
-                @click="editHandle(scope.row.id)"
-              >
-                编辑
-              </el-button>
-              <el-button
-                type="primary"
-                link
-                :loading="loadingRows[scope.row.id]?.delete"
-                @click="deleteBatchHandle(scope.row.id)"
-              >
-                删除
-              </el-button>
-              <el-button
-                type="primary"
-                link
-                :loading="loadingRows[scope.row.id]?.sync"
-                @click="syncHandle(scope.row)"
-              >
-                同步
-              </el-button>
-            </template>
-          </el-table-column>
-        </el-table>
-        <el-pagination
-          class="m-t-5"
-          :current-page="state.page"
-          :page-sizes="state.pageSizes"
-          :page-size="state.limit"
-          :total="state.total"
-          layout="total, sizes, prev, pager, next, jumper"
-          @size-change="sizeChangeHandle"
-          @current-change="currentChangeHandle"
-        ></el-pagination>
-      </el-card>
+            <el-table-column
+              type="selection"
+              header-align="center"
+              align="center"
+              width="50"
+            ></el-table-column>
+            <el-table-column
+              prop="tableName"
+              label="表名"
+              header-align="center"
+              align="center"
+            ></el-table-column>
+            <el-table-column
+              prop="tableComment"
+              label="表说明"
+              header-align="center"
+              align="center"
+            ></el-table-column>
+            <el-table-column
+              prop="className"
+              label="类名"
+              header-align="center"
+              align="center"
+            ></el-table-column>
+            <el-table-column
+              label="操作"
+              fixed="right"
+              header-align="center"
+              align="center"
+              width="320"
+            >
+              <template #default="scope">
+                <el-button
+                  type="primary"
+                  link
+                  :loading="loadingRows[scope.row.id]?.preview"
+                  @click="previewHandle(scope.row.id)"
+                >
+                  预览
+                </el-button>
+                <el-button
+                  type="primary"
+                  link
+                  :loading="loadingRows[scope.row.id]?.generator"
+                  @click="generatorHandle(scope.row.id)"
+                >
+                  基础信息
+                </el-button>
+                <el-button
+                  type="primary"
+                  link
+                  :loading="loadingRows[scope.row.id]?.edit"
+                  @click="editHandle(scope.row.id)"
+                >
+                  编辑
+                </el-button>
+                <el-button
+                  type="primary"
+                  link
+                  :loading="loadingRows[scope.row.id]?.delete"
+                  @click="deleteBatchHandle(scope.row.id)"
+                >
+                  删除
+                </el-button>
+                <el-button
+                  type="primary"
+                  link
+                  :loading="loadingRows[scope.row.id]?.sync"
+                  @click="syncHandle(scope.row)"
+                >
+                  同步
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+          <el-pagination
+            class="m-t-5"
+            :current-page="state.page"
+            :page-sizes="state.pageSizes"
+            :page-size="state.limit"
+            :total="state.total"
+            layout="total, sizes, prev, pager, next, jumper"
+            @size-change="sizeChangeHandle"
+            @current-change="currentChangeHandle"
+          ></el-pagination>
+        </el-card>
+      </div>
+      <import ref="importRef" @refresh-data-list="getDataList"></import>
+      <preview
+        :key="componentKey"
+        @close="componentKey = generateUUID()"
+        ref="previewRef"
+        @refresh-data-list="getDataList"
+      ></preview>
+      <edit ref="editRef" @refresh-data-list="getDataList"></edit>
+      <generator ref="generatorRef" @refresh-data-list="getDataList"></generator>
+      <setting ref="settingRef"></setting>
     </div>
-    <import ref="importRef" @refresh-data-list="getDataList"></import>
-    <preview
-      :key="componentKey"
-      @close="componentKey = generateUUID()"
-      ref="previewRef"
-      @refresh-data-list="getDataList"
-    ></preview>
-    <edit ref="editRef" @refresh-data-list="getDataList"></edit>
-    <generator ref="generatorRef" @refresh-data-list="getDataList"></generator>
-    <setting ref="settingRef"></setting>
-  </div>
+  </SystemPage>
 </template>
 
 <script setup lang="ts">
+  import SystemPage from '/@/views/system/shared/SystemPage.vue';
   import { reactive, ref } from 'vue';
   import { IHooksOptions } from '/@/hooks/interface';
   import { useCrud } from '/@/hooks';

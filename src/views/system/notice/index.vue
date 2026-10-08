@@ -1,5 +1,18 @@
 <template>
   <SystemPage feature="notice">
+    <template #actions>
+      <TableTool
+                ref="tableToolRef"
+                tableComment="系统公告"
+                functionName="notice"
+                :key="componentKey"
+                :param="state.tableData.param"
+                @close="componentKey = generateUUID()"
+                @insert="onCURD"
+                @deletes="onCURD"
+                @success="getTableData"
+              />
+    </template>
     <div class="block">
       <!-- 功能栏  -->
       <div class="views-tool">
@@ -50,20 +63,7 @@
       <div class="system-notice-container layout-padding">
         <el-card shadow="never" class="layout-padding-auto">
           <el-container>
-            <el-header>
-              <!-- 新增/导入/导出/打印 -->
-              <TableTool
-                ref="tableToolRef"
-                tableComment="系统公告"
-                functionName="notice"
-                :key="componentKey"
-                :param="state.tableData.param"
-                @close="componentKey = generateUUID()"
-                @insert="onCURD"
-                @deletes="onCURD"
-                @success="getTableData"
-              />
-            </el-header>
+
             <el-main>
               <!-- Table -->
               <el-table
@@ -121,8 +121,13 @@
                   align="center"
                   min-width="120"
                 ></el-table-column>
-                <el-table-column fixed="right" label="操作" width=" 100 ">
+                <el-table-column fixed="right" label="操作" width="130">
                   <template #default="scope">
+                    <el-tooltip placement="top" content="预览公告">
+                      <el-button link type="primary" class="notice-preview-action" aria-label="预览公告" v-auth="'system:notice:query'" @click="noticePreviewRef.open(scope.row)">
+                        <el-icon><View /></el-icon>
+                      </el-button>
+                    </el-tooltip>
                     <el-tooltip placement="top" :content="$t('message.form.edit')">
                       <el-icon
                         class="mr10"
@@ -165,6 +170,7 @@
             </el-footer>
           </el-container>
         </el-card>
+        <NoticePreview ref="noticePreviewRef" />
         <NoticeDialog ref="noticeDialogRef" @refresh="formSubmit" />
       </div>
     </div>
@@ -183,8 +189,10 @@
   import FastSwitch from '/@/components/fast-switch/src/fast-switch.vue';
 
   import { NoticeEntity, NoticeState } from '/@/views/system/notice/type';
-  import { Eleme } from '@element-plus/icons-vue';
+  import { Eleme, View } from '@element-plus/icons-vue';
   import { NextLoading } from '/@/utils/loading';
+  const noticePreviewRef = ref();
+  const NoticePreview = defineAsyncComponent(() => import('/@/views/system/notice/components/NoticePreview.vue'));
   const noticeDialogRef = ref();
   const NoticeDialog = defineAsyncComponent(
     () => import('/@/views/system/notice/components/NoticeDialog.vue')
@@ -339,4 +347,6 @@
   });
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.notice-preview-action { margin-right: 10px; vertical-align: baseline; }
+</style>

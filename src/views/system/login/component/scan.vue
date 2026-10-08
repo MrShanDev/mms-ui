@@ -1,6 +1,19 @@
 <template>
   <div class="login-scan-container">
-    <div v-if="succeed" class="flex flex-col f-y-c">
+    <div v-if="!serviceEnabled || loginContext.loginMode === 'tenant'" class="scan-unavailable">
+      <div class="scan-placeholder">
+        <el-icon><ele-FullScreen /></el-icon>
+      </div>
+      <h3>扫码登录</h3>
+      <p>
+        {{
+          loginContext.loginMode === 'tenant'
+            ? '租户扫码认证尚未接通，请使用账号密码登录'
+            : '微信扫码服务暂未启用，请使用账号密码登录'
+        }}
+      </p>
+    </div>
+    <div v-else-if="succeed" class="flex flex-col f-y-c">
       <div class="fond16 mt-10">
         <el-icon color="#2dac34" :size="80"><ele-CircleCheckFilled /></el-icon>
       </div>
@@ -17,7 +30,11 @@
         </div>
       </div>
       <div v-else>
-        <div v-loading="!codeUrl && !codeQrBroken" element-loading-text="加载中..." style="height: 250px">
+        <div
+          v-loading="!codeUrl && !codeQrBroken"
+          element-loading-text="加载中..."
+          style="height: 250px"
+        >
           <div v-if="codeQrBroken" class="login-scan-qr-broken">
             <div class="login-scan-qr-broken__visual" aria-hidden="true">
               <span class="login-scan-qr-broken__crack" />
@@ -54,11 +71,15 @@
   import { useThemeConfig } from '/@/stores/themeConfig';
   import { initFrontEndControlRoutes } from '/@/router/frontEnd';
   import { initBackEndControlRoutes } from '/@/router/backEnd';
-  import { Session } from '/@/utils/storage';
+  import { Session, Cookie } from '/@/utils/storage';
   import { formatAxis } from '/@/utils/formatTime';
   import { NextLoading } from '/@/utils/loading';
   import { SysEnum } from '/@/enums/SysEnum';
 
+  const props = defineProps({
+    loginContext: { type: Object, required: true },
+    serviceEnabled: { type: Boolean, default: false },
+  });
   /** 刷新页面后仍沿用同一会话的 key，避免 SSE/倒计时重来（关闭标签后清空） */
   const WX_LOGIN_SCAN_KEY = 'mms_wx_login_scan_key';
 
@@ -186,7 +207,8 @@
   const finalizeLoginViaHttp = () => {
     queryWxCodeState(reqKey.value)
       .then(async (res) => {
-        if (res.status == 0) {
+        if (res.code === 200 && res.data?.token) {
+          Cookie.captureLogin();
           succeed.value = true;
           clearLoginScanKey();
           if (intervalId !== undefined) {
@@ -300,11 +322,37 @@
     }
   });
   onMounted(() => {
-    initQrcode();
+    if (props.serviceEnabled && props.loginContext.loginMode !== 'tenant') initQrcode();
   });
 </script>
 
 <style scoped lang="scss">
+  .scan-unavailable {
+    padding: 4px 0 8px;
+    h3 {
+      font-size: 15px;
+      margin: 16px 0 8px;
+    }
+    p {
+      font-size: 12px;
+      line-height: 1.7;
+      color: #8295b2;
+    }
+  }
+  .scan-placeholder {
+    width: 160px;
+    height: 160px;
+    margin: 0 auto;
+    border: 1px dashed #c8d9ef;
+    border-radius: 10px;
+    background: #f6f9fe;
+    display: grid;
+    place-items: center;
+    .el-icon {
+      font-size: 70px;
+      color: #a3bedf;
+    }
+  }
   .login-scan-animation {
     opacity: 0;
     animation-name: error-num;

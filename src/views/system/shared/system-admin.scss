@@ -214,3 +214,9 @@
 .system-admin-page .el-table .cell {
   word-break: normal;
 }
+
+.system-admin-page .system-admin-heading.is-compact { margin-bottom: 18px; align-items: center; flex-wrap: wrap; }
+.system-admin-page .system-admin-heading.is-compact h1 { margin: 0; font-size: 22px; white-space: nowrap; }
+.system-admin-page .system-admin-heading > .system-toolbar { margin-left: auto; }
+.system-admin-page .config-form-toolbar { display: flex; justify-content: flex-end; margin-bottom: 18px; }
+@media (max-width: 600px) { .system-admin-page .system-admin-heading > .system-toolbar { width: 100%; } }

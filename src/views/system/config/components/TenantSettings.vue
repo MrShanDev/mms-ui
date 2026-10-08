@@ -1,94 +1,24 @@
 <template>
-  <el-form ref="deptDialogFormRef" :model="configRuleForm" size="default" label-width="150px">
-    <el-alert
-      title="多租户功能尚未完成隔离验收，暂不支持启用。此处开关不代表后端实际隔离状态。"
-      type="warning"
-      :closable="false"
-      show-icon
-      class="mb20"
-    />
-    <el-row>
-      <el-col :xs="24" :sm="24" :md="18" :lg="14" :offset="0">
-        <el-form-item label="多租户状态" prop="status">
-          <el-switch
-            disabled
-            v-model="configRuleForm[0].configValue"
-            inline-prompt
-            active-text="启用"
-            inactive-text="禁用"
-            active-color="#13ce66"
-            inactive-color="#ff4949"
-            active-value="1"
-            inactive-value="2"
-          ></el-switch>
-        </el-form-item>
-        <el-form-item label="多租户排除的的表" prop="status">
-          <el-input
-            type="textarea"
-            v-model="configRuleForm[1].configValue"
-            placeholder="多租户排除的的表(以,分隔)"
-          ></el-input>
-          <el-text size="small" type="danger">多租户排除的的表(以,分隔)</el-text>
-        </el-form-item>
-        <el-form-item>
-          <el-button size="default" @click="onSubmitConfig" type="primary" class="ml10">
-            保存
-          </el-button>
-        </el-form-item>
-      </el-col>
-    </el-row>
-  </el-form>
+  <el-alert title="应用模式可在租户管理中切换，即时生效。单应用模式保留默认租户数据隔离；共享表及字段配置仍由部署配置管理。" type="info" :closable="false" show-icon class="mb20" />
+  <el-descriptions v-loading="loading" :column="1" border>
+    <el-descriptions-item label="应用模式">{{ runtime.enabled ? '多租户' : '单应用' }}</el-descriptions-item>
+    <el-descriptions-item label="数据隔离">已启用</el-descriptions-item>
+    <el-descriptions-item label="租户字段">{{ runtime.column }}</el-descriptions-item>
+    <el-descriptions-item label="全局共享表">{{ runtime.exclusionTables.join(', ') || '无' }}</el-descriptions-item>
+  </el-descriptions>
+  <el-button class="mt20" @click="initData" :loading="loading">刷新运行配置</el-button>
 </template>
 <script setup lang="ts">
-  import { onMounted, reactive } from 'vue';
-  import { sysConfigApi } from '/@/views/system/config';
-  const baseApi = sysConfigApi();
-  import { ElMessage } from 'element-plus';
-  const props = defineProps({
-    value: {
-      type: Array,
-      default: () => [],
-    },
-  });
-  const configRuleForm = reactive([
-    {
-      index: 0,
-      configName: '多租户状态',
-      configKey: 'sys_tenant_state',
-      configType: '1',
-      valueType: 'String',
-      configValue: '2',
-    },
-    {
-      index: 1,
-      configName: '多租户排除的的表',
-      configKey: 'sys_tenant_exclusion_table',
-      configType: '1',
-      valueType: 'String',
-      configValue: '',
-    },
-  ]);
-
-  const onSubmitConfig = () => {
-    //console.log(configRuleForm);
-    baseApi.configs(configRuleForm).then((res) => {
-      if (res.code === 200) {
-        ElMessage.success('保存成功！');
-      }
-    });
-  };
-
-  const initData = () => {
-    baseApi.getConfigs(configRuleForm).then((res) => {
-      configRuleForm[0].configValue = res.data[0].configValue;
-      configRuleForm[1].configValue = res.data[1].configValue;
-    });
-  };
-  onMounted(() => {
-    initData();
-  });
-  // 暴露变量
-  defineExpose({
-    initData,
-  });
+import { reactive, ref, onMounted } from 'vue';
+import request from '/@/utils/request';
+import { getEnv } from '/@/utils/mms';
+const loading = ref(false);
+const runtime = reactive({ enabled: false, column: '', exclusionTables: [] as string[] });
+const initData = async () => {
+  loading.value = true;
+  try { const res = await request({url: getEnv() + '/system/config/tenantRuntime', method: 'get'}); Object.assign(runtime, res.data); }
+  finally { loading.value = false; }
+};
+onMounted(initData);
+defineExpose({initData});
 </script>

@@ -34,7 +34,7 @@
             <SvgIcon
               name="ele-RefreshRight"
               class="ml5 layout-navbars-tagsview-ul-li-refresh"
-              @click.stop="refreshCurrentTagsView($route.fullPath)"
+              @click.stop="refreshCurrentTagsView(route.fullPath)"
             />
             <SvgIcon
               name="ele-Close"
@@ -632,7 +632,9 @@
   watch(
     () => tagsViewRoutes.value,
     (val) => {
-      if (val.length === state.tagsViewRoutesList.length) return false;
+      const validNames = new Set(val.map((item: any) => item.name));
+      state.tagsViewList = state.tagsViewList.filter((item: any) => validNames.has(item.name));
+      addBrowserSetSession(state.tagsViewList);
       getTagsViewRoutes();
     },
     {

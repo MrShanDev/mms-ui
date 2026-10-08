@@ -1,20 +1,23 @@
 <template>
   <div class="home-container base-dashboard layout-pd">
     <header class="system-welcome">
+      <img class="workspace-orbit" :src="orbitArtwork" alt="" aria-hidden="true" />
       <div>
-        <span class="system-eyebrow">SYSTEM WORKSPACE</span>
-        <h1>系统管理工作台</h1>
-        <p>从日常管理到服务运行，关键信息一目了然。</p>
+        <span class="system-eyebrow">LIVE WORKSPACE</span>
+        <h1>系统运行，一目了然</h1>
+        <p>管理资源、服务状态与团队通知</p>
       </div>
       <div class="system-live-status" :class="{ 'is-live': runtimeConnected }" role="status">
         <span></span>
-        {{ runtimeConnected ? '实时监控已连接' : '实时监控连接中' }}
+        {{
+          !canMonitor
+            ? '当前账户未获监控权限'
+            : runtimeConnected
+              ? '实时监控已连接'
+              : '实时监控连接中'
+        }}
       </div>
     </header>
-    <div class="system-section-label">
-      <h2>数据概览</h2>
-      <span>当前系统资源 · 今日增量</span>
-    </div>
     <div class="metric-grid">
       <DashboardMetric
         v-for="item in state.homeInfoData"
@@ -25,12 +28,12 @@
         :icon="homeStatIconName(item.num4)"
       />
     </div>
-    <QuickEntries :items="availableQuickEntries" @navigate="router.push" />
 
     <div class="system-workspace-grid">
       <section class="home-card-four system-monitor-column" aria-label="服务运行监控">
         <RuntimeMonitor
           :info="state.runtimeInfo"
+          :connected="runtimeConnected"
           :loading="state.runtimeInfoLoading"
           :slow-sql-threshold-text="slowSqlThresholdText"
           :format="runtimeFormat"
@@ -42,17 +45,57 @@
           :items="homeUnreadNoticeList"
           :notice-row-time="noticeRowTime"
           @open="openNoticeDetail"
-          @show-all="router.push('/system/notice')"
+          @show-all="noticeListVisible = true"
         />
-        <div class="workspace-tip">
-          <SvgIcon name="ele-InfoFilled" :size="18" />
-          <div>
-            <strong>工作台说明</strong>
-            <p>统计与监控来自当前系统。公告已读状态按账户保存在本机。</p>
-          </div>
-        </div>
+        <QuickEntries :items="availableQuickEntries" @navigate="router.push" />
       </aside>
     </div>
+    <section class="workspace-runtime-overview" aria-label="运行详情">
+      <h2>
+        <SvgIcon name="ele-Document" :size="19" />
+        运行详情
+        <small>服务器及运行环境信息</small>
+      </h2>
+      <div class="runtime-overview-grid">
+        <div>
+          <SvgIcon name="ele-Coin" :size="23" />
+          <span>
+            服务器名称
+            <strong>{{ safeText(state.runtimeInfo?.os?.hostname) }}</strong>
+          </span>
+        </div>
+        <div>
+          <SvgIcon name="ele-Monitor" :size="23" />
+          <span>
+            操作系统
+            <strong>
+              {{ safeText(state.runtimeInfo?.os?.name) }} ·
+              {{ safeText(state.runtimeInfo?.os?.arch) }}
+            </strong>
+          </span>
+        </div>
+        <div>
+          <SvgIcon name="ele-Box" :size="23" />
+          <span>
+            项目版本
+            <strong>{{ safeText(state.runtimeInfo?.app?.version) }}</strong>
+          </span>
+        </div>
+        <div>
+          <SvgIcon name="ele-Timer" :size="23" />
+          <span>
+            启动时间
+            <strong>
+              {{
+                state.runtimeInfo?.app?.startTimeMs
+                  ? formatServerTime(state.runtimeInfo.app.startTimeMs)
+                  : '-'
+              }}
+            </strong>
+          </span>
+        </div>
+      </div>
+    </section>
     <details class="system-capabilities home-card-four">
       <summary>
         应用能力与技术说明
@@ -66,9 +109,21 @@
     </details>
 
     <el-dialog
+      v-model="noticeListVisible"
+      title="已发布公告"
+      width="min(680px, 92vw)"
+      append-to-body
+    >
+      <el-empty v-if="!state.sysNoticeData.length" description="暂无公告" />
+      <div v-for="notice in state.sysNoticeData" :key="String(notice.id)">
+        <el-button text @click="openNoticeDetail(notice)">{{ notice.title }}</el-button>
+        <span>{{ noticeRowTime(notice) }}</span>
+      </div>
+    </el-dialog>
+    <el-dialog
       v-model="noticeDetailVisible"
       :title="noticeDetail.title ? String(noticeDetail.title) : '公告详情'"
-      width="680px"
+      width="min(680px, 92vw)"
       align-center
       destroy-on-close
       append-to-body
@@ -86,31 +141,31 @@
 <script setup lang="ts" name="BaseDashboard">
   import '../base-dashboard.scss';
   import '../system-workspace.scss';
+  import '../workspace-light.scss';
+  import orbitArtwork from '/@/assets/workspace-orbit-v2.png';
   import QuickEntries from '../widgets/QuickEntries.vue';
   import SystemNotices from '../widgets/SystemNotices.vue';
   import RuntimeMonitor from '../widgets/RuntimeMonitor.vue';
   import ApplicationInfo from '../widgets/ApplicationInfo.vue';
   import DashboardMetric from '../components/DashboardMetric.vue';
-  import { reactive, onMounted, onBeforeUnmount, ref, nextTick, computed, watch } from 'vue';
+  import { reactive, onMounted, onBeforeUnmount, ref, nextTick, computed } from 'vue';
   import { useUserInfo } from '/@/stores/userInfo';
   import { storeToRefs } from 'pinia';
   import { useRoute, useRouter } from 'vue-router';
   import { ElMessage } from 'element-plus';
-  import { noticeApi } from '/@/views/system/notice';
+  import DOMPurify from 'dompurify';
+  import { auth } from '/@/utils/authFunction';
   import type { NoticeEntity } from '/@/views/system/notice/type';
   import { homeApi } from '/@/views/system/home';
   import * as echarts from 'echarts';
   import type { EChartsOption } from 'echarts';
   import { getEnv } from '/@/utils/mms';
-  import { Local, Session } from '/@/utils/storage';
-  import { SysEnum } from '/@/enums/SysEnum';
 
   const stores = useUserInfo();
   const { userInfos } = storeToRefs(stores);
   const route = useRoute();
   const router = useRouter();
   const baseApi = homeApi();
-  const baseApiNotice = noticeApi();
 
   const runtimeConnected = ref(false);
   const cpuTrendRef = ref<HTMLDivElement>();
@@ -307,6 +362,8 @@
   let memTrendChart: echarts.ECharts | null = null;
   let jvmTrendChart: echarts.ECharts | null = null;
   let sse: EventSource | null = null;
+  let sseGeneration = 0;
+  let sseRetry: ReturnType<typeof setTimeout> | undefined;
 
   const slowSqlThresholdText = '≥500ms';
 
@@ -316,55 +373,17 @@
     return s || 'ele-DataAnalysis';
   };
 
+  const noticeListVisible = ref(false);
   const noticeDetailVisible = ref(false);
   const noticeDetailLoading = ref(false);
   const noticeDetail = ref<Partial<NoticeEntity>>({});
 
-  /** 首页公告已读 ID（服务端无字段时按用户维度存本机，与「系统公告」列表独立） */
-  const HOME_NOTICE_READ_STORAGE = 'homeSysNoticeReadIds';
+  const canMonitor = computed(() => auth('system:monitor:query'));
   const noticeReadIdList = ref<string[]>([]);
-
-  const homeNoticeUserScope = (): string => {
-    const u = userInfos.value as Record<string, unknown>;
-    const c = u?.userId ?? u?.id ?? u?.userName ?? u?.loginName;
-    const s = c != null ? String(c).trim() : '';
-    return s || '_guest';
+  const markNoticeRead = async (id: string | number) => {
+    await baseApi.markNoticeRead(id);
+    noticeReadIdList.value = [...new Set([...noticeReadIdList.value, String(id)])];
   };
-
-  function readNoticeStorageKey() {
-    return `${HOME_NOTICE_READ_STORAGE}:${homeNoticeUserScope()}`;
-  }
-
-  function hydrateHomeNoticeReads() {
-    try {
-      const parsed = Local.get(readNoticeStorageKey());
-      noticeReadIdList.value = Array.isArray(parsed) ? parsed.map((x: unknown) => String(x)) : [];
-    } catch {
-      noticeReadIdList.value = [];
-    }
-  }
-
-  function persistHomeNoticeReads() {
-    const dedup = [...new Set(noticeReadIdList.value.map(String).filter(Boolean))];
-    noticeReadIdList.value = dedup;
-    Local.set(readNoticeStorageKey(), dedup);
-  }
-
-  /** 公告详情加载成功后视为「已阅读」 */
-  function markNoticeReadLocally(id: unknown) {
-    const sid = id != null ? String(id).trim() : '';
-    if (!sid || noticeReadIdList.value.includes(sid)) return;
-    noticeReadIdList.value = [...noticeReadIdList.value, sid];
-    persistHomeNoticeReads();
-  }
-
-  watch(
-    userInfos,
-    () => {
-      hydrateHomeNoticeReads();
-    },
-    { deep: true, immediate: true }
-  );
 
   /** 首页便签区：最多展示的未读条数（列表已为发布时间倒序，靠前即较新） */
   const HOME_NOTICE_STICKY_MAX = 8;
@@ -395,7 +414,7 @@
     if (c == null || String(c).trim() === '') {
       return '<p class="home-notice-empty">暂无正文</p>';
     }
-    return String(c);
+    return DOMPurify.sanitize(String(c));
   });
 
   const noticeRowTime = (item: NoticeEntity) => {
@@ -411,11 +430,11 @@
     noticeDetailVisible.value = true;
     noticeDetailLoading.value = true;
     noticeDetail.value = { id: row.id, title: row.title };
-    baseApiNotice
-      .query(row.id)
+    baseApi
+      .noticeDetail(row.id)
       .then((res: any) => {
         noticeDetail.value = { ...(res.data || {}) };
-        markNoticeReadLocally(row.id);
+        return markNoticeRead(row.id);
       })
       .catch((err) => {
         ElMessage.warning(err);
@@ -485,7 +504,7 @@
   onMounted(() => {
     getHomeInfo();
     getNoticeList();
-    startRuntimeSse();
+    if (canMonitor.value) startRuntimeSse();
     nextTick(() => {
       initRuntimeCharts();
     });
@@ -524,9 +543,16 @@
 
   const sparkOption = (color: string, data: Array<[number, number]>) => {
     return {
-      grid: { left: 0, right: 0, top: 6, bottom: 0, containLabel: false },
+      grid: { left: 32, right: 0, top: 6, bottom: 6, containLabel: false },
       xAxis: { type: 'time', show: false },
-      yAxis: { type: 'value', min: 0, max: 100, show: false },
+      yAxis: {
+        type: 'value',
+        min: 0,
+        max: 100,
+        interval: 50,
+        axisLabel: { formatter: '{value}%', color: '#91a4c0', fontSize: 9 },
+        splitLine: { lineStyle: { color: '#e8eff9', type: 'dashed' } },
+      },
       tooltip: {
         trigger: 'axis',
         axisPointer: { type: 'line' },
@@ -562,18 +588,14 @@
       .map((p: any): [number, number] => [Number(p.timeMs), Number(p.jvm) * 100])
       .filter((x: any) => Number.isFinite(x[0]) && Number.isFinite(x[1]));
     cpuTrendChart?.setOption(sparkOption('#409eff', cpu));
-    memTrendChart?.setOption(sparkOption('#67c23a', mem));
-    jvmTrendChart?.setOption(sparkOption('#e6a23c', jvm));
-  };
-
-  const buildRuntimeSseUrl = () => {
-    const baseApiPrefix = getEnv('VITE_APP_BASE_API').replace(/\/$/, '');
-    const token = Session.get(SysEnum.TOKEN_KEY);
-    if (!token) return '';
-    return `${baseApiPrefix}/system/home/runtimeSse?Authorization=${encodeURIComponent(String(token))}`;
+    memTrendChart?.setOption(sparkOption('#9254ff', mem));
+    jvmTrendChart?.setOption(sparkOption('#00b8d9', jvm));
   };
 
   const stopRuntimeSse = () => {
+    sseGeneration++;
+    clearTimeout(sseRetry);
+    runtimeConnected.value = false;
     try {
       sse?.close();
     } catch (e) {
@@ -583,9 +605,21 @@
     }
   };
 
-  const startRuntimeSse = () => {
+  const startRuntimeSse = async () => {
     stopRuntimeSse();
-    const url = buildRuntimeSseUrl();
+    const generation = sseGeneration;
+    let ticket: string;
+    try {
+      ticket = (await baseApi.runtimeTicket()).data;
+    } catch {
+      state.runtimeInfoLoading = false;
+      return;
+    }
+    if (generation !== sseGeneration) return;
+    const baseApiPrefix = getEnv('VITE_APP_BASE_API').replace(/\/$/, '');
+    const url = ticket
+      ? `${baseApiPrefix}/system/home/runtimeSse?ticket=${encodeURIComponent(ticket)}`
+      : '';
     if (!url) {
       ElMessage.warning('未获取到登录信息，无法建立实时连接');
       return;
@@ -624,7 +658,10 @@
 
     sse.onerror = () => {
       runtimeConnected.value = false;
-      // EventSource 会自动重连，这里不弹窗，避免刷屏
+      sse?.close();
+      sseRetry = setTimeout(() => {
+        if (generation === sseGeneration) void startRuntimeSse();
+      }, 5000);
       state.runtimeInfoLoading = false;
     };
   };
@@ -632,18 +669,15 @@
    * 系统公告
    */
   const getNoticeList = () => {
-    baseApiNotice
-      .list({
-        pageNum: 1,
-        pageSize: 50,
-      })
+    baseApi
+      .notices()
       .then((res) => {
-        state.sysNoticeData = res.rows;
+        state.sysNoticeData = res.data?.rows || [];
+        noticeReadIdList.value = (res.data?.readIds || []).map(String);
       })
-      .catch(async (err) => {
-        ElMessage.warning(err);
-      })
-      .finally(() => {});
+      .catch(() => {
+        ElMessage.warning('公告加载失败，请稍后重试');
+      });
   };
 </script>
 

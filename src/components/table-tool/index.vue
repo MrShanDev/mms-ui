@@ -5,7 +5,7 @@
       <el-button-group>
         <!-- 新增 -->
         <el-button
-          size="small"
+          :size="size"
           type="primary"
           v-if="supportedActions.includes('insert')"
           @click="insert"
@@ -17,7 +17,7 @@
         </el-button>
         <!-- 删除 -->
         <el-button
-          size="small"
+          :size="size"
           type="danger"
           v-if="supportedActions.includes('delete')"
           @click="deletes"
@@ -29,7 +29,7 @@
         </el-button>
         <!-- 导入 -->
         <el-button
-          size="small"
+          :size="size"
           type="success"
           v-if="supportedActions.includes('import')"
           @click="openDialog"
@@ -41,7 +41,7 @@
         </el-button>
         <!-- 导出 -->
         <el-button
-          size="small"
+          :size="size"
           type="warning"
           v-if="supportedActions.includes('export')"
           @click="exportExcel"
@@ -53,7 +53,7 @@
         </el-button>
         <!-- 打印 -->
         <el-button
-          size="small"
+          :size="size"
           type="info"
           v-if="supportedActions.includes('print')"
           @click="print"
@@ -132,6 +132,7 @@
   });
   // 传入对象
   interface PropsType {
+    size?: 'small' | 'default' | 'large';
     fileType?: any[]; // 图片类型限制 ==> 非必传（默认为 ["image/jpeg", "image/png", "image/gif"]）
     functionName?: string;
     modelName?: string;
@@ -140,6 +141,7 @@
   }
   // Prop 组件传过来的值
   const props = withDefaults(defineProps<PropsType>(), {
+    size: 'default',
     fileType: () => ['xlsx'],
     functionName: '',
     modelName: 'system',

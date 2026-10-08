@@ -12,6 +12,7 @@ import {
 
 type PluginManifestLike = {
   id?: string;
+  version?: string;
   frontend?: {
     modulePackage?: string;
   };
@@ -19,6 +20,8 @@ type PluginManifestLike = {
 
 const scopeToPluginId = new Map<string, string>();
 const scopeRegistered = new Set<string>();
+const scopeVersions = new Map<string, string>();
+let generation = 0;
 let loaded = false;
 let loading: Promise<void> | null = null;
 
@@ -26,8 +29,8 @@ function normalizeScope(raw: string): string {
   return raw.trim();
 }
 
-function buildRemoteEntryUrl(pluginId: string): string {
-  return `/plugin-assets/${pluginId}/current/assets/remoteEntry.js`;
+function buildRemoteEntryUrl(pluginId: string, version: string): string {
+  return `/plugin-assets/${encodeURIComponent(pluginId)}/${encodeURIComponent(version)}/assets/remoteEntry.js`;
 }
 
 async function ensureManifestIndexLoaded(): Promise<void> {
@@ -41,13 +44,16 @@ async function ensureManifestIndexLoaded(): Promise<void> {
     const res = await fetchPluginManifests<any>();
     const arr = Array.isArray(res?.data) ? (res.data as PluginManifestLike[]) : [];
     scopeToPluginId.clear();
+    scopeVersions.clear();
     for (const m of arr) {
       const pid = String(m?.id ?? '').trim();
       const scope = normalizeScope(String(m?.frontend?.modulePackage ?? ''));
-      if (!pid || !scope) {
+      const version = String(m?.version ?? '').trim();
+      if (!pid || !scope || !version) {
         continue;
       }
       scopeToPluginId.set(scope, pid);
+      scopeVersions.set(scope, version);
     }
     loaded = true;
   })().finally(() => {
@@ -65,8 +71,9 @@ async function ensureScopeRemoteRegistered(scope: string): Promise<void> {
   if (!pluginId) {
     throw new Error(`未找到 scope 对应的已加载插件: ${scope}`);
   }
-  const remoteEntry = buildRemoteEntryUrl(pluginId);
-  setRemote(scope, {
+  const version = scopeVersions.get(scope)!;
+  const remoteEntry = buildRemoteEntryUrl(pluginId, version);
+  setRemote(`${scope}__${generation}`, {
     url: remoteEntry,
     from: 'vite',
     format: 'esm',
@@ -104,7 +111,7 @@ export function parseFederationComponentRef(component: string): FederationCompon
 
 export async function loadFederationComponent(scope: string, expose: string): Promise<unknown> {
   await ensureScopeRemoteRegistered(scope);
-  const mod = await getRemote(scope, expose);
+  const mod = await getRemote(`${scope}__${generation}`, expose);
 
   const candidates: unknown[] = [unwrapDefault(mod), (mod as any)?.default, mod];
 
@@ -118,4 +125,12 @@ export async function loadFederationComponent(scope: string, expose: string): Pr
   }
 
   throw new Error(`联邦组件解析失败: ${scope}${expose}`);
+}
+/** 插件变更后使用新运行时身份，避免 ESM/federation 缓存继续引用旧版本。 */
+export async function refreshPluginFederation(): Promise<void> {
+  if (loading) await loading;
+  loaded = false;
+  scopeRegistered.clear();
+  generation++;
+  await ensureManifestIndexLoaded();
 }
