@@ -11,6 +11,16 @@ export function fetchPluginMarketCards<T = any>(): AxiosPromise<T> {
   return request({ url: marketBase() + '/cards', method: 'get' });
 }
 
+/** 从服务端预置的受信 Gitee Release 下载、校验并安装；客户端只提交 pluginId。 */
+export function installOfficialPlugin<T = any>(pluginId: string): AxiosPromise<T> {
+  return request({
+    url: marketBase() + '/installRelease',
+    method: 'post',
+    data: { pluginId },
+    timeout: 600_000,
+  });
+}
+
 export function fetchPluginHostStatus<T = any>(): AxiosPromise<T> {
   return request({ url: hostBase() + '/status', method: 'get' });
 }

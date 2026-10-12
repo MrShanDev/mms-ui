@@ -217,6 +217,15 @@
             </div>
           </div>
           <div v-if="cardFootVisible(row)" class="plugin-card__foot" @click.stop>
+            <el-button
+              v-if="row.runtimeState === 'NOT_INSTALLED' && row.releaseVersion"
+              type="success"
+              link
+              :loading="releaseInstallingPluginId === row.pluginId"
+              :disabled="!!releaseInstallingPluginId && releaseInstallingPluginId !== row.pluginId"
+              :title="`自动下载安装官方版本 ${row.releaseVersion}`"
+              @click="onInstallRelease(row)"
+            >安装</el-button>
             <el-upload
               v-if="row.runtimeState === 'NOT_INSTALLED'"
               class="plugin-card__upload"
@@ -224,8 +233,15 @@
               accept=".jar"
               :http-request="(opt: UploadRequestOptions) => onUploadForRow(opt, row)"
             >
-              <el-button type="success" link>安装</el-button>
+              <el-button type="success" link>{{ row.releaseVersion ? '手动上传' : '安装' }}</el-button>
             </el-upload>
+            <el-link
+              v-if="row.releasePageUrl"
+              type="primary"
+              :href="row.releasePageUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+            >发行版 {{ row.releaseVersion }}</el-link>
             <el-button
               v-if="row.runtimeState === 'NOT_INSTALLED' && pluginLogVersion(row)"
               type="info"
@@ -764,6 +780,7 @@ import {
   fetchPluginHostHealth,
   fetchPluginLogTail,
   fetchPluginMarketCards,
+  installOfficialPlugin,
   fetchPluginManifests,
   purgePlugin,
   reloadPlugins,
@@ -1604,6 +1621,7 @@ async function onRollback(row: any) {
 const installFlowVisible = ref(false);
 const installFlowMode = ref<'install' | 'agreement'>('install');
 const pendingInstallFile = ref<File | null>(null);
+const releaseInstallingPluginId = ref<string | null>(null);
 
 const installFlowTitle = computed(() =>
   installFlowMode.value === 'agreement' ? '插件使用协议' : '插件安装'
@@ -1669,6 +1687,34 @@ async function onUploadForRow(opt: UploadRequestOptions, row: any) {
     detailVisible.value = false;
   } catch {
     /* */
+  }
+}
+
+async function onInstallRelease(row: any) {
+  if (!row?.pluginId || !row?.releaseVersion || releaseInstallingPluginId.value) return;
+  try {
+    await ElMessageBox.confirm(
+      `将从 mms 子项目发行版下载安装「${row.name}」${row.releaseVersion}，校验包体后执行插件自带安装 SQL 并激活。是否继续？`,
+      '安装官方插件',
+      { type: 'warning', confirmButtonText: '下载安装' }
+    );
+  } catch {
+    return;
+  }
+  releaseInstallingPluginId.value = row.pluginId;
+  try {
+    const result: any = await installOfficialPlugin(row.pluginId);
+    if (result?.code !== 200) {
+      ElMessage.error(result?.msg || '官方插件安装失败');
+      return;
+    }
+    detailVisible.value = false;
+    await Promise.all([loadAll(), refreshCurrentUserPermissionContext()]);
+    ElMessage.success(`${row.name} 已安装并激活`);
+  } catch {
+    /* request 拦截器已提示 */
+  } finally {
+    releaseInstallingPluginId.value = null;
   }
 }
 
