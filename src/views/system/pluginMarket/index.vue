@@ -61,10 +61,19 @@
       <p class="plugin-market__alert-p"><code>{{ statusBody.resolvedPluginsRoot }}</code></p>
     </el-alert>
 
-    <el-empty v-if="!loading && cards.length === 0" description="暂无插件" />
+    <el-tabs v-model="activeCategory" class="plugin-market__tabs" aria-label="插件分类">
+      <el-tab-pane v-for="category in pluginCategories" :key="category.name" :name="category.name">
+        <template #label>
+          <span>{{ category.label }}</span>
+          <span class="plugin-market__tab-count">{{ category.count }}</span>
+        </template>
+      </el-tab-pane>
+    </el-tabs>
+
+    <el-empty v-if="!loading && filteredCards.length === 0" :description="categoryEmptyDescription" />
 
     <el-row v-else :gutter="16" class="plugin-market__grid">
-      <el-col v-for="row in cards" :key="row.pluginId" :xs="24" :sm="12" :md="8" :lg="6">
+      <el-col v-for="row in filteredCards" :key="row.pluginId" :xs="24" :sm="12" :md="8" :lg="6">
         <el-card class="plugin-card" shadow="hover">
           <div
             class="plugin-card__media plugin-card__media--clickable"
@@ -72,8 +81,8 @@
             @click="openDetail(row)"
           >
             <el-image
-              v-if="resolvePluginMarketIconUrl(row.iconUrl)"
-              :src="resolvePluginMarketIconUrl(row.iconUrl)"
+              v-if="resolvePluginMarketIconUrl(row.iconUrl, row.pluginId)"
+              :src="resolvePluginMarketIconUrl(row.iconUrl, row.pluginId)"
               fit="contain"
               class="plugin-card__img"
               lazy
@@ -766,7 +775,20 @@ import PluginInstallUnifiedFlow from './components/PluginInstallUnifiedFlow.vue'
 import { getEnv } from '/@/utils/mms';
 
 /** 市场卡片封面：相对路径拼 API base，便于 dev 代理与跨端口部署下 img 正常加载 */
-function resolvePluginMarketIconUrl(url: string | undefined | null): string {
+const installedPluginCovers: Record<string, string> = {
+  'mms.plugin.c-base': '/plugin-covers/c-base.svg',
+  'mms.plugin.datasource': '/plugin-covers/datasource.svg',
+  'mms.plugin.redis-inspect': '/plugin-covers/redis-inspect.svg',
+  'mms.plugin.wechat-bot': '/plugin-covers/wechat-bot.svg',
+  'mms.plugin.doc': '/plugin-covers/doc-v2.png',
+  'mms.plugin.c-site': '/plugin-covers/site-v2.png',
+  'mms.plugin.syslog': '/plugin-covers/syslog-v2.png',
+  'mms.plugin.c-member': '/plugin-covers/member-v2.png',
+};
+
+function resolvePluginMarketIconUrl(url: string | undefined | null, pluginId?: string): string {
+  // Official artwork ships with the UI so installed cards also work without remote images.
+  if (pluginId && installedPluginCovers[pluginId]) return installedPluginCovers[pluginId];
   if (url == null) {
     return '';
   }
@@ -780,6 +802,8 @@ function resolvePluginMarketIconUrl(url: string | undefined | null): string {
   if (u.startsWith('//')) {
     return u;
   }
+  // Catalog covers are bundled with the UI, rather than served by the API.
+  if (u.startsWith('/plugin-covers/')) return u;
   if (u.startsWith('/')) {
     let base = getEnv('VITE_APP_BASE_API');
     if (base.endsWith('/')) {
@@ -826,6 +850,22 @@ const pluginRootConfigDiffers = computed(() => {
   return !!(c && r && c !== r);
 });
 const cards = ref<any[]>([]);
+type PluginCategory = 'all' | 'installed' | 'uninstalled';
+const activeCategory = ref<PluginCategory>('all');
+const isInstalledPlugin = (row: any) => row.runtimeState === 'LOADED' || row.runtimeState === 'ON_DISK';
+const pluginCategories = computed(() => [
+  { name: 'all', label: '全部', count: cards.value.length },
+  { name: 'installed', label: '已安装', count: cards.value.filter(isInstalledPlugin).length },
+  { name: 'uninstalled', label: '未安装', count: cards.value.filter(row => !isInstalledPlugin(row)).length },
+]);
+const filteredCards = computed(() => cards.value.filter(row => {
+  if (activeCategory.value === 'installed') return isInstalledPlugin(row);
+  if (activeCategory.value === 'uninstalled') return !isInstalledPlugin(row);
+  return true;
+}));
+const categoryEmptyDescription = computed(() => ({
+  all: '暂无插件', installed: '暂无已安装插件', uninstalled: '暂无未安装插件',
+})[activeCategory.value]);
 const detailVisible = ref(false);
 /** 详情弹窗 Tab：打开详情时重置为概览 */
 const detailActiveTab = ref('overview');
@@ -1807,6 +1847,21 @@ onMounted(() => loadAll());
   min-height: 100%;
   height: auto;
   flex: 0 0 auto;
+}
+.plugin-market__tabs {
+  margin: 4px 0 16px;
+  :deep(.el-tabs__header) { margin: 0; }
+  :deep(.el-tabs__item) { gap: 8px; font-size: 14px; }
+}
+.plugin-market__tab-count {
+  padding: 1px 7px;
+  border-radius: 10px;
+  background: var(--el-fill-color);
+  font-size: 12px;
+  line-height: 18px;
+}
+.plugin-market__tabs :deep(.is-active) .plugin-market__tab-count {
+  background: var(--el-color-primary-light-9);
 }
 .plugin-market__hero {
   display: flex;

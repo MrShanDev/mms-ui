@@ -85,9 +85,9 @@
 </template>
 
 <script setup lang="ts">
-import axios from 'axios';
 import { saveAs } from 'file-saver';
-import { usePluginLogViewer, Session, SysEnum } from '@mms-ui/plugin-common-kit';
+import { usePluginLogViewer } from '@mms-ui/plugin-common-kit';
+import { createHttp } from '@mms-ui/plugin-common-kit/api/request';
 import { ElButton, ElCard, ElForm, ElFormItem, ElInputNumber, ElMessage, ElOption, ElRadioButton, ElRadioGroup, ElSelect, ElSwitch } from 'element-plus';
 import { onUnmounted, ref, watch } from 'vue';
 
@@ -98,20 +98,7 @@ const API_BASE = RAW_BASE_API
   : (typeof window !== 'undefined' && /^(localhost|127\.0\.0\.1)$/i.test(window.location.hostname) ? '/prod-api' : '');
 const API = `${API_BASE}/plugin/${PLUGIN_ID}/syslog`;
 
-const http = axios.create({
-  baseURL: ((import.meta as any).env?.VITE_APP_BASE ?? '').toString(),
-  timeout: 50000,
-  headers: { 'Content-Type': 'application/json' },
-});
-
-http.interceptors.request.use((config) => {
-  const token = Session.get(SysEnum.TOKEN_KEY);
-  if (token) {
-    config.headers = config.headers ?? {};
-    (config.headers as any).Authorization = String(token);
-  }
-  return config;
-});
+const http = createHttp(((import.meta as any).env?.VITE_APP_BASE ?? '').toString());
 
 async function apiGet(url: string, params?: Record<string, any>) {
   const { data } = await http.get(url, { params });

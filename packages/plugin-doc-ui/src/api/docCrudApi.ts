@@ -7,5 +7,17 @@ const API_BASE = RAW_BASE_API
 
 /** 与后端 {@code doc/docXxx} 控制器路径一致 */
 export function docCrudApi(segment: string) {
-  return createCrudApi(`${API_BASE}/doc/${segment}`);
+  const api = createCrudApi(`${API_BASE}/doc/${segment}`);
+  const unwrap = async (request: Promise<any>) => {
+    const result = (await request).data;
+    if (result.code !== 200) throw new Error(result.msg || '请求失败');
+    return result;
+  };
+  return {
+    list: (params?: object) => unwrap(api.list(params)),
+    query: (id?: number | string) => unwrap(api.query(id)),
+    insert: (params?: object) => unwrap(api.insert(params)),
+    edit: (params?: object) => unwrap(api.edit(params)),
+    delete: (id?: number | string) => unwrap(api.delete(id)),
+  };
 }

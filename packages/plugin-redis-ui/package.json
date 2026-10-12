@@ -1,0 +1,29 @@
+{
+  "name": "@mms-ui/plugin-redis-ui",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Redis \u9884\u89c8\u7ba1\u7406\u7aef\u8054\u90a6\u9875\u9762",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 5175"
+  },
+  "dependencies": {
+    "@mms-ui/plugin-common-kit": "workspace:*"
+  },
+  "devDependencies": {
+    "@originjs/vite-plugin-federation": "^1.4.1",
+    "@vitejs/plugin-vue": "^5.2.4",
+    "typescript": "^5.9.2",
+    "vite": "^6.3.5",
+    "vue": "^3.5.21",
+    "vue-tsc": "^2.2.12"
+  },
+  "peerDependencies": {
+    "element-plus": "^2.11.2",
+    "pinia": "^2.0.34",
+    "vue": "^3.5.21",
+    "vue-router": "^4.3.2"
+  }
+}
